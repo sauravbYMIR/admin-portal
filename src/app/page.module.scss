@@ -1,0 +1,165 @@
+.landingPageContainer {
+  width: 100%;
+  height: 100vh;
+  display: flex;
+  box-sizing: border-box;
+  overflow: hidden;
+  background: var(--Colour-Primary-6, #f2fafc);
+
+  .landingPageLeftSection {
+    width: 50%;
+
+    .brandLogoImg {
+      padding: 24px 0 0 80px;
+    }
+
+    .contentContainer {
+      padding: 148px 0 0 80px;
+
+      .otpInputContainer {
+        display: flex;
+        flex-direction: column;
+        gap: 8px;
+        align-items: flex-start;
+
+        .otpInputLabel {
+          color: var(--Colour-Neutral-2, #434956);
+          text-align: right;
+          font-family: Lexend;
+          font-size: 20px;
+          font-style: normal;
+          font-weight: 400;
+          line-height: 100%;
+        }
+
+        .otpInputsWrapper {
+          display: flex;
+          gap: 20px;
+
+          .otpInputBox {
+            border-radius: 8px;
+            border: 1px solid #d9dee7;
+            background: #fff;
+            width: 79px;
+            height: 64px;
+            text-align: center;
+          }
+        }
+      }
+
+      .otpHeadingText {
+        color: #024471;
+        font-family: Poppins;
+        font-size: 48px;
+        font-style: normal;
+        font-weight: 500;
+        line-height: 112%;
+        margin: 0;
+        margin-bottom: 13px;
+      }
+
+      .otpDesc {
+        color: var(--Colour-Neutral-2, #434956);
+        font-family: Poppins;
+        font-size: 16px;
+        font-style: normal;
+        font-weight: 400;
+        line-height: 20px;
+        margin: 0;
+        margin-bottom: 80px;
+      }
+
+      .resendOtpText {
+        color: #3b475e;
+        font-family: Poppins;
+        font-size: 16px;
+        font-style: normal;
+        font-weight: 400;
+        line-height: 128%;
+        margin: 43px 0 59px;
+
+        span {
+          color: var(--Colour-Primary-2, #096f90);
+          font-weight: 500;
+        }
+      }
+
+      .headingText {
+        color: #024471;
+        font-family: Poppins;
+        font-size: 48px;
+        font-style: normal;
+        font-weight: 500;
+        line-height: 112%;
+        margin: 0;
+        margin-bottom: 113px;
+      }
+
+      .emailLabel {
+        color: #000;
+        text-align: center;
+        font-family: Inter;
+        font-size: 20px;
+        font-style: normal;
+        font-weight: 400;
+        line-height: 100%;
+        display: flex;
+        gap: 8px;
+        flex-direction: column;
+        align-items: flex-start;
+        margin-bottom: 122px;
+
+        .emailInput {
+          box-sizing: border-box;
+          border-radius: 10.667px;
+          border: 2px solid #d9dee7;
+          background: #fff;
+          padding: 0px 12px;
+          width: 360px;
+          height: 68px;
+          outline: none;
+          overflow: hidden;
+          color: #1a1a1e;
+          text-overflow: ellipsis;
+          font-family: Inter;
+          font-size: 24px;
+          font-style: normal;
+          font-weight: 400;
+          line-height: 100%;
+        }
+      }
+
+      .landingPageCtaBtn {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        width: 262px;
+        height: 64px;
+        border-radius: 6px;
+        background: #096f90;
+
+        .ctaBtnText {
+          color: var(--Colour-Neutral-7, #f7f9fa);
+          font-family: Poppins;
+          font-size: 24px;
+          font-style: normal;
+          font-weight: 400;
+          line-height: 150%;
+        }
+      }
+
+      .landingPageCtaBtn:hover {
+        background: var(--Colour-Primary-1, #0c4e64);
+      }
+    }
+  }
+
+  .landingPageRightSection {
+    width: 50%;
+
+    .bannerImg {
+      width: 100%;
+      height: 100%;
+    }
+  }
+}

@@ -1,0 +1,26 @@
+.inputContainer {
+  gap: 20px;
+}
+
+.input {
+  width: 79px !important;
+  height: 64px;
+  box-sizing: border-box;
+  border-radius: 8.049px;
+  border: 1.509px solid #d9dee7;
+  background: #fff;
+  padding: 4px;
+}
+
+.input[type="number"] {
+  -moz-appearance: textfield;
+  appearance: textfield;
+  -webkit-appearance: textfield;
+  appearance: textfield;
+}
+
+.input[type="number"]::-webkit-inner-spin-button,
+.input[type="number"]::-webkit-outer-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}

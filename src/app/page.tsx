@@ -5,8 +5,10 @@
 // eslint-disable-next-line import/no-extraneous-dependencies
 import { FbtButton } from '@frontbase/components-react';
 import Image from 'next/image';
+import { useRouter } from 'next/navigation';
 import React, { useState } from 'react';
 
+import { OTPInput } from '@/components';
 import arrowIcon from '@/public/assets/icons/whiteArrow.svg';
 import brandLogo from '@/public/assets/images/brandLogo.svg';
 import landingPageBanner from '@/public/assets/images/landingPageBanner.png';
@@ -15,11 +17,8 @@ import style from './page.module.scss';
 
 function LandingPage() {
   const [isEmailSubmit, setIsEmailSubmit] = useState(false);
-  const [otp, setOtp] = useState(['', '', '', '']);
 
-  const otpInputHandler = () => {
-    setOtp(['', '', '', '']);
-  };
+  const router = useRouter();
 
   return (
     <div className={style.landingPageContainer}>
@@ -38,21 +37,7 @@ function LandingPage() {
             <div className={style.otpInputContainer}>
               <label className={style.otpInputLabel}>OTP</label>
 
-              <div className={style.otpInputsWrapper}>
-                {otp.map((digit, index) => {
-                  return (
-                    <input
-                      className={style.otpInputBox}
-                      type="number"
-                      // eslint-disable-next-line react/no-array-index-key
-                      key={index * index}
-                      value={digit}
-                      maxLength={1}
-                      onChange={otpInputHandler}
-                    />
-                  );
-                })}
-              </div>
+              <OTPInput />
             </div>
 
             <p className={style.resendOtpText}>
@@ -63,6 +48,7 @@ function LandingPage() {
               className={style.landingPageCtaBtn}
               size="sm"
               variant="solid"
+              onClick={() => router.push('/patients')}
             >
               <p className={style.ctaBtnText}>Verify email</p>
               <Image src={arrowIcon} alt="arrow icon cta button" />

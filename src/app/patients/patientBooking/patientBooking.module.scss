@@ -1,0 +1,122 @@
+.patientBookingContentContainer {
+  padding: 60px;
+
+  .backIcon {
+    padding-left: 15px;
+    margin-bottom: 41px;
+  }
+
+  .title {
+    padding-left: 20px;
+    margin: 0;
+    margin-bottom: 30px;
+  }
+
+  .firstSectionContentContainer {
+    padding: 23px 20px;
+    background: var(--Colour-Neutral-7, #f7f9fa);
+
+    .patientTagContainer {
+      display: flex;
+      gap: 16px;
+      align-items: center;
+      margin-bottom: 38px;
+
+      .patientIdTag {
+        border-radius: 8px;
+        background: var(--Colour-Primary-5, #e1f7fe);
+        padding: 5px 10px;
+        color: var(--Colour-Primary-1, #0c4e64);
+        font-family: "Clash Display Variable";
+        font-size: 16px;
+        font-style: normal;
+        font-weight: 460;
+        line-height: 20px;
+      }
+
+      .patientStatusTag {
+        border-radius: 8px;
+        background: var(--Error-3, #fdeded);
+        padding: 8px 12px;
+        color: var(--Error-1, #900012);
+        font-family: Lexend;
+        font-size: 14px;
+        font-style: normal;
+        font-weight: 400;
+        line-height: 100%;
+      }
+    }
+
+    .patientsInfoContainer {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 20px 345px;
+
+      .patientInfoContainer {
+        display: flex;
+        flex-direction: column;
+        gap: 8px;
+        align-items: flex-start;
+
+        .infoLabel {
+          color: var(--Colour-Neutral-2, #434956);
+          font-family: Lexend;
+          font-size: 14px;
+          font-style: normal;
+          font-weight: 300;
+          line-height: 18px;
+          letter-spacing: -0.28px;
+          margin: 0;
+        }
+
+        .infoValue {
+          color: var(--Neutral-background, #1e1e1e);
+          text-align: right;
+          font-family: Poppins;
+          font-size: 16px;
+          font-style: normal;
+          font-weight: 500;
+          line-height: 20px;
+          margin: 0;
+        }
+      }
+    }
+  }
+
+  .secondSectionContentContainer {
+    padding: 68px 20px;
+    width: 60%;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 82px 300px;
+    
+    .patientInfoContainer {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      align-items: flex-start;
+
+      .infoLabel {
+        color: var(--Colour-Neutral-2, #434956);
+        font-family: Lexend;
+        font-size: 14px;
+        font-style: normal;
+        font-weight: 300;
+        line-height: 18px;
+        letter-spacing: -0.28px;
+        margin: 0;
+      }
+
+      .infoValue {
+        color: var(--Neutral-background, #1e1e1e);
+        text-align: right;
+        font-family: Poppins;
+        font-size: 16px;
+        font-style: normal;
+        font-weight: 500;
+        line-height: 20px;
+        margin: 0;
+      }
+    }
+  }
+}

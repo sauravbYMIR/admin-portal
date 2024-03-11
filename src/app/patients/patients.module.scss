@@ -1,0 +1,25 @@
+.patientsPageContentContainer {
+  padding: 80px;
+
+  .patientsPageTitle {
+    color: var(--Colour-Primary-1, #0c4e64);
+    font-family: Poppins;
+    font-size: 36px;
+    font-style: normal;
+    font-weight: 500;
+    line-height: 40px;
+    margin: 0;
+    margin-bottom: 12px;
+  }
+
+  .patientsPageDesc {
+    color: var(--Colour-Neutral-2, #434956);
+    font-family: Poppins;
+    font-size: 16px;
+    font-style: normal;
+    font-weight: 400;
+    line-height: 20px;
+    margin: 0;
+    margin-bottom: 23px;
+  }
+}

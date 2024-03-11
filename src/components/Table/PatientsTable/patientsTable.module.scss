@@ -1,0 +1,54 @@
+.patientsTableBtnContainer {
+  display: flex;
+  gap: 40px;
+  margin-top: 5px;
+
+  .patientsTableAcceptBtn {
+    border-radius: 6.4px;
+    background: var(--Colour-Primary-2, #096f90);
+    height: 30px;
+    padding: 4px 24px;
+    box-sizing: border-box;
+    border: none;
+    outline: none;
+    color: var(--Colour-Neutral-7, #f7f9fa);
+    font-family: Poppins;
+    font-size: 16px;
+    font-style: normal;
+    font-weight: 400;
+    line-height: 150%;
+  }
+
+  .patientsTableAcceptBtn:hover {
+    border-radius: 6px;
+    background: var(--Colour-Primary-1, #0c4e64);
+  }
+
+  .patientsTableRejectBtn {
+    border-radius: 6.4px;
+    border: 2px solid var(--Colour-Primary-2, #096f90);
+    height: 30px;
+    padding: 4px 24px;
+    box-sizing: border-box;
+    outline: none;
+    color: var(--Colour-Primary-2, #096f90);
+    font-family: Poppins;
+    font-size: 16px;
+    font-style: normal;
+    font-weight: 500;
+    line-height: 150%;
+    background: transparent;
+  }
+
+  .patientsTableRejectBtn:hover {
+    border-radius: 5.963px;
+    border: 2px solid var(--Colour-Primary-1, #0c4e64);
+    color: var(--Colour-Primary-1, #0c4e64);
+    background: transparent;
+  }
+
+  .patientsTableInfoLink {
+    cursor: pointer;
+    margin-left: auto;
+  }
+}

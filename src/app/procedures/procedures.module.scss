@@ -1,0 +1,77 @@
+.proceduresPageContentContainer {
+  padding: 80px;
+
+  .titleContainer {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    padding-left: 7px;
+    margin-bottom: 72px;
+
+    .title {
+      color: var(--Colour-Primary-1, #0c4e64);
+      font-family: Poppins;
+      font-size: 36px;
+      font-style: normal;
+      font-weight: 500;
+      line-height: 40px;
+      margin: 0;
+    }
+
+    .desc {
+      color: var(--Colour-Neutral-2, #434956);
+      font-family: Poppins;
+      font-size: 16px;
+      font-style: normal;
+      font-weight: 400;
+      line-height: 20px;
+      margin: 0;
+    }
+  }
+
+  .addDepartmentContainer {
+    border-radius: 12px;
+    border: 1px solid var(--Colour-Primary-3, #3da1c2);
+    background: var(--Colour-Neutral-7, #f7f9fa);
+    box-shadow: 2px 2px 4px 1px rgba(9, 111, 144, 0.1);
+    display: flex;
+    width: 100%;
+    padding: 48px 178px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 48px;
+    box-sizing: border-box;
+
+    .subTitle {
+      color: var(--Colour-Neutral-1, #181b20);
+      text-align: center;
+      font-family: Poppins;
+      font-size: 32px;
+      font-style: normal;
+      font-weight: 500;
+      line-height: 28px;
+      margin: 0;
+    }
+
+    .addDepartmentBtn {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      width: 262px;
+      height: 64px;
+      border-radius: 8px;
+      background: var(--Colour-Primary-2, #096f90);
+
+      .btnText {
+        color: var(--Colour-Neutral-7, #f7f9fa);
+        font-family: Poppins;
+        font-size: 24px;
+        font-style: normal;
+        font-weight: 400;
+        line-height: 150%;
+        margin: 0;
+      }
+    }
+  }
+}

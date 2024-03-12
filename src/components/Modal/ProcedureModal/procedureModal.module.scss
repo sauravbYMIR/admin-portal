@@ -1,0 +1,315 @@
+.modalOverlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.5);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 10;
+
+  .modal {
+    width: 740px;
+    padding: 32px 48px 48px;
+    display: flex;
+    flex-direction: column;
+    border-radius: 8px;
+    background: #fff;
+    box-sizing: border-box;
+    box-shadow: 0px 4px 4px 0px rgba(0, 0, 0, 0.25);
+    overflow: scroll;
+    max-height: 90vh;
+
+    .modalHeader {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 64px;
+
+      h2 {
+        color: var(--Neutral-4, #282828);
+        font-family: Poppins;
+        font-size: 32px;
+        font-style: normal;
+        font-weight: 500;
+        line-height: 45.7px;
+        margin: 0;
+      }
+
+      .closeButton {
+        cursor: pointer;
+      }
+    }
+
+    .modalBody {
+      .radioSelectContainer {
+        display: flex;
+        align-items: center;
+        gap: 60px;
+        margin-bottom: 24px;
+
+        .radioWrapper {
+          display: flex;
+          align-items: center;
+          gap: 20px;
+
+          .radio {
+            margin: 0;
+          }
+
+          .radioLabel {
+            color: #09090b;
+            font-family: Inter;
+            font-size: 17.5px;
+            font-style: normal;
+            font-weight: 400;
+            line-height: 100%;
+
+            span {
+              color: #09090b;
+              font-family: Inter;
+              font-size: 17.5px;
+              font-style: normal;
+              font-weight: 500;
+              line-height: 100%;
+            }
+          }
+        }
+      }
+
+      .createProcedureFormContainer {
+        .procedureReimbursementInputContainer {
+          display: flex;
+          flex-direction: column;
+          gap: 20px;
+
+          .procedureReimbursementInput {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+
+            label {
+              color: #000;
+              font-family: Poppins;
+              font-size: 20px;
+              font-style: normal;
+              font-weight: 400;
+              line-height: 100%;
+            }
+
+            .inputWrapper {
+              border-radius: 10px;
+              border: 2px solid var(--Colour-Neutral-5, #e0e4eb);
+              background: #fff;
+              display: flex;
+              align-items: center;
+              height: 64px;
+              box-sizing: border-box;
+
+              .countryCodeWrapper {
+                border-radius: 8px;
+                border: 1px solid var(--Colour-Neutral-5, #e0e4eb);
+                background: var(--Colour-Neutral-6, #eceff3);
+                display: flex;
+                padding: 12px;
+                align-items: center;
+                gap: 8px;
+                height: 64px;
+                box-sizing: border-box;
+
+                img {
+                  border-radius: 100px;
+                }
+
+                span {
+                  overflow: hidden;
+                  color: var(--Colour-Neutral-2, #434956);
+                  text-overflow: ellipsis;
+                  font-family: Poppins;
+                  font-size: 20px;
+                  font-style: normal;
+                  font-weight: 400;
+                  line-height: 20px;
+                }
+              }
+
+              input {
+                width: 100%;
+                height: 64px;
+                box-sizing: border-box;
+                outline: none;
+                border-radius: 0 10px 10px 0;
+                border: 2px solid var(--Colour-Neutral-5, #e0e4eb);
+                border-right: 0;
+                border-left: 0;
+                background: #fff;
+                overflow: hidden;
+                color: #000;
+                text-overflow: ellipsis;
+                font-family: Lexend;
+                font-size: 20px;
+                font-style: normal;
+                font-weight: 300;
+                line-height: 100%;
+                padding-left: 12px;
+              }
+            }
+          }
+        }
+      }
+
+      .departmentInputLabel {
+        color: #000;
+        font-family: Inter;
+        font-size: 20px;
+        font-style: normal;
+        font-weight: 400;
+        line-height: 100%;
+      }
+
+      .departmentInput {
+        border-radius: 10.667px;
+        border: 2px solid #d9dee7;
+        background: #fff;
+        padding: 0px 12px;
+        height: 64px;
+        width: 100%;
+        box-sizing: border-box;
+        overflow: hidden;
+        color: #1a1a1e;
+        text-overflow: ellipsis;
+        font-family: Inter;
+        font-size: 24px;
+        font-style: normal;
+        font-weight: 400;
+        line-height: 100%;
+        outline: none;
+        margin: 8px 0 24px;
+      }
+
+      .subCategoryInputLabel {
+        color: #000;
+        font-family: Inter;
+        font-size: 20px;
+        font-style: normal;
+        font-weight: 400;
+        line-height: 100%;
+      }
+
+      .languageTabContainer {
+        display: flex;
+        gap: 8px;
+        align-items: center;
+        margin: 20px 0;
+
+        button {
+          border-radius: 8px;
+          background: var(--Colour-Primary-6, #f2fafc);
+          box-shadow: 0px 2px 2px 0px rgba(0, 0, 0, 0.1);
+          color: var(--Colour-Primary-1, #0c4e64);
+          font-family: Poppins;
+          font-size: 16px;
+          font-style: normal;
+          font-weight: 500;
+          line-height: 20px;
+          padding: 12px 10px;
+          margin: 0;
+          border: none;
+        }
+
+        .activeLanguageTab {
+          border-radius: 8px;
+          background: var(--Colour-Neutral-7, #f7f9fa);
+          box-shadow: 0px 2px 2px 0px rgba(0, 0, 0, 0.1);
+          border: 1.4px solid var(--Colour-Primary-2, #096f90);
+          color: var(--Colour-Primary-2, #096f90);
+        }
+      }
+
+      .subCategoryInput {
+        border-radius: 10.667px;
+        border: 2px solid #d9dee7;
+        background: #fff;
+        padding: 0px 12px;
+        height: 64px;
+        width: 100%;
+        box-sizing: border-box;
+        overflow: hidden;
+        color: #1a1a1e;
+        text-overflow: ellipsis;
+        font-family: Inter;
+        font-size: 24px;
+        font-style: normal;
+        font-weight: 400;
+        line-height: 100%;
+        outline: none;
+        margin-bottom: 64px;
+      }
+
+      .procedureInput {
+        border-radius: 10.667px;
+        border: 2px solid #d9dee7;
+        background: #fff;
+        padding: 0px 12px;
+        height: 64px;
+        width: 100%;
+        box-sizing: border-box;
+        overflow: hidden;
+        color: #1a1a1e;
+        text-overflow: ellipsis;
+        font-family: Inter;
+        font-size: 24px;
+        font-style: normal;
+        font-weight: 400;
+        line-height: 100%;
+        outline: none;
+        margin-bottom: 64px;
+      }
+
+      .procedureCheckboxContainer {
+        display: flex;
+        align-items: center;
+        gap: 24px;
+        margin-bottom: 24px;
+
+        .checkbox {
+          border-radius: 6px;
+          border: 1.5px solid #64646a;
+          background: rgba(255, 255, 255, 0);
+          margin: 0;
+        }
+
+        .checkboxLabel {
+          color: var(--Colour-Neutral-2, #434956);
+          font-family: Lexend;
+          font-size: 20px;
+          font-style: normal;
+          font-weight: 400;
+          line-height: 100%;
+        }
+      }
+
+      .createProcedureBtn {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        width: 262px;
+        height: 64px;
+        border-radius: 8px;
+        background: var(--Colour-Primary-2, #096f90);
+
+        .btnText {
+          font-family: Poppins;
+          font-size: 24px;
+          font-style: normal;
+          font-weight: 400;
+          line-height: 150%;
+          margin: 0;
+          color: var(--Colour-Primary-6, #f2fafc);
+        }
+      }
+    }
+  }
+}

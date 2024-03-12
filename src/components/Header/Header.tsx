@@ -14,7 +14,7 @@ import brandLogo from '@/public/assets/images/brandLogo.svg';
 
 import headerStyle from './header.module.scss';
 
-const menuItems = ['How it works', 'Our Hospitals', 'FAQs'];
+const menuItems = ['Patients', 'Procedures', 'Hospitals'];
 
 function Header() {
   return (

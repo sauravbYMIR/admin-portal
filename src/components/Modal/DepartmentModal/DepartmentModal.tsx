@@ -1,9 +1,12 @@
+'use client';
+
 /* eslint-disable jsx-a11y/label-has-associated-control */
 import { FbtButton } from '@frontbase/components-react';
 import Image from 'next/image';
 import { useState } from 'react';
 
 import closeIcon from '@/public/assets/icons/close.svg';
+import { languages } from '@/utils/global';
 
 import departmentModalStyle from './departmentModal.module.scss';
 
@@ -42,53 +45,22 @@ function DepartmentModal({ isOpen, onClose, isEdit }: DepartmentModalProps) {
               </label>
 
               <div className={departmentModalStyle.languageTabContainer}>
-                <button
-                  onClick={() => setActiveLanguageTab('English')}
-                  className={
-                    activeLanguageTab === 'English'
-                      ? departmentModalStyle.activeLanguageTab
-                      : ''
-                  }
-                  type="button"
-                >
-                  English
-                </button>
-
-                <button
-                  onClick={() => setActiveLanguageTab('Norwegian')}
-                  type="button"
-                  className={
-                    activeLanguageTab === 'Norwegian'
-                      ? departmentModalStyle.activeLanguageTab
-                      : ''
-                  }
-                >
-                  Norwegian
-                </button>
-
-                <button
-                  onClick={() => setActiveLanguageTab('Danish')}
-                  className={
-                    activeLanguageTab === 'Danish'
-                      ? departmentModalStyle.activeLanguageTab
-                      : ''
-                  }
-                  type="button"
-                >
-                  Danish
-                </button>
-
-                <button
-                  onClick={() => setActiveLanguageTab('Swedish')}
-                  className={
-                    activeLanguageTab === 'Swedish'
-                      ? departmentModalStyle.activeLanguageTab
-                      : ''
-                  }
-                  type="button"
-                >
-                  Swedish
-                </button>
+                {languages.map((lang) => {
+                  return (
+                    <button
+                      key={lang.id}
+                      onClick={() => setActiveLanguageTab(lang.name)}
+                      className={
+                        activeLanguageTab === lang.name
+                          ? departmentModalStyle.activeLanguageTab
+                          : ''
+                      }
+                      type="button"
+                    >
+                      {lang.name}
+                    </button>
+                  );
+                })}
               </div>
 
               <input
@@ -97,25 +69,39 @@ function DepartmentModal({ isOpen, onClose, isEdit }: DepartmentModalProps) {
                 placeholder="Enter department"
               />
 
-              <div className={departmentModalStyle.departmentCheckboxContainer}>
-                <input
-                  className={departmentModalStyle.checkbox}
-                  type="checkbox"
-                />
-                <label className={departmentModalStyle.checkboxLabel}>
-                  Create another department
-                </label>
-              </div>
+              {!isEdit && (
+                <div
+                  className={departmentModalStyle.departmentCheckboxContainer}
+                >
+                  <input
+                    className={departmentModalStyle.checkbox}
+                    type="checkbox"
+                  />
+                  <label className={departmentModalStyle.checkboxLabel}>
+                    Create another department
+                  </label>
+                </div>
+              )}
 
-              <FbtButton
-                className={departmentModalStyle.createDepartmentBtn}
-                size="sm"
-                variant="solid"
-              >
-                <p className={departmentModalStyle.btnText}>
-                  Create department
-                </p>
-              </FbtButton>
+              {isEdit ? (
+                <FbtButton
+                  className={departmentModalStyle.createDepartmentBtn}
+                  size="sm"
+                  variant="solid"
+                >
+                  <p className={departmentModalStyle.btnText}>Save changes</p>
+                </FbtButton>
+              ) : (
+                <FbtButton
+                  className={departmentModalStyle.createDepartmentBtn}
+                  size="sm"
+                  variant="solid"
+                >
+                  <p className={departmentModalStyle.btnText}>
+                    Create department
+                  </p>
+                </FbtButton>
+              )}
             </div>
           </div>
         </div>

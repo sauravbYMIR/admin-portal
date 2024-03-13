@@ -29,6 +29,33 @@
     }
   }
 
+  .addDeptProcedureBtnContainer {
+    display: flex;
+    align-items: center;
+    gap: 24px;
+    margin-bottom: 42px;
+
+    .addDepartmentBtn {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 12px 24px;
+      box-sizing: border-box;
+      height: 48px;
+      border-radius: 8px;
+      background: var(--Colour-Primary-2, #096f90);
+
+      .btnText {
+        color: #fff;
+        font-family: Poppins;
+        font-size: 16px;
+        font-style: normal;
+        font-weight: 500;
+        line-height: 150%;
+      }
+    }
+  }
+
   .addDepartmentContainer {
     border-radius: 12px;
     border: 1px solid var(--Colour-Primary-3, #3da1c2);
@@ -58,7 +85,7 @@
       display: flex;
       align-items: center;
       gap: 12px;
-      width: 262px;
+      padding: 12px 24px;
       height: 64px;
       border-radius: 8px;
       background: var(--Colour-Primary-2, #096f90);
@@ -71,6 +98,34 @@
         font-weight: 400;
         line-height: 150%;
         margin: 0;
+      }
+    }
+  }
+
+  .departmentAccordionContainer {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+
+    .proceduresAccordionContainer {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+
+    .subCategoryAccordionContainer {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+
+    .subCategoryTitleWrapper {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+
+      .subCategoryEditIcon {
+        margin-right: 46px;
       }
     }
   }

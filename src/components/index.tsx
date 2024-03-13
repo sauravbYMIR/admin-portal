@@ -1,3 +1,4 @@
+import Accordion from './Accordion/Accordion';
 import Dropdown from './Dropdown/Dropdown';
 import Header from './Header/Header';
 import DepartmentModal from './Modal/DepartmentModal/DepartmentModal';
@@ -7,6 +8,7 @@ import OTPInput from './OtpInput/OtpInput';
 import PatientsTable from './Table/PatientsTable/PatientsTable';
 
 export {
+  Accordion,
   DepartmentModal,
   Dropdown,
   Header,

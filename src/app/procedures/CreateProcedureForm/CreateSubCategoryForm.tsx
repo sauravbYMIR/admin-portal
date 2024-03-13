@@ -6,6 +6,11 @@ import { useState } from 'react';
 // eslint-disable-next-line import/no-cycle
 import { Dropdown } from '@/components';
 import procedureModalStyle from '@/components/Modal/ProcedureModal/procedureModal.module.scss';
+import type {
+  IntialLanguagesDataType,
+  LanguagesType,
+} from '@/types/components';
+import { intialLanguagesData, languages } from '@/utils/global';
 
 const options = [
   { value: 'epilepsy', label: 'epilepsy' },
@@ -16,21 +21,20 @@ const options = [
   { value: 'tuberclusios', label: 'tuberclusios' },
 ];
 
-function CreateSubCategoryForm() {
+interface CreateSubCategoryFormPropType {
+  isEdit: boolean;
+}
+
+function CreateSubCategoryForm({ isEdit }: CreateSubCategoryFormPropType) {
   const [selectedDepartment, setSelectedDepartment] = useState('');
   const [createAnotherSubCategory, setCreateAnotherSubCategory] =
     useState(false);
 
-  const [activeLanguageTab, setActiveLanguageTab] = useState<
-    'English' | 'Norwegian' | 'Danish' | 'Swedish'
-  >('English');
+  const [activeLanguageTab, setActiveLanguageTab] =
+    useState<LanguagesType>('English');
 
-  const [subCategory, setSubCategory] = useState({
-    English: '',
-    Norwegian: '',
-    Danish: '',
-    Swedish: '',
-  });
+  const [subCategory, setSubCategory] =
+    useState<IntialLanguagesDataType>(intialLanguagesData);
 
   const handleSelect = (value: string) => {
     setSelectedDepartment(value);
@@ -49,12 +53,7 @@ function CreateSubCategoryForm() {
     setSelectedDepartment('');
     setCreateAnotherSubCategory(false);
     setActiveLanguageTab('English');
-    setSubCategory({
-      English: '',
-      Norwegian: '',
-      Danish: '',
-      Swedish: '',
-    });
+    setSubCategory(intialLanguagesData);
   };
 
   return (
@@ -81,53 +80,22 @@ function CreateSubCategoryForm() {
       </label>
 
       <div className={procedureModalStyle.languageTabContainer}>
-        <button
-          onClick={() => setActiveLanguageTab('English')}
-          className={
-            activeLanguageTab === 'English'
-              ? procedureModalStyle.activeLanguageTab
-              : ''
-          }
-          type="button"
-        >
-          English
-        </button>
-
-        <button
-          onClick={() => setActiveLanguageTab('Norwegian')}
-          type="button"
-          className={
-            activeLanguageTab === 'Norwegian'
-              ? procedureModalStyle.activeLanguageTab
-              : ''
-          }
-        >
-          Norwegian
-        </button>
-
-        <button
-          onClick={() => setActiveLanguageTab('Danish')}
-          className={
-            activeLanguageTab === 'Danish'
-              ? procedureModalStyle.activeLanguageTab
-              : ''
-          }
-          type="button"
-        >
-          Danish
-        </button>
-
-        <button
-          onClick={() => setActiveLanguageTab('Swedish')}
-          className={
-            activeLanguageTab === 'Swedish'
-              ? procedureModalStyle.activeLanguageTab
-              : ''
-          }
-          type="button"
-        >
-          Swedish
-        </button>
+        {languages.map((lang) => {
+          return (
+            <button
+              key={lang.id}
+              onClick={() => setActiveLanguageTab(lang.name)}
+              className={
+                activeLanguageTab === lang.name
+                  ? procedureModalStyle.activeLanguageTab
+                  : ''
+              }
+              type="button"
+            >
+              {lang.name}
+            </button>
+          );
+        })}
       </div>
 
       <input
@@ -138,26 +106,40 @@ function CreateSubCategoryForm() {
         onChange={handleSubCategoryChange}
       />
 
-      <div className={procedureModalStyle.procedureCheckboxContainer}>
-        <input
-          onClick={() => setCreateAnotherSubCategory(!createAnotherSubCategory)}
-          checked={createAnotherSubCategory}
-          className={procedureModalStyle.checkbox}
-          type="checkbox"
-        />
-        <label className={procedureModalStyle.checkboxLabel}>
-          Create another sub category
-        </label>
-      </div>
+      {!isEdit && (
+        <div className={procedureModalStyle.procedureCheckboxContainer}>
+          <input
+            onClick={() =>
+              setCreateAnotherSubCategory(!createAnotherSubCategory)
+            }
+            checked={createAnotherSubCategory}
+            className={procedureModalStyle.checkbox}
+            type="checkbox"
+          />
+          <label className={procedureModalStyle.checkboxLabel}>
+            Create another sub category
+          </label>
+        </div>
+      )}
 
-      <FbtButton
-        className={procedureModalStyle.createProcedureBtn}
-        size="sm"
-        variant="solid"
-        onClick={handleCreateSubCategory}
-      >
-        <p className={procedureModalStyle.btnText}>Create sub category</p>
-      </FbtButton>
+      {isEdit ? (
+        <FbtButton
+          className={procedureModalStyle.createProcedureBtn}
+          size="sm"
+          variant="solid"
+        >
+          <p className={procedureModalStyle.btnText}>Save changes</p>
+        </FbtButton>
+      ) : (
+        <FbtButton
+          className={procedureModalStyle.createProcedureBtn}
+          size="sm"
+          variant="solid"
+          onClick={handleCreateSubCategory}
+        >
+          <p className={procedureModalStyle.btnText}>Create sub category</p>
+        </FbtButton>
+      )}
     </div>
   );
 }

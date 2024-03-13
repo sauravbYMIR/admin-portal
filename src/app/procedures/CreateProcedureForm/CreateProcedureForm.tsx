@@ -7,17 +7,15 @@ import { useState } from 'react';
 // eslint-disable-next-line import/no-cycle
 import { Dropdown } from '@/components';
 import procedureModalStyle from '@/components/Modal/ProcedureModal/procedureModal.module.scss';
-import denmarkFlag from '@/public/assets/icons/denmarkFlag.svg';
-import irelandFlag from '@/public/assets/icons/irelandFlag.svg';
-import norwayFlag from '@/public/assets/icons/norwayFlag.svg';
-import swedenFlag from '@/public/assets/icons/swedenFlag.svg';
-
-const reimbursementInputData = [
-  { label: 'Denmark', iconSrc: denmarkFlag, code: 'DKK' },
-  { label: 'Norway', iconSrc: norwayFlag, code: 'NOK' },
-  { label: 'Ireland', iconSrc: irelandFlag, code: 'EUR' },
-  { label: 'Sweden', iconSrc: swedenFlag, code: 'SEK' },
-];
+import type {
+  IntialLanguagesDataType,
+  LanguagesType,
+} from '@/types/components';
+import {
+  intialLanguagesData,
+  languages,
+  reimbursementInputData,
+} from '@/utils/global';
 
 const options = [
   { value: 'epilepsy', label: 'epilepsy' },
@@ -28,22 +26,21 @@ const options = [
   { value: 'tuberclusios', label: 'tuberclusios' },
 ];
 
-function CreateProcedureForm() {
-  const [activeLanguageTab, setActiveLanguageTab] = useState<
-    'English' | 'Norwegian' | 'Danish' | 'Swedish'
-  >('English');
+interface CreateProcedureFormPropType {
+  isEdit: boolean;
+}
+
+function CreateProcedureForm({ isEdit }: CreateProcedureFormPropType) {
+  const [activeLanguageTab, setActiveLanguageTab] =
+    useState<LanguagesType>('English');
 
   const [selectedDepartmentSubCategory, setSelectedDepartmentSubCategory] =
     useState('');
 
   const [createAnotherProcedure, setCreateAnotherProcedure] = useState(false);
 
-  const [procedure, setProcedure] = useState({
-    English: '',
-    Norwegian: '',
-    Danish: '',
-    Swedish: '',
-  });
+  const [procedure, setProcedure] =
+    useState<IntialLanguagesDataType>(intialLanguagesData);
 
   const handleProcedureChange = (e: ChangeEvent<HTMLInputElement>) => {
     setProcedure((prevData) => ({
@@ -62,12 +59,7 @@ function CreateProcedureForm() {
     setSelectedDepartmentSubCategory('');
     setCreateAnotherProcedure(false);
     setActiveLanguageTab('English');
-    setProcedure({
-      English: '',
-      Norwegian: '',
-      Danish: '',
-      Swedish: '',
-    });
+    setProcedure(intialLanguagesData);
   };
 
   return (
@@ -94,53 +86,22 @@ function CreateProcedureForm() {
       </label>
 
       <div className={procedureModalStyle.languageTabContainer}>
-        <button
-          onClick={() => setActiveLanguageTab('English')}
-          className={
-            activeLanguageTab === 'English'
-              ? procedureModalStyle.activeLanguageTab
-              : ''
-          }
-          type="button"
-        >
-          English
-        </button>
-
-        <button
-          onClick={() => setActiveLanguageTab('Norwegian')}
-          type="button"
-          className={
-            activeLanguageTab === 'Norwegian'
-              ? procedureModalStyle.activeLanguageTab
-              : ''
-          }
-        >
-          Norwegian
-        </button>
-
-        <button
-          onClick={() => setActiveLanguageTab('Danish')}
-          className={
-            activeLanguageTab === 'Danish'
-              ? procedureModalStyle.activeLanguageTab
-              : ''
-          }
-          type="button"
-        >
-          Danish
-        </button>
-
-        <button
-          onClick={() => setActiveLanguageTab('Swedish')}
-          className={
-            activeLanguageTab === 'Swedish'
-              ? procedureModalStyle.activeLanguageTab
-              : ''
-          }
-          type="button"
-        >
-          Swedish
-        </button>
+        {languages.map((lang) => {
+          return (
+            <button
+              key={lang.id}
+              onClick={() => setActiveLanguageTab(lang.name)}
+              className={
+                activeLanguageTab === lang.name
+                  ? procedureModalStyle.activeLanguageTab
+                  : ''
+              }
+              type="button"
+            >
+              {lang.name}
+            </button>
+          );
+        })}
       </div>
 
       <input
@@ -172,29 +133,43 @@ function CreateProcedureForm() {
         })}
       </div>
 
-      <div
-        className={procedureModalStyle.procedureCheckboxContainer}
-        style={{ marginTop: '64px' }}
-      >
-        <input
-          onClick={() => setCreateAnotherProcedure(!createAnotherProcedure)}
-          checked={createAnotherProcedure}
-          className={procedureModalStyle.checkbox}
-          type="checkbox"
-        />
-        <label className={procedureModalStyle.checkboxLabel}>
-          Create another procedure
-        </label>
-      </div>
+      {!isEdit && (
+        <div
+          className={procedureModalStyle.procedureCheckboxContainer}
+          style={{ marginTop: '64px' }}
+        >
+          <input
+            onClick={() => setCreateAnotherProcedure(!createAnotherProcedure)}
+            checked={createAnotherProcedure}
+            className={procedureModalStyle.checkbox}
+            type="checkbox"
+          />
+          <label className={procedureModalStyle.checkboxLabel}>
+            Create another procedure
+          </label>
+        </div>
+      )}
 
-      <FbtButton
-        className={procedureModalStyle.createProcedureBtn}
-        size="sm"
-        variant="solid"
-        onClick={handleCreateProcedure}
-      >
-        <p className={procedureModalStyle.btnText}>Create procedure</p>
-      </FbtButton>
+      {isEdit ? (
+        <FbtButton
+          className={procedureModalStyle.createProcedureBtn}
+          style={{ marginTop: '64px' }}
+          size="sm"
+          variant="solid"
+          onClick={handleCreateProcedure}
+        >
+          <p className={procedureModalStyle.btnText}>Save changes</p>
+        </FbtButton>
+      ) : (
+        <FbtButton
+          className={procedureModalStyle.createProcedureBtn}
+          size="sm"
+          variant="solid"
+          onClick={handleCreateProcedure}
+        >
+          <p className={procedureModalStyle.btnText}>Create procedure</p>
+        </FbtButton>
+      )}
     </div>
   );
 }

@@ -1,3 +1,5 @@
+'use client';
+
 import Image from 'next/image';
 
 import { Header } from '@/components';
@@ -24,7 +26,9 @@ const patientBookingAdditionalData = [
   { label: 'Reimbursement offered', value: '800,000 euros' },
 ];
 
-function PatientBooking() {
+function PatientBooking({ params }: { params: { id: string } }) {
+  console.log(params.id);
+
   return (
     <div>
       <Header />

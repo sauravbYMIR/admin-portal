@@ -3,10 +3,12 @@
 /* eslint-disable jsx-a11y/label-has-associated-control */
 import { FbtButton } from '@frontbase/components-react';
 import Image from 'next/image';
+import type { ChangeEvent } from 'react';
 import { useState } from 'react';
 
 import closeIcon from '@/public/assets/icons/close.svg';
-import { languages } from '@/utils/global';
+import type { LanguagesType } from '@/types/components';
+import { countryData, intialLanguagesData } from '@/utils/global';
 
 import departmentModalStyle from './departmentModal.module.scss';
 
@@ -17,7 +19,16 @@ interface DepartmentModalProps {
 }
 
 function DepartmentModal({ isOpen, onClose, isEdit }: DepartmentModalProps) {
-  const [activeLanguageTab, setActiveLanguageTab] = useState('English');
+  const [activeLanguageTab, setActiveLanguageTab] =
+    useState<LanguagesType>('English');
+  const [department, setDepartment] = useState(intialLanguagesData);
+
+  const handleDepartmentChange = (e: ChangeEvent<HTMLInputElement>) => {
+    setDepartment((prevData) => ({
+      ...prevData,
+      [activeLanguageTab]: e.target.value,
+    }));
+  };
 
   return (
     <div>
@@ -45,19 +56,19 @@ function DepartmentModal({ isOpen, onClose, isEdit }: DepartmentModalProps) {
               </label>
 
               <div className={departmentModalStyle.languageTabContainer}>
-                {languages.map((lang) => {
+                {countryData.map((data) => {
                   return (
                     <button
-                      key={lang.id}
-                      onClick={() => setActiveLanguageTab(lang.name)}
+                      key={data.locale}
+                      onClick={() => setActiveLanguageTab(data.language)}
                       className={
-                        activeLanguageTab === lang.name
+                        activeLanguageTab === data.language
                           ? departmentModalStyle.activeLanguageTab
                           : ''
                       }
                       type="button"
                     >
-                      {lang.name}
+                      {data.language}
                     </button>
                   );
                 })}
@@ -67,6 +78,8 @@ function DepartmentModal({ isOpen, onClose, isEdit }: DepartmentModalProps) {
                 className={departmentModalStyle.departmentInput}
                 type="text"
                 placeholder="Enter department"
+                value={department[activeLanguageTab]}
+                onChange={handleDepartmentChange}
               />
 
               {!isEdit && (

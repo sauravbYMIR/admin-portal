@@ -6,6 +6,7 @@ import 'ag-grid-community/styles/ag-grid.css';
 import 'ag-grid-community/styles/ag-theme-quartz.css';
 
 import { FbtButton } from '@frontbase/components-react';
+import type { CustomCellRendererProps } from 'ag-grid-react';
 import { AgGridReact } from 'ag-grid-react';
 import Image from 'next/image';
 import { useRouter } from 'next/navigation';
@@ -23,9 +24,14 @@ interface RowData {
   status: string;
 }
 
-const CustomStatusEditComponent = () => {
+const CustomStatusEditComponent = (props: CustomCellRendererProps) => {
   const [showBtn, setShowBtn] = useState(true);
   const router = useRouter();
+
+  const handleClickInfoLink = () => {
+    const patientBookingId = props?.data?.id;
+    router.push(`/patients/${patientBookingId}`);
+  };
 
   return (
     <div className={patientsTableStyle.patientsTableBtnContainer}>
@@ -55,7 +61,7 @@ const CustomStatusEditComponent = () => {
         className={patientsTableStyle.patientsTableInfoLink}
         src={infoLinkIcon}
         alt="patients table info link arrow icon"
-        onClick={() => router.push('/patients/patientBooking')}
+        onClick={handleClickInfoLink}
       />
     </div>
   );

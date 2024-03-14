@@ -6,11 +6,8 @@ import { useState } from 'react';
 // eslint-disable-next-line import/no-cycle
 import { Dropdown } from '@/components';
 import procedureModalStyle from '@/components/Modal/ProcedureModal/procedureModal.module.scss';
-import type {
-  IntialLanguagesDataType,
-  LanguagesType,
-} from '@/types/components';
-import { intialLanguagesData, languages } from '@/utils/global';
+import type { LanguagesType } from '@/types/components';
+import { countryData, intialLanguagesData } from '@/utils/global';
 
 const options = [
   { value: 'epilepsy', label: 'epilepsy' },
@@ -33,8 +30,7 @@ function CreateSubCategoryForm({ isEdit }: CreateSubCategoryFormPropType) {
   const [activeLanguageTab, setActiveLanguageTab] =
     useState<LanguagesType>('English');
 
-  const [subCategory, setSubCategory] =
-    useState<IntialLanguagesDataType>(intialLanguagesData);
+  const [subCategory, setSubCategory] = useState(intialLanguagesData);
 
   const handleSelect = (value: string) => {
     setSelectedDepartment(value);
@@ -80,19 +76,19 @@ function CreateSubCategoryForm({ isEdit }: CreateSubCategoryFormPropType) {
       </label>
 
       <div className={procedureModalStyle.languageTabContainer}>
-        {languages.map((lang) => {
+        {countryData.map((data) => {
           return (
             <button
-              key={lang.id}
-              onClick={() => setActiveLanguageTab(lang.name)}
+              key={data.locale}
+              onClick={() => setActiveLanguageTab(data.language)}
               className={
-                activeLanguageTab === lang.name
+                activeLanguageTab === data.language
                   ? procedureModalStyle.activeLanguageTab
                   : ''
               }
               type="button"
             >
-              {lang.name}
+              {data.language}
             </button>
           );
         })}

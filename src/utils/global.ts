@@ -4,42 +4,62 @@ import norwayFlag from '@/public/assets/icons/norwayFlag.svg';
 import swedenFlag from '@/public/assets/icons/swedenFlag.svg';
 import type { LanguagesType } from '@/types/components';
 
-type Languages = {
-  id: string;
-  name: LanguagesType;
+type CountryData = {
+  name: string;
+  language: LanguagesType;
+  locale: string;
+  currency: string;
+  countryCode: string;
+  flagIcon: string;
 };
 
-const languages: Languages[] = [
+interface IntialLanguagesDataType {
+  English: string;
+  Norwegian: string;
+  Danish: string;
+  Swedish: string;
+}
+
+const countryData: CountryData[] = [
   {
-    id: 'en',
-    name: 'English',
+    name: 'Ireland',
+    language: 'English',
+    locale: 'en',
+    currency: 'EUR',
+    countryCode: 'ie',
+    flagIcon: irelandFlag,
   },
   {
-    id: 'no',
-    name: 'Norwegian',
+    name: 'Norway',
+    language: 'Norwegian',
+    locale: 'nb',
+    currency: 'NOK',
+    countryCode: 'no',
+    flagIcon: norwayFlag,
   },
   {
-    id: 'da',
-    name: 'Danish',
+    name: 'Denmark',
+    language: 'Danish',
+    locale: 'da',
+    currency: 'DKK',
+    countryCode: 'dk',
+    flagIcon: denmarkFlag,
   },
   {
-    id: 'sv',
-    name: 'Swedish',
+    name: 'Sweden',
+    language: 'Swedish',
+    locale: 'sv',
+    currency: 'SEK',
+    countryCode: 'se',
+    flagIcon: swedenFlag,
   },
 ];
 
-const reimbursementInputData = [
-  { label: 'Denmark', iconSrc: denmarkFlag, code: 'DKK' },
-  { label: 'Norway', iconSrc: norwayFlag, code: 'NOK' },
-  { label: 'Ireland', iconSrc: irelandFlag, code: 'EUR' },
-  { label: 'Sweden', iconSrc: swedenFlag, code: 'SEK' },
-];
-
-const intialLanguagesData = {
+const intialLanguagesData: IntialLanguagesDataType = {
   English: '',
   Norwegian: '',
   Danish: '',
   Swedish: '',
 };
 
-export { intialLanguagesData, languages, reimbursementInputData };
+export { countryData, intialLanguagesData };

@@ -1,4 +1,5 @@
 /* eslint-disable jsx-a11y/label-has-associated-control */
+// eslint-disable-next-line simple-import-sort/imports
 import { FbtButton } from '@frontbase/components-react';
 import Image from 'next/image';
 import type { ChangeEvent } from 'react';
@@ -7,15 +8,8 @@ import { useState } from 'react';
 // eslint-disable-next-line import/no-cycle
 import { Dropdown } from '@/components';
 import procedureModalStyle from '@/components/Modal/ProcedureModal/procedureModal.module.scss';
-import type {
-  IntialLanguagesDataType,
-  LanguagesType,
-} from '@/types/components';
-import {
-  intialLanguagesData,
-  languages,
-  reimbursementInputData,
-} from '@/utils/global';
+import type { LanguagesType } from '@/types/components';
+import { countryData, intialLanguagesData } from '@/utils/global';
 
 const options = [
   { value: 'epilepsy', label: 'epilepsy' },
@@ -39,8 +33,7 @@ function CreateProcedureForm({ isEdit }: CreateProcedureFormPropType) {
 
   const [createAnotherProcedure, setCreateAnotherProcedure] = useState(false);
 
-  const [procedure, setProcedure] =
-    useState<IntialLanguagesDataType>(intialLanguagesData);
+  const [procedure, setProcedure] = useState(intialLanguagesData);
 
   const handleProcedureChange = (e: ChangeEvent<HTMLInputElement>) => {
     setProcedure((prevData) => ({
@@ -86,19 +79,19 @@ function CreateProcedureForm({ isEdit }: CreateProcedureFormPropType) {
       </label>
 
       <div className={procedureModalStyle.languageTabContainer}>
-        {languages.map((lang) => {
+        {countryData.map((data) => {
           return (
             <button
-              key={lang.id}
-              onClick={() => setActiveLanguageTab(lang.name)}
+              key={data.locale}
+              onClick={() => setActiveLanguageTab(data.language)}
               className={
-                activeLanguageTab === lang.name
+                activeLanguageTab === data.language
                   ? procedureModalStyle.activeLanguageTab
                   : ''
               }
               type="button"
             >
-              {lang.name}
+              {data.language}
             </button>
           );
         })}
@@ -114,17 +107,17 @@ function CreateProcedureForm({ isEdit }: CreateProcedureFormPropType) {
       />
 
       <div className={procedureModalStyle.procedureReimbursementInputContainer}>
-        {reimbursementInputData.map((data) => {
+        {countryData.map((data) => {
           return (
             <div
               className={procedureModalStyle.procedureReimbursementInput}
-              key={data.label}
+              key={data.locale}
             >
-              <label>Reimbursement for {data.label}</label>
+              <label>Reimbursement for {data.name}</label>
               <div className={procedureModalStyle.inputWrapper}>
                 <div className={procedureModalStyle.countryCodeWrapper}>
-                  <Image src={data.iconSrc} alt="reimbursement input flag" />
-                  <span>{data.code}</span>
+                  <Image src={data.flagIcon} alt="reimbursement input flag" />
+                  <span>{data.currency}</span>
                 </div>
                 <input type="text" />
               </div>

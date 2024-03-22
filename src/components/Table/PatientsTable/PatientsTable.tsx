@@ -4,6 +4,7 @@
 
 import 'ag-grid-community/styles/ag-grid.css';
 import 'ag-grid-community/styles/ag-theme-quartz.css';
+import './table.css';
 
 import { FbtButton } from '@frontbase/components-react';
 import type { CustomCellRendererProps } from 'ag-grid-react';
@@ -78,7 +79,7 @@ const PatientsTable = () => {
     },
     {
       id: '2',
-      name: 'Jane Doe',
+      name: 'John Doe',
       procedure: 'Checkup',
       hospital: 'Community Clinic',
       status: 'Accepted',
@@ -113,7 +114,7 @@ const PatientsTable = () => {
     },
     {
       id: '7',
-      name: 'Sarah Jones',
+      name: 'Mary Williams',
       procedure: 'Physical Therapy',
       hospital: 'Rehabilitation Center',
       status: 'Rejected',
@@ -128,10 +129,32 @@ const PatientsTable = () => {
   ]);
 
   const [colDefs] = useState<any>([
-    { field: 'name', flex: 1, filter: true, floatingFilter: true },
+    {
+      field: 'name',
+      flex: 1,
+      filter: true,
+      floatingFilter: true,
+    },
     { field: 'procedure', flex: 1, filter: true, floatingFilter: true },
     { field: 'hospital', flex: 1, filter: true, floatingFilter: true },
-    { field: 'status', flex: 1, filter: true, floatingFilter: true },
+    {
+      field: 'status',
+      cellStyle: (params: any) => {
+        if (params.value === 'Pending') {
+          return { backgroundColor: 'lightblue' };
+        }
+        if (params.value === 'Accepted') {
+          return { backgroundColor: 'lightgreen' };
+        }
+        if (params.value === 'Rejected') {
+          return { backgroundColor: '#FF8F8F' };
+        }
+        return null;
+      },
+      flex: 1,
+      filter: true,
+      floatingFilter: true,
+    },
     {
       field: '',
       flex: 2,
@@ -141,7 +164,8 @@ const PatientsTable = () => {
 
   return (
     // eslint-disable-next-line tailwindcss/no-custom-classname
-    <div className="ag-theme-quartz" style={{ height: '500px', width: '100%' }}>
+
+    <div className="ag-theme-quartz" style={{ width: '100%', height: '516px' }}>
       <AgGridReact
         rowData={rowData}
         columnDefs={colDefs}

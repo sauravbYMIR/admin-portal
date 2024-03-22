@@ -1,0 +1,257 @@
+.hospitalDetailPageContainer {
+  padding: 60px 75px;
+
+  .headerSection {
+    margin: 30px 0 80px;
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+
+    .titleContainer {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+
+      .hospitalLogo {
+        border-radius: 100px;
+      }
+
+      .titleBreadCrumbContainer {
+        display: flex;
+        flex-direction: column;
+        gap: 12px;
+
+        h3 {
+          color: var(--Colour-Primary-1, #0c4e64);
+          font-family: Poppins;
+          font-size: 36px;
+          font-style: normal;
+          font-weight: 500;
+          line-height: 28px;
+          margin: 0;
+        }
+
+        .breadcrumb {
+          display: flex;
+          align-items: center;
+          gap: 12px;
+
+          a {
+            color: var(--Colour-Neutral-3, #757f95);
+            font-family: Lexend;
+            font-size: 16px;
+            font-style: normal;
+            font-weight: 400;
+            line-height: 100%;
+          }
+        }
+      }
+    }
+
+    .editHospitalBtn {
+      border-radius: 8px;
+      border: 2px solid var(--Colour-Primary-2, #096f90);
+      background: var(--Colour-Neutral-7, #f9fafb);
+      width: 262px;
+      height: 64px;
+      padding: 12px 24px;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      gap: 12px;
+      box-sizing: border-box;
+
+      p {
+        color: var(--Colour-Primary-2, #096f90);
+        font-family: Poppins;
+        font-size: 24px;
+        font-style: normal;
+        font-weight: 400;
+        line-height: 150%;
+      }
+    }
+  }
+
+  .subTitle {
+    color: #4d4d4d;
+    font-family: Poppins;
+    font-size: 24px;
+    font-style: normal;
+    font-weight: 500;
+    line-height: 110%;
+    letter-spacing: 0.48px;
+    margin: 0;
+  }
+
+  .hospitalDesc {
+    color: var(--Colour-Neutral-3, #757f95);
+    font-family: Lexend;
+    font-size: 16px;
+    font-style: normal;
+    font-weight: 300;
+    line-height: 22px;
+    letter-spacing: 0.32px;
+    margin: 24px 0 55px;
+  }
+
+  .address {
+    color: var(--Colour-Neutral-3, #757f95);
+    font-family: Lexend;
+    font-size: 16px;
+    font-style: normal;
+    font-weight: 300;
+    line-height: 22px;
+    letter-spacing: 0.32px;
+    margin: 24px 0 55px;
+  }
+
+  .createTeamMemberContainer {
+    border-radius: 12px;
+    border: 1px solid var(--Colour-Primary-3, #3da1c2);
+    background: var(--Colour-Neutral-7, #f9fafb);
+    box-shadow: 2px 2px 4px 1px rgba(9, 111, 144, 0.1);
+    padding: 48px 178px;
+    width: 100%;
+    box-sizing: border-box;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 48px;
+    margin: 28px 0 75px;
+
+    .title {
+      color: var(--Colour-Neutral-1, #181b20);
+      text-align: center;
+      font-family: Poppins;
+      font-size: 32px;
+      font-style: normal;
+      font-weight: 500;
+      line-height: 28px;
+    }
+
+    .btn {
+      border-radius: 6.4px;
+      background: #096f90;
+      height: 64px;
+      padding: 12px 24px;
+      p {
+        color: var(--Colour-Neutral-7, #f9fafb);
+        text-align: center;
+        font-family: Poppins;
+        font-size: 24px;
+        font-style: normal;
+        font-weight: 400;
+        line-height: 150%;
+        margin: 0;
+      }
+    }
+  }
+
+  .teamMemberViewSection {
+    .headerSection {
+      width: 100%;
+      display: flex;
+      align-items: center;
+      justify-content: flex-end;
+
+      .addBtn {
+        height: var(--size-ag-header-height, 48px);
+        padding: 12px 24px;
+        border-radius: 6.4px;
+        border: 2px solid var(--Colour-Primary-2, #096f90);
+        background: var(--Colour-Primary-2, #096f90);
+        box-sizing: border-box;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        gap: 12px;
+
+        p {
+          color: #fff;
+          font-family: Poppins;
+          font-size: 16px;
+          font-style: normal;
+          font-weight: 500;
+          line-height: 150%;
+        }
+      }
+
+      .editBtn {
+        border-radius: 6.4px;
+        border: 2px solid var(--Colour-Primary-2, #096f90);
+        background: var(--Colour-Primary-6, #f2fafc);
+        height: var(--size-ag-header-height, 48px);
+        padding: 12px 24px;
+        box-sizing: border-box;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        gap: 12px;
+        margin-left: 12px;
+
+        p {
+          color: var(--Colour-Primary-2, #096f90);
+          font-family: Poppins;
+          font-size: 16px;
+          font-style: normal;
+          font-weight: 500;
+          line-height: 150%;
+        }
+      }
+    }
+
+    .teamMemberCardsContainer {
+      margin-bottom: 64px;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 32px;
+    }
+  }
+
+  .procedureManagementContainer {
+    border-radius: 8px;
+    border: 1px solid var(--Colour-Primary-3, #3da1c2);
+    background: #fff;
+    box-shadow: 0px 4px 4px 0px rgba(0, 0, 0, 0.25);
+    display: flex;
+    width: 549px;
+    padding: 48px 24px;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 24px;
+    box-sizing: border-box;
+    margin-top: 36px;
+
+    h2 {
+      color: var(--Colour-Primary-2, #096f90);
+      font-family: Poppins;
+      font-size: 36px;
+      font-style: normal;
+      font-weight: 500;
+      line-height: 40px;
+      letter-spacing: 0.72px;
+      margin: 0;
+    }
+
+    .linkBtn {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      border: none;
+      outline: none;
+      background-color: transparent;
+      border-bottom: 2px solid var(--Colour-Primary-2, #096f90);
+      cursor: pointer;
+
+      p {
+        color: var(--Colour-Primary-2, #096f90);
+        font-family: Poppins;
+        font-size: 20px;
+        font-style: normal;
+        font-weight: 500;
+        line-height: 130%;
+        margin: 0;
+      }
+    }
+  }
+}

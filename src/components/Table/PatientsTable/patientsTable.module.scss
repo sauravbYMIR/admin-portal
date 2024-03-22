@@ -1,18 +1,19 @@
 .patientsTableBtnContainer {
   display: flex;
   gap: 40px;
-  margin-top: 5px;
+  margin: 11px 0 0 20px;
+  
 
   .patientsTableAcceptBtn {
     border-radius: 6.4px;
     background: var(--Colour-Primary-2, #096f90);
-    height: 30px;
+    height: 40px;
     padding: 4px 24px;
     box-sizing: border-box;
     border: none;
     outline: none;
     color: var(--Colour-Neutral-7, #f7f9fa);
-    font-family: Poppins;
+    font-family: Lexend;
     font-size: 16px;
     font-style: normal;
     font-weight: 400;
@@ -27,12 +28,12 @@
   .patientsTableRejectBtn {
     border-radius: 6.4px;
     border: 2px solid var(--Colour-Primary-2, #096f90);
-    height: 30px;
+    height: 40px;
     padding: 4px 24px;
     box-sizing: border-box;
     outline: none;
     color: var(--Colour-Primary-2, #096f90);
-    font-family: Poppins;
+    font-family: Lexend;
     font-size: 16px;
     font-style: normal;
     font-weight: 500;

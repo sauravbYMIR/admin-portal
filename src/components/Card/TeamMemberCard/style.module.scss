@@ -1,0 +1,46 @@
+.cardContainer {
+  width: 265px;
+  box-sizing: border-box;
+  border-radius: 12px;
+  border: 1px solid var(--Colour-Neutral-5, #e0e4eb);
+  background: #fff;
+  box-shadow: 2px 2px 4px 1px rgba(9, 111, 144, 0.1);
+  padding: 24px 20px var(--size-ag-icon-size, 16px) 20px;
+
+  .cardHeader {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 12px;
+
+    p {
+      color: var(--Colour-Neutral-1, #181b20);
+      font-family: Poppins;
+      font-size: 16px;
+      font-style: normal;
+      font-weight: 500;
+      line-height: 28px;
+      margin: 0;
+    }
+  }
+
+  .memberPosition {
+    color: var(--Colour-Neutral-2, #434956);
+    font-family: Lexend;
+    font-size: 16px;
+    font-style: normal;
+    font-weight: 300;
+    line-height: 25px;
+    margin: 0 0 4px;
+  }
+
+  .memberQualification {
+    color: var(--Colour-Neutral-2, #434956);
+    font-family: Lexend;
+    font-size: 16px;
+    font-style: normal;
+    font-weight: 300;
+    line-height: 25px;
+    margin: 0;
+  }
+}

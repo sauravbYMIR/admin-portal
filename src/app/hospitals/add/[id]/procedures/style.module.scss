@@ -1,0 +1,57 @@
+.procedureManagementContentContainer {
+  padding: 60px 75px;
+
+  .title {
+    color: var(--Colour-Primary-1, #0c4e64);
+    font-family: Poppins;
+    font-size: 36px;
+    font-style: normal;
+    font-weight: 500;
+    line-height: 28px;
+    margin: 47px 0 90px;
+  }
+
+  .procedureManagementCard {
+    display: flex;
+    width: 100%;
+    padding: var(--size-ag-header-height, 48px) 178px;
+    flex-direction: column;
+    align-items: center;
+    gap: var(--size-ag-header-height, 48px);
+    border-radius: 12px;
+    border: 1px solid var(--Colour-Primary-3, #3da1c2);
+    background: var(--Colour-Neutral-7, #f6f8f9);
+    box-shadow: 2px 2px 4px 1px rgba(9, 111, 144, 0.1);
+    box-sizing: border-box;
+
+    h3 {
+      color: var(--Colour-Neutral-1, #181b20);
+      text-align: center;
+      font-family: Poppins;
+      font-size: 32px;
+      font-style: normal;
+      font-weight: 500;
+      line-height: 28px;
+      margin: 0;
+    }
+
+    .btn {
+      border-radius: 6.4px;
+      background: #096f90;
+      width: 290px;
+      height: 64px;
+      padding: 12px 24px;
+
+      p {
+        color: var(--Colour-Neutral-7, #f6f8f9);
+        text-align: center;
+        font-family: Poppins;
+        font-size: 24px;
+        font-style: normal;
+        font-weight: 400;
+        line-height: 150%;
+        margin: 0;
+      }
+    }
+  }
+}

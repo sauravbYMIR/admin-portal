@@ -6,16 +6,17 @@ import CreateHospitalTeamMemberModal from './Modal/CreateHospitalTeamMemberModal
 import DepartmentModal from './Modal/DepartmentModal/DepartmentModal';
 // eslint-disable-next-line import/no-cycle
 import ProcedureModal from './Modal/ProcedureModal/ProcedureModal';
-import OTPInput from './OtpInput/OtpInput';
+import OTPInputWrapper from './OtpInput/OtpInput';
 import PatientsTable from './Table/PatientsTable/PatientsTable';
 
+export * from './Login/Login';
 export {
   Accordion,
   CreateHospitalTeamMemberModal,
   DepartmentModal,
   Dropdown,
   Header,
-  OTPInput,
+  OTPInputWrapper,
   PatientsTable,
   ProcedureModal,
   TeamMemberCard,

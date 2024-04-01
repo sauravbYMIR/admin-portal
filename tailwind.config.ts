@@ -39,6 +39,11 @@ export default {
           800: '#2c5282',
           900: '#2a4365',
         },
+        darkteal: 'rgba(9, 111, 144, 1)',
+        darkgray: 'rgba(59, 71, 94, 1)',
+      },
+      fontFamily: {
+        poppins: ['Poppins', 'sans-serif'],
       },
     },
   },

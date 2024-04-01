@@ -1,12 +1,11 @@
 'use client';
 
 import React, { useState } from 'react';
-// eslint-disable-next-line import/no-extraneous-dependencies
 import OtpInput from 'react-otp-input';
 
 import otpInputStyle from './otpInput.module.scss';
 
-function OTPInput() {
+function OTPInputWrapper() {
   const [otp, setOtp] = useState('');
 
   const changeInputHandler = (x: any) => {
@@ -27,4 +26,4 @@ function OTPInput() {
   );
 }
 
-export default OTPInput;
+export default OTPInputWrapper;

@@ -9,14 +9,31 @@ import {
 } from '@frontbase/components-react';
 import Image from 'next/image';
 import Link from 'next/link';
+import { usePathname } from 'next/navigation';
 
 import brandLogo from '@/public/assets/images/brandLogo.svg';
 
 import headerStyle from './header.module.scss';
 
-const menuItems = ['Patients', 'Procedures', 'Hospitals'];
+const menuItems = {
+  links: [
+    {
+      name: 'Patients',
+      link: '/patients',
+    },
+    {
+      name: 'Procedures',
+      link: '/procedures',
+    },
+    {
+      name: 'Hospitals',
+      link: '/hospitals',
+    },
+  ],
+};
 
 function Header() {
+  const pathname = usePathname();
   return (
     <FbtHeader className={headerStyle.headerContainer}>
       <FbtHeaderBrand>
@@ -24,11 +41,14 @@ function Header() {
       </FbtHeaderBrand>
 
       <FbtHeaderContent className={headerStyle.headerLinkContainer}>
-        {menuItems.map((menu) => {
+        {menuItems.links.map((menu) => {
           return (
-            <FbtHeaderItem key={menu}>
-              <Link className={headerStyle.headerLink} href="./">
-                {menu}
+            <FbtHeaderItem key={`${menu.name}`}>
+              <Link
+                className={`text-left font-poppins text-base font-semibold  ${pathname === menu.link ? 'text-darkteal underline decoration-2 underline-offset-2' : ''}`}
+                href={menu.link}
+              >
+                {menu.name}
               </Link>
             </FbtHeaderItem>
           );

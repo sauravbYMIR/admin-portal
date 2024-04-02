@@ -1,7 +1,13 @@
-import type { Config } from 'tailwindcss';
+/** @type {import('tailwindcss').Config} */
+module.exports = {
+  content: [
+    './app/**/*.{js,ts,jsx,tsx,mdx}',
+    './pages/**/*.{js,ts,jsx,tsx,mdx}',
+    './components/**/*.{js,ts,jsx,tsx,mdx}',
 
-export default {
-  content: ['./src/**/*.{js,ts,jsx,tsx}'],
+    // Or if using `src` directory:
+    './src/**/*.{js,ts,jsx,tsx,mdx}',
+  ],
   theme: {
     fontSize: {
       xs: '0.75rem',
@@ -41,11 +47,14 @@ export default {
         },
         darkteal: 'rgba(9, 111, 144, 1)',
         darkgray: 'rgba(59, 71, 94, 1)',
+        error: 'rgba(203, 0, 25, 1)',
+        'neutral-2': 'rgba(67, 73, 86, 1)',
       },
       fontFamily: {
         poppins: ['Poppins', 'sans-serif'],
+        lexend: ['Lexend', 'sans-serif'],
       },
     },
   },
   plugins: [],
-} satisfies Config;
+};

@@ -132,7 +132,8 @@
       .landingPageCtaBtn {
         display: flex;
         align-items: center;
-        gap: 12px;
+        justify-content:space-between;
+        padding: 14px 27px 14px 24px;
         width: 262px;
         height: 64px;
         border-radius: 6px;

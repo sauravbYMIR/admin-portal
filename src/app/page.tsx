@@ -19,7 +19,6 @@ function LandingPage() {
         <div className={style.brandLogoImg}>
           <Image src={brandLogo} alt="brand logo" />
         </div>
-
         <Login />
       </div>
 

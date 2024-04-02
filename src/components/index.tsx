@@ -6,6 +6,7 @@ import Header from './Header/Header';
 import OTPInputWrapper from './OtpInput/OtpInput';
 import PatientsTable from './Table/PatientsTable/PatientsTable';
 
+export * from './CustomHomePage/CustomHomePage';
 export * from './Icons/Icons';
 export * from './Login/Login';
 export * from './Modal';

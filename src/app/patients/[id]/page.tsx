@@ -1,6 +1,7 @@
 'use client';
 
 import Image from 'next/image';
+import { useRouter } from 'next/navigation';
 
 import { Header } from '@/components';
 import backArrow from '@/public/assets/icons/backArrow.svg';
@@ -28,17 +29,23 @@ const patientBookingAdditionalData = [
 
 function PatientBooking({ params }: { params: { id: string } }) {
   console.log(params.id);
-
+  const router = useRouter();
   return (
     <div>
       <Header />
 
       <div className={patientBookingStyle.patientBookingContentContainer}>
-        <Image
-          className={patientBookingStyle.backIcon}
-          src={backArrow}
-          alt="back arrow"
-        />
+        <button
+          type="button"
+          className="cursor-pointer border-none bg-transparent"
+          onClick={() => router.push('/patients')}
+        >
+          <Image
+            className={patientBookingStyle.backIcon}
+            src={backArrow}
+            alt="back arrow"
+          />
+        </button>
 
         <h2 className={patientBookingStyle.title}>Booking details</h2>
 

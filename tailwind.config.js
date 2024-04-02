@@ -49,6 +49,11 @@ module.exports = {
         darkgray: 'rgba(59, 71, 94, 1)',
         error: 'rgba(203, 0, 25, 1)',
         'neutral-2': 'rgba(67, 73, 86, 1)',
+        'neutral-7': 'rgba(246, 248, 249, 1)',
+        'neutral-1': 'rgba(24, 27, 32, 1)',
+        darkslategray: 'rgba(12, 78, 100, 1)',
+        lightskyblue: 'rgba(61, 161, 194, 1)',
+        'primary-6': 'rgba(242, 250, 252, 1)',
       },
       fontFamily: {
         poppins: ['Poppins', 'sans-serif'],

@@ -109,8 +109,8 @@
               box-sizing: border-box;
 
               .countryCodeWrapper {
-                border-radius: 8px;
-                border: 1px solid var(--Colour-Neutral-5, #e0e4eb);
+                // border-radius: 8px;
+                // border: 1px solid var(--Colour-Neutral-5, #e0e4eb);
                 background: var(--Colour-Neutral-6, #eceff3);
                 display: flex;
                 padding: 12px;
@@ -265,7 +265,6 @@
         font-weight: 400;
         line-height: 100%;
         outline: none;
-        margin-bottom: 64px;
       }
 
       .procedureCheckboxContainer {
@@ -275,10 +274,11 @@
         margin-bottom: 24px;
 
         .checkbox {
-          border-radius: 6px;
-          border: 1.5px solid #64646a;
           background: rgba(255, 255, 255, 0);
-          margin: 0;
+          width: 24px;
+          height: 24px;
+          border-radius: 6px;
+          border: 1.5px solid rgba(100, 100, 106, 1);
         }
 
         .checkboxLabel {
@@ -295,10 +295,9 @@
         display: flex;
         align-items: center;
         gap: 12px;
-        width: 262px;
-        height: 64px;
         border-radius: 8px;
         background: var(--Colour-Primary-2, #096f90);
+        padding: 14px 54.5px;
 
         .btnText {
           font-family: Poppins;

@@ -76,12 +76,12 @@ function LoginWithMail({
       <h2 className={style.headingText}>Log in</h2>
 
       <form onSubmit={handleSubmit(onFormSubmit)}>
-        <label className={style.emailLabel} htmlFor="em">
+        <label className={style.emailLabel} htmlFor="email">
           Email
           <input
             placeholder="Enter your email"
             className={style.emailInput}
-            id="em"
+            id="email"
             type="text"
             {...register('email')}
           />

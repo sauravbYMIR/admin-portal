@@ -1,7 +1,7 @@
 'use client';
 
 import Image from 'next/image';
-import { useState } from 'react';
+import React, { useState } from 'react';
 
 import arrowDown from '@/public/assets/icons/arrowDown.svg';
 import arrowUp from '@/public/assets/icons/arrowUp.svg';
@@ -17,15 +17,15 @@ interface DropdownProps {
   options: Option[];
   onSelect: (value: any) => void;
   placeholder?: string;
-  selectedValue?: any;
+  selectedValue?: string;
 }
 
-function Dropdown({
+const Dropdown = ({
   options,
   onSelect,
   placeholder,
   selectedValue,
-}: DropdownProps) {
+}: DropdownProps) => {
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
 
   const toggleDropdown = () => {
@@ -68,6 +68,7 @@ function Dropdown({
             <li
               className={dropdownStyle.option}
               key={option.value}
+              value={option.value}
               onClick={() => handleSelect(option.value)}
             >
               {option.label}
@@ -77,6 +78,7 @@ function Dropdown({
       )}
     </div>
   );
-}
+};
+Dropdown.displayName = 'Dropdown';
 
 export default Dropdown;

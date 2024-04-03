@@ -1,3 +1,5 @@
+/* eslint-disable import/no-cycle */
+
 'use client';
 
 /* eslint-disable jsx-a11y/label-has-associated-control */
@@ -5,7 +7,6 @@
 import Image from 'next/image';
 import { useEffect, useState } from 'react';
 
-// eslint-disable-next-line import/no-cycle
 import CreateProcedureForm from '@/app/procedures/CreateProcedureForm/CreateProcedureForm';
 import CreateSubCategoryForm from '@/app/procedures/CreateProcedureForm/CreateSubCategoryForm';
 import closeIcon from '@/public/assets/icons/close.svg';
@@ -45,7 +46,9 @@ function ProcedureModal({
             <div className={procedureModalStyle.modalHeader}>
               <h2 className={procedureModalStyle.title}>
                 {!isEdit
-                  ? 'Create a procedure'
+                  ? isProcedure
+                    ? 'Create a procedure'
+                    : 'Create a sub category'
                   : editSubCategory
                     ? 'Edit sub category'
                     : 'Edit procedure'}
@@ -70,8 +73,12 @@ function ProcedureModal({
                       className={procedureModalStyle.radio}
                       type="radio"
                       onClick={() => setIsProcedure(true)}
+                      id="create-procedure"
                     />
-                    <label className={procedureModalStyle.radioLabel}>
+                    <label
+                      className={procedureModalStyle.radioLabel}
+                      htmlFor="create-procedure"
+                    >
                       Create <span>procedure</span>
                     </label>
                   </div>
@@ -82,8 +89,12 @@ function ProcedureModal({
                       className={procedureModalStyle.radio}
                       type="radio"
                       onClick={() => setIsProcedure(false)}
+                      id="create-subcat"
                     />
-                    <label className={procedureModalStyle.radioLabel}>
+                    <label
+                      className={procedureModalStyle.radioLabel}
+                      htmlFor="create-subcat"
+                    >
                       Create <span>sub category</span>
                     </label>
                   </div>

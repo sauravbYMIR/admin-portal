@@ -1,7 +1,7 @@
 import { FbtButton } from '@frontbase/components-react';
 import Image from 'next/image';
 
-import { Header } from '@/components';
+import { Header, WithAuth } from '@/components';
 import backArrow from '@/public/assets/icons/backArrow.svg';
 
 import style from './style.module.scss';
@@ -28,4 +28,4 @@ function HospitalProcedureManagement() {
   );
 }
 
-export default HospitalProcedureManagement;
+export default WithAuth(HospitalProcedureManagement);

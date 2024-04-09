@@ -4,7 +4,12 @@ import { FbtButton } from '@frontbase/components-react';
 import Image from 'next/image';
 import React from 'react';
 
-import { Accordion, DepartmentModal, ProcedureModal } from '@/components';
+import {
+  Accordion,
+  DepartmentModal,
+  ProcedureModal,
+  WithAuth,
+} from '@/components';
 import editIcon from '@/public/assets/icons/edit.svg';
 import plusIcon from '@/public/assets/icons/plus.svg';
 
@@ -329,4 +334,4 @@ function AddProcedure() {
   );
 }
 
-export default AddProcedure;
+export default WithAuth(AddProcedure);

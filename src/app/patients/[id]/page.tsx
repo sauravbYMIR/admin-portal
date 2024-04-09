@@ -3,7 +3,7 @@
 import Image from 'next/image';
 import { useRouter } from 'next/navigation';
 
-import { Header } from '@/components';
+import { Header, WithAuth } from '@/components';
 import backArrow from '@/public/assets/icons/backArrow.svg';
 
 import patientBookingStyle from './patientBooking.module.scss';
@@ -27,7 +27,11 @@ const patientBookingAdditionalData = [
   { label: 'Reimbursement offered', value: '800,000 euros' },
 ];
 
-function PatientBooking({ params }: { params: { id: string } }) {
+const PatientBooking: React.FC<{ params: { id: string } }> = ({
+  params,
+}: {
+  params: { id: string };
+}) => {
   console.log(params.id);
   const router = useRouter();
   return (
@@ -89,6 +93,6 @@ function PatientBooking({ params }: { params: { id: string } }) {
       </div>
     </div>
   );
-}
+};
 
-export default PatientBooking;
+export default WithAuth(PatientBooking);

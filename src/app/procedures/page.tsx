@@ -1,6 +1,6 @@
 'use client';
 
-import { CustomHomePage } from '@/components';
+import { CustomHomePage, WithAuth } from '@/components';
 
 function ProceduresList() {
   return (
@@ -16,4 +16,4 @@ function ProceduresList() {
   );
 }
 
-export default ProceduresList;
+export default WithAuth(ProceduresList);

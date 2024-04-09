@@ -1,6 +1,6 @@
 'use client';
 
-import { Header, PatientsTable } from '@/components';
+import { Header, PatientsTable, WithAuth } from '@/components';
 
 import patientsStyle from './patients.module.scss';
 
@@ -21,4 +21,4 @@ function PatientsPage() {
   );
 }
 
-export default PatientsPage;
+export default WithAuth(PatientsPage);

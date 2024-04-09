@@ -1,6 +1,6 @@
 'use client';
 
-import { CustomHomePage, Header } from '@/components';
+import { CustomHomePage, Header, WithAuth } from '@/components';
 
 function HospitalsPage() {
   return (
@@ -17,4 +17,4 @@ function HospitalsPage() {
   );
 }
 
-export default HospitalsPage;
+export default WithAuth(HospitalsPage);

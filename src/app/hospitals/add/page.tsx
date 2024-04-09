@@ -11,7 +11,7 @@ import type { SubmitHandler } from 'react-hook-form';
 import { useForm } from 'react-hook-form';
 import { z } from 'zod';
 
-import { BackArrowIcon, Header } from '@/components';
+import { BackArrowIcon, Header, WithAuth } from '@/components';
 import type { LanguagesType } from '@/types/components';
 import { countryData } from '@/utils/global';
 
@@ -314,4 +314,4 @@ function AddHospital() {
   );
 }
 
-export default AddHospital;
+export default WithAuth(AddHospital);

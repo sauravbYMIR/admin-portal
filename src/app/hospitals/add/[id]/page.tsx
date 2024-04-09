@@ -11,6 +11,7 @@ import {
   CreateHospitalTeamMemberModal,
   Header,
   TeamMemberCard,
+  WithAuth,
 } from '@/components';
 import arrowForward from '@/public/assets/icons/arrowForward.svg';
 import backArrow from '@/public/assets/icons/backArrow.svg';
@@ -20,16 +21,16 @@ import hospitalLogo from '@/public/assets/icons/sampleLogo.svg';
 
 import style from './hospitalDetailPage.module.scss';
 
-export const teamMemberTypeSchema = z.object({
-  label: z.string(),
-  value: z.string(),
-});
-
 export type HospitalTeamMemberFormSchemaType =
   | 'hospitalDescEn'
   | 'hospitalDescNb'
   | 'hospitalDescDa'
   | 'hospitalDescSv';
+
+const teamMemberTypeSchema = z.object({
+  label: z.string(),
+  value: z.string(),
+});
 
 const createHospitalTeamMemberFormSchema = z.object({
   roleEn: z
@@ -167,4 +168,4 @@ function HospitalDetailsPage() {
   );
 }
 
-export default HospitalDetailsPage;
+export default WithAuth(HospitalDetailsPage);

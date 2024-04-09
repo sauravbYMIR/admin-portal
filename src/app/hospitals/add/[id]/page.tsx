@@ -5,6 +5,7 @@ import Image from 'next/image';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { useState } from 'react';
+import { z } from 'zod';
 
 import {
   CreateHospitalTeamMemberModal,
@@ -18,6 +19,36 @@ import plusIcon from '@/public/assets/icons/plus.svg';
 import hospitalLogo from '@/public/assets/icons/sampleLogo.svg';
 
 import style from './hospitalDetailPage.module.scss';
+
+export const teamMemberTypeSchema = z.object({
+  label: z.string(),
+  value: z.string(),
+});
+
+export type HospitalTeamMemberFormSchemaType =
+  | 'hospitalDescEn'
+  | 'hospitalDescNb'
+  | 'hospitalDescDa'
+  | 'hospitalDescSv';
+
+const createHospitalTeamMemberFormSchema = z.object({
+  roleEn: z
+    .string()
+    .min(1, { message: 'Fill in details in all the languages' }),
+  roleNb: z
+    .string()
+    .min(1, { message: 'Fill in details in all the languages' }),
+  roleDa: z
+    .string()
+    .min(1, { message: 'Fill in details in all the languages' }),
+  roleSv: z
+    .string()
+    .min(1, { message: 'Fill in details in all the languages' }),
+  member: teamMemberTypeSchema,
+});
+export type CreateHospitalTeamMemberFormFields = z.infer<
+  typeof createHospitalTeamMemberFormSchema
+>;
 
 function HospitalDetailsPage() {
   const [isCreateHospitalTeamModal, setIsCreateHospitalTeamModal] =

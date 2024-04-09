@@ -62,4 +62,36 @@ const intialLanguagesData: IntialLanguagesDataType = {
   Swedish: '',
 };
 
-export { countryData, intialLanguagesData };
+const handleSetLocalStorage = ({
+  tokenKey,
+  tokenValue,
+}: {
+  tokenKey: string;
+  tokenValue: string;
+}) => {
+  if (typeof window !== 'undefined') {
+    return localStorage.setItem(tokenKey, tokenValue);
+  }
+  return null;
+};
+
+const handleGetLocalStorage = ({ tokenKey }: { tokenKey: string }) => {
+  if (typeof window !== 'undefined') {
+    return localStorage.getItem(tokenKey);
+  }
+  return null;
+};
+
+const handleRemoveFromLocalStorage = ({ tokenKey }: { tokenKey: string }) => {
+  if (typeof window !== 'undefined') {
+    localStorage.removeItem(tokenKey);
+  }
+};
+
+export {
+  countryData,
+  handleGetLocalStorage,
+  handleRemoveFromLocalStorage,
+  handleSetLocalStorage,
+  intialLanguagesData,
+};

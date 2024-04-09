@@ -1,16 +1,19 @@
 'use client';
 
-import React, { useState } from 'react';
+import React from 'react';
 import OtpInput from 'react-otp-input';
 
 import otpInputStyle from './otpInput.module.scss';
 
-function OTPInputWrapper() {
-  const [otp, setOtp] = useState('');
-
-  const changeInputHandler = (x: any) => {
+function OTPInputWrapper({
+  otp,
+  setOtp,
+}: {
+  otp: string;
+  setOtp: React.Dispatch<React.SetStateAction<string>>;
+}) {
+  const changeInputHandler = (x: string) => {
     setOtp(x);
-    // console.log(x, 'code');
   };
 
   return (

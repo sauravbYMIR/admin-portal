@@ -45,7 +45,7 @@ function Header() {
           return (
             <FbtHeaderItem key={`${menu.name}`}>
               <Link
-                className={`text-left font-poppins text-base font-semibold  ${pathname.startsWith(menu.link) ? 'text-darkteal underline decoration-2 underline-offset-2' : ''}`}
+                className={`text-left font-poppins text-base font-semibold  ${pathname.startsWith(menu.link) ? 'text-darkteal underline decoration-2 underline-offset-4' : ''}`}
                 href={menu.link}
               >
                 {menu.name}

@@ -1,13 +1,19 @@
+'use client';
+
 import { FbtButton } from '@frontbase/components-react';
 import { zodResolver } from '@hookform/resolvers/zod';
 import Image from 'next/image';
-import { useRouter } from 'next/navigation';
+import { useRouter, useSearchParams } from 'next/navigation';
 import React from 'react';
 import type { SubmitHandler } from 'react-hook-form';
 import { useForm } from 'react-hook-form';
+import { ClipLoader } from 'react-spinners';
+import { toast, Toaster } from 'sonner';
 import { z } from 'zod';
 
+import { resendOTP, sendOTP, verifyOTP } from '@/hooks';
 import arrowIcon from '@/public/assets/icons/whiteArrow.svg';
+import { handleSetLocalStorage } from '@/utils/global';
 
 import style from '../../app/page.module.scss';
 import OTPInputWrapper from '../OtpInput/OtpInput';
@@ -61,24 +67,35 @@ function LoginWithMail({
 }: {
   setStep: React.Dispatch<React.SetStateAction<LoginStep>>;
 }) {
+  const router = useRouter();
   const {
     register,
     handleSubmit,
     formState: { errors, isSubmitting },
+    getValues,
   } = useForm<EmailFormFields>({
     resolver: zodResolver(emailFormSchema),
   });
-  const onFormSubmit: SubmitHandler<EmailFormFields> = () => {
-    setStep((prevState) => ({ ...prevState, otp: true, email: false }));
+  const onFormSubmit: SubmitHandler<EmailFormFields> = async () => {
+    try {
+      const response = await sendOTP({ email: getValues('email') });
+      if (response.success) {
+        setStep((prevState) => ({ ...prevState, otp: true, email: false }));
+        router.push(`?email=${getValues('email')}`, { scroll: false });
+      }
+    } catch (error) {
+      toast.error('Email verification failed');
+    }
   };
   return (
     <div className={style.contentContainer}>
       <h2 className={style.headingText}>Log in</h2>
-
       <form onSubmit={handleSubmit(onFormSubmit)}>
         <label className={style.emailLabel} htmlFor="email">
           Email
           <input
+            // eslint-disable-next-line jsx-a11y/no-autofocus
+            autoFocus
             placeholder="Enter your email"
             className={style.emailInput}
             id="email"
@@ -100,7 +117,13 @@ function LoginWithMail({
           disabled={isSubmitting}
         >
           {isSubmitting ? (
-            <>Loading...</>
+            <ClipLoader
+              loading={isSubmitting}
+              color="#fff"
+              size={30}
+              aria-label="Loading Spinner"
+              data-testid="loader"
+            />
           ) : (
             <>
               <p className={style.ctaBtnText}>Verify email</p>
@@ -114,15 +137,68 @@ function LoginWithMail({
 }
 
 function LoginWithOtp() {
+  const searchParams = useSearchParams();
+  const email = searchParams.get('email');
   const router = useRouter();
   const [isTimeElapsed, setIsTimeElapsed] = React.useState<boolean>(false);
+  const [otp, setOtp] = React.useState<string>('');
+  const [isLoading, setIsLoading] = React.useState<boolean>(false);
+  const [isDisableResendBtn, setIsDisableResendBtn] =
+    React.useState<boolean>(false);
+  const handleOtpLogin = async (
+    e: React.MouseEvent<HTMLButtonElement, MouseEvent>,
+  ) => {
+    e.preventDefault();
+    if (!email) {
+      toast.error('Email not found, please try again');
+      return;
+    }
+    setIsLoading(true);
+    try {
+      const response = await verifyOTP({ otp, email });
+      if (!response.success) {
+        toast.error('Incorrect otp');
+        return;
+      }
+      if (response.success) {
+        handleSetLocalStorage({
+          tokenKey: 'access_token',
+          tokenValue: response.accessToken,
+        });
+        handleSetLocalStorage({
+          tokenKey: 'refresh_token',
+          tokenValue: response.accessToken,
+        });
+        router.push('/patients');
+      }
+    } catch (error) {
+      toast.error('Error while verifying otp, please try again');
+    } finally {
+      setIsLoading(false);
+    }
+  };
+  const handleResendOtp = async () => {
+    if (!email) {
+      toast.error('Email not found');
+      return;
+    }
+    setIsDisableResendBtn(true);
+    try {
+      await resendOTP({ email });
+    } catch (error) {
+      toast.error('Resend otp failed, please try again');
+    } finally {
+      setIsDisableResendBtn(false);
+    }
+  };
   return (
-    <div className={style.contentContainer}>
+    <form className={style.contentContainer}>
+      <Toaster position="top-center" richColors closeButton />
       <h2 className={style.otpHeadingText}>Verify with OTP</h2>
       <p className={style.otpDesc}>You will receive the OTP on your email</p>
       <div className={style.otpInputContainer}>
         <p className="font-lexend text-xl font-light">OTP</p>
-        <OTPInputWrapper />
+        <OTPInputWrapper otp={otp} setOtp={setOtp} />
       </div>
       {!isTimeElapsed ? (
         <Timer
@@ -131,33 +207,49 @@ function LoginWithOtp() {
           setIsTimeElapsed={setIsTimeElapsed}
         />
       ) : (
-        <p className="mb-12 mt-[55px] font-poppins text-xl font-normal text-darkgray">
+        <button
+          className={`mb-12 mt-[55px] font-poppins text-xl font-normal text-darkgray ${isDisableResendBtn ? 'cursor-not-allowed' : 'cursor-pointer'}`}
+          type="button"
+          onClick={() => handleResendOtp()}
+          disabled={isDisableResendBtn}
+        >
           Didn&apos;t receive OTP?
-          <button
-            type="button"
-            className="ml-1 cursor-pointer border-none text-darkteal underline underline-offset-4"
-          >
+          <span className="ml-1 border-none text-darkteal underline underline-offset-4">
             Resend
-          </button>
-        </p>
+          </span>
+        </button>
       )}
       <FbtButton
-        className={style.landingPageCtaBtn}
+        className={`${style.landingPageCtaBtn} ${otp.length < 4 ? 'cursor-not-allowed' : ''}`}
         size="sm"
         variant="solid"
-        onClick={() => router.push('/patients')}
+        onClick={(e) => handleOtpLogin(e)}
+        type="submit"
+        disabled={otp.length < 4}
       >
-        <p className={style.ctaBtnText}>Log in</p>
-        <Image src={arrowIcon} alt="arrow icon cta button" />
+        {isLoading ? (
+          <ClipLoader
+            loading={isLoading}
+            color="#fff"
+            size={30}
+            aria-label="Loading Spinner"
+            data-testid="loader"
+          />
+        ) : (
+          <>
+            <p className={style.ctaBtnText}>Log in</p>
+            <Image src={arrowIcon} alt="arrow icon cta button" />
+          </>
+        )}
       </FbtButton>
-    </div>
+    </form>
   );
 }
 
 function Login() {
   const [step, setStep] = React.useState<LoginStep>({
-    email: true,
-    otp: false,
+    email: false,
+    otp: true,
   });
   return (
     <>

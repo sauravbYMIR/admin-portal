@@ -52,14 +52,14 @@ export const sendOTP = async ({
   email: string;
 }): Promise<ResendOtpResponse> => {
   try {
-    const response = await axios.post<ResendOtpResponse>(
+    const response = await axios.post<{ status: number }>(
       `${process.env.BASE_URL}/auth/send-otp`,
       {
         email,
       },
     );
     return {
-      success: response.data.success,
+      success: response.status === 201,
     };
   } catch (err) {
     if (axios.isAxiosError(err)) {

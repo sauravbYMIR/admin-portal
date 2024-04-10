@@ -94,8 +94,6 @@ function LoginWithMail({
         <label className={style.emailLabel} htmlFor="email">
           Email
           <input
-            // eslint-disable-next-line jsx-a11y/no-autofocus
-            autoFocus
             placeholder="Enter your email"
             className={style.emailInput}
             id="email"
@@ -143,6 +141,8 @@ function LoginWithOtp() {
   const [isTimeElapsed, setIsTimeElapsed] = React.useState<boolean>(false);
   const [otp, setOtp] = React.useState<string>('');
   const [isLoading, setIsLoading] = React.useState<boolean>(false);
+  const [isOtpResendLoading, setIsOtpResendLoading] =
+    React.useState<boolean>(false);
   const [isDisableResendBtn, setIsDisableResendBtn] =
     React.useState<boolean>(false);
   const handleOtpLogin = async (
@@ -183,12 +183,17 @@ function LoginWithOtp() {
       return;
     }
     setIsDisableResendBtn(true);
+    setIsOtpResendLoading(true);
     try {
-      await resendOTP({ email });
+      const r = await resendOTP({ email });
+      if (r.success) {
+        toast.success('Otp send successfully');
+      }
     } catch (error) {
       toast.error('Resend otp failed, please try again');
     } finally {
       setIsDisableResendBtn(false);
+      setIsOtpResendLoading(false);
     }
   };
   return (
@@ -200,7 +205,7 @@ function LoginWithOtp() {
         <p className="font-lexend text-xl font-light">OTP</p>
         <OTPInputWrapper otp={otp} setOtp={setOtp} />
       </div>
-      {!isTimeElapsed ? (
+      {isTimeElapsed ? (
         <Timer
           msg="Resend otp in"
           time={60}
@@ -214,9 +219,20 @@ function LoginWithOtp() {
           disabled={isDisableResendBtn}
         >
           Didn&apos;t receive OTP?
-          <span className="ml-1 border-none text-darkteal underline underline-offset-4">
-            Resend
-          </span>
+          {isOtpResendLoading ? (
+            <ClipLoader
+              className="ml-4"
+              loading={isOtpResendLoading}
+              color="#096f90"
+              size={20}
+              aria-label="Loading Spinner"
+              data-testid="loader"
+            />
+          ) : (
+            <span className="ml-1 border-none text-darkteal underline underline-offset-4">
+              Resend
+            </span>
+          )}
         </button>
       )}
       <FbtButton
@@ -248,8 +264,8 @@ function LoginWithOtp() {
 
 function Login() {
   const [step, setStep] = React.useState<LoginStep>({
-    email: false,
-    otp: true,
+    email: true,
+    otp: false,
   });
   return (
     <>

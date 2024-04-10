@@ -21,6 +21,8 @@
     "@frontbase/components-react": "^0.0.22-beta",
     "@hookform/resolvers": "^3.3.4",
     "@t3-oss/env-nextjs": "^0.8.0",
+    "@tanstack/react-query": "^5.29.0",
+    "@tanstack/react-query-devtools": "^5.29.0",
     "ag-grid-community": "^31.1.1",
     "ag-grid-react": "^31.1.1",
     "axios": "^1.6.8",

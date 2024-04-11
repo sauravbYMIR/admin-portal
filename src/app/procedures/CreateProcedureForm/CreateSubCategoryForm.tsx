@@ -1,26 +1,23 @@
 /* eslint-disable import/no-extraneous-dependencies */
 /* eslint-disable jsx-a11y/label-has-associated-control */
 import { zodResolver } from '@hookform/resolvers/zod';
-import { useState } from 'react';
+import React, { useState } from 'react';
 import type { SubmitHandler } from 'react-hook-form';
 import { Controller, useForm } from 'react-hook-form';
 import Select from 'react-select';
+import { ClipLoader } from 'react-spinners';
 import { z } from 'zod';
 
 import procedureModalStyle from '@/components/Modal/ProcedureModal/procedureModal.module.scss';
+import {
+  useCreateDepartment,
+  useGetAllDepartment,
+} from '@/hooks/useDepartment';
 import type { LanguagesType } from '@/types/components';
 import { countryData } from '@/utils/global';
 
+import type { DepartmentType } from './CreateProcedureForm';
 import { departmentTypeSchema } from './CreateProcedureForm';
-
-const options = [
-  { value: 'epilepsy', label: 'epilepsy' },
-  { value: 'dementia', label: 'dementia' },
-  { value: 'cardio', label: 'cardio' },
-  { value: 'cardiac arrest', label: 'cardiac arrest' },
-  { value: 'malaria', label: 'malaria' },
-  { value: 'tuberclusios', label: 'tuberclusios' },
-];
 
 interface CreateSubCategoryFormPropType {
   isEdit: boolean;
@@ -51,14 +48,46 @@ const subCategoryFormSchema = z.object({
 export type SubCategoryFormFields = z.infer<typeof subCategoryFormSchema>;
 
 function CreateSubCategoryForm({ isEdit }: CreateSubCategoryFormPropType) {
+  const createDepartment = useCreateDepartment();
+  const allDepartment = useGetAllDepartment();
+  const [departmentList, setDepartmentList] = useState<Array<DepartmentType>>(
+    [],
+  );
+  React.useEffect(() => {
+    if (
+      allDepartment.isSuccess &&
+      allDepartment.data &&
+      Array.isArray(allDepartment.data.data) &&
+      allDepartment.data.data.length > 0
+    ) {
+      setDepartmentList(() =>
+        allDepartment.data.data.map((department) => ({
+          value: department.id,
+          label:
+            department.name.en ||
+            department.name.nb ||
+            department.name.sv ||
+            department.name.da,
+        })),
+      );
+    }
+  }, [allDepartment.data, allDepartment.isSuccess]);
   const [createAnotherSubCategory, setCreateAnotherSubCategory] =
     useState(false);
 
   const [activeLanguageTab, setActiveLanguageTab] =
     useState<LanguagesType>('English');
 
-  const handleCreateSubCategory = () => {
-    // API call to create sub category
+  const handleCreateSubCategory = (data: SubCategoryFormFields) => {
+    createDepartment.mutate({
+      name: {
+        en: data.subCategoryEn,
+        nb: data.subCategoryNb,
+        da: data.subCategoryDa,
+        sv: data.subCategorySv,
+      },
+      parentCategoryId: data.department.value,
+    });
     setCreateAnotherSubCategory(false);
     setActiveLanguageTab('English');
   };
@@ -77,11 +106,13 @@ function CreateSubCategoryForm({ isEdit }: CreateSubCategoryFormPropType) {
     resolver: zodResolver(subCategoryFormSchema),
   });
 
-  const onFormSubmit: SubmitHandler<SubCategoryFormFields> = () => {
+  const onFormSubmit: SubmitHandler<SubCategoryFormFields> = (
+    data: SubCategoryFormFields,
+  ) => {
     if (isEdit) {
       handleEditSubCategory();
     } else {
-      handleCreateSubCategory();
+      handleCreateSubCategory(data);
     }
   };
 
@@ -115,7 +146,7 @@ function CreateSubCategoryForm({ isEdit }: CreateSubCategoryFormPropType) {
         render={({ field }) => (
           <Select
             {...field}
-            options={options}
+            options={departmentList}
             classNames={{
               control: (state) =>
                 state.isFocused
@@ -185,7 +216,7 @@ function CreateSubCategoryForm({ isEdit }: CreateSubCategoryFormPropType) {
           className={`${procedureModalStyle.procedureCheckboxContainer} mt-16`}
         >
           <input
-            onClick={() =>
+            onChange={() =>
               setCreateAnotherSubCategory(!createAnotherSubCategory)
             }
             checked={createAnotherSubCategory}
@@ -204,18 +235,27 @@ function CreateSubCategoryForm({ isEdit }: CreateSubCategoryFormPropType) {
 
       {isEdit ? (
         <button
-          className="flex items-center justify-center rounded-lg bg-darkteal px-6 py-3 font-poppins text-2xl font-normal text-white"
+          className="mt-5 flex items-center justify-center rounded-lg bg-darkteal px-6 py-3 font-poppins text-2xl font-normal text-white"
           type="submit"
         >
           Save changes
         </button>
       ) : (
         <button
-          className="flex items-center justify-center rounded-lg bg-darkteal px-6 py-3 font-poppins text-2xl font-normal text-white"
+          className="mb-5 flex items-center justify-center rounded-lg bg-darkteal px-6 py-3 font-poppins text-2xl font-normal text-white"
           type="submit"
-          onClick={handleCreateSubCategory}
         >
-          Create sub category
+          {createDepartment.isPending ? (
+            <ClipLoader
+              loading={createDepartment.isPending}
+              color="#fff"
+              size={30}
+              aria-label="Loading Spinner"
+              data-testid="loader"
+            />
+          ) : (
+            <span>Create sub category</span>
+          )}
         </button>
       )}
     </form>

@@ -4,6 +4,7 @@
 
 /* eslint-disable jsx-a11y/label-has-associated-control */
 /* eslint-disable no-nested-ternary */
+
 import Image from 'next/image';
 import { useEffect, useState } from 'react';
 
@@ -12,6 +13,9 @@ import CreateSubCategoryForm from '@/app/procedures/CreateProcedureForm/CreateSu
 import closeIcon from '@/public/assets/icons/close.svg';
 
 import procedureModalStyle from './procedureModal.module.scss';
+
+export const SUBCAT = 'SUBCAT';
+export const PROC = 'PROC';
 
 interface DepartmentModalProps {
   isOpen: boolean;
@@ -26,17 +30,19 @@ function ProcedureModal({
   isEdit,
   editSubCategory,
 }: DepartmentModalProps) {
-  const [isProcedure, setIsProcedure] = useState<boolean | undefined>(false);
+  const [radioType, setRadioType] = useState<'SUBCAT' | 'PROC'>(SUBCAT);
 
   useEffect(() => {
     if (isEdit) {
       if (editSubCategory) {
-        setIsProcedure(false);
+        setRadioType(SUBCAT);
       } else {
-        setIsProcedure(true);
+        setRadioType(PROC);
       }
     }
   }, [isEdit, editSubCategory]);
+
+  console.log({ radioType, v: radioType === PROC, b: radioType === SUBCAT });
 
   return (
     <div>
@@ -46,7 +52,7 @@ function ProcedureModal({
             <div className={procedureModalStyle.modalHeader}>
               <h2 className={procedureModalStyle.title}>
                 {!isEdit
-                  ? isProcedure
+                  ? radioType === PROC
                     ? 'Create a procedure'
                     : 'Create a sub category'
                   : editSubCategory
@@ -54,58 +60,97 @@ function ProcedureModal({
                     : 'Edit procedure'}
               </h2>
 
-              <Image
-                className={procedureModalStyle.closeButton}
-                src={closeIcon}
-                alt="modal close icon"
-                width={24}
-                height={24}
+              <button
                 onClick={onClose}
-              />
+                type="button"
+                className="cursor-pointer"
+              >
+                <Image
+                  src={closeIcon}
+                  alt="modal close icon"
+                  width={24}
+                  height={24}
+                />
+              </button>
             </div>
 
             <div className={procedureModalStyle.modalBody}>
               {!isEdit && (
+                // <FbtRadioGroup
+                //   defaultValue={radioType}
+                //   className="!mb-6 !flex !items-center"
+                // >
+                //   <div className="mr-14 flex items-center space-x-2">
+                //     <FbtRadioGroupItem
+                //       value={radioType}
+                //       className={procedureModalStyle.radio}
+                //       onChange={() => setRadioType(PROC)}
+                //       id={radioType}
+                //     />
+                //     <FbtLabel
+                //       className={procedureModalStyle.radioLabel}
+                //       htmlFor={radioType}
+                //     >
+                //       Create procedure
+                //     </FbtLabel>
+                //   </div>
+                //   <div className="flex items-center space-x-2">
+                //     <FbtRadioGroupItem
+                //       value={radioType}
+                //       className={procedureModalStyle.radio}
+                //       onChange={() => setRadioType(SUBCAT)}
+                //       id={radioType}
+                //     />
+                //     <FbtLabel
+                //       className={procedureModalStyle.radioLabel}
+                //       htmlFor={radioType}
+                //     >
+                //       Create sub category
+                //     </FbtLabel>
+                //   </div>
+                // </FbtRadioGroup>
                 <div className={procedureModalStyle.radioSelectContainer}>
                   <div className={procedureModalStyle.radioWrapper}>
                     <input
-                      checked={isProcedure}
+                      checked={radioType === PROC}
                       className={procedureModalStyle.radio}
                       type="radio"
-                      onClick={() => setIsProcedure(true)}
-                      id="create-procedure"
+                      onChange={() => setRadioType(PROC)}
+                      id={PROC}
+                      name={PROC}
+                      value={radioType}
                     />
                     <label
                       className={procedureModalStyle.radioLabel}
-                      htmlFor="create-procedure"
+                      htmlFor={PROC}
                     >
-                      Create <span>procedure</span>
+                      Create procedure
                     </label>
                   </div>
 
                   <div className={procedureModalStyle.radioWrapper}>
                     <input
-                      checked={!isProcedure}
+                      checked={radioType === SUBCAT}
                       className={procedureModalStyle.radio}
                       type="radio"
-                      onClick={() => setIsProcedure(false)}
-                      id="create-subcat"
+                      onChange={() => setRadioType(SUBCAT)}
+                      id={SUBCAT}
+                      name={SUBCAT}
+                      value={radioType}
                     />
                     <label
                       className={procedureModalStyle.radioLabel}
-                      htmlFor="create-subcat"
+                      htmlFor={SUBCAT}
                     >
-                      Create <span>sub category</span>
+                      Create sub category
                     </label>
                   </div>
                 </div>
               )}
-
-              {isProcedure ? (
-                <CreateProcedureForm isEdit={isEdit} />
-              ) : (
+              {radioType === SUBCAT && (
                 <CreateSubCategoryForm isEdit={isEdit} />
               )}
+              {radioType === PROC && <CreateProcedureForm isEdit={isEdit} />}
             </div>
           </div>
         </div>

@@ -2,24 +2,18 @@
 /* eslint-disable jsx-a11y/label-has-associated-control */
 import { zodResolver } from '@hookform/resolvers/zod';
 import Image from 'next/image';
-import { useState } from 'react';
+import React, { useState } from 'react';
 import type { SubmitHandler } from 'react-hook-form';
 import { Controller, useForm } from 'react-hook-form';
 import Select from 'react-select';
+import { ClipLoader } from 'react-spinners';
 import { z } from 'zod';
 
 import procedureModalStyle from '@/components/Modal/ProcedureModal/procedureModal.module.scss';
+import { useGetAllDepartment } from '@/hooks/useDepartment';
+import { useCreateProcedure } from '@/hooks/useProcedure';
 import type { LanguagesType } from '@/types/components';
 import { countryData } from '@/utils/global';
-
-const options = [
-  { value: 'epilepsy', label: 'epilepsy' },
-  { value: 'dementia', label: 'dementia' },
-  { value: 'cardio', label: 'cardio' },
-  { value: 'cardiac arrest', label: 'cardiac arrest' },
-  { value: 'malaria', label: 'malaria' },
-  { value: 'tuberclusios', label: 'tuberclusios' },
-];
 
 interface CreateProcedureFormPropType {
   isEdit: boolean;
@@ -77,15 +71,55 @@ const procedureFormSchema = z.object({
   department: departmentTypeSchema,
 });
 export type ProcedureFormFields = z.infer<typeof procedureFormSchema>;
+export type DepartmentType = {
+  value: string;
+  label: string;
+};
 
 function CreateProcedureForm({ isEdit }: CreateProcedureFormPropType) {
+  const createProcedure = useCreateProcedure();
+  const allDepartment = useGetAllDepartment();
   const [activeLanguageTab, setActiveLanguageTab] =
     useState<LanguagesType>('English');
-
   const [createAnotherProcedure, setCreateAnotherProcedure] = useState(false);
-
-  const handleCreateProcedure = () => {
-    // API call to create sub category
+  const [departmentList, setDepartmentList] = useState<Array<DepartmentType>>(
+    [],
+  );
+  React.useEffect(() => {
+    if (
+      allDepartment.isSuccess &&
+      allDepartment.data &&
+      Array.isArray(allDepartment.data.data) &&
+      allDepartment.data.data.length > 0
+    ) {
+      setDepartmentList(() =>
+        allDepartment.data.data.map((department) => ({
+          value: department.id,
+          label:
+            department.name.en ||
+            department.name.nb ||
+            department.name.sv ||
+            department.name.da,
+        })),
+      );
+    }
+  }, [allDepartment.data, allDepartment.isSuccess]);
+  const handleCreateProcedure = (data: ProcedureFormFields) => {
+    createProcedure.mutate({
+      name: {
+        en: data.procedureEn,
+        nb: data.procedureNb,
+        da: data.procedureDa,
+        sv: data.procedureSv,
+      },
+      categoryId: data.department.value,
+      reimbursement: {
+        en: Number(data.reimbursementEn),
+        nb: Number(data.reimbursementNb),
+        da: Number(data.reimbursementDa),
+        sv: Number(data.reimbursementSv),
+      },
+    });
     setCreateAnotherProcedure(false);
     setActiveLanguageTab('English');
   };
@@ -104,11 +138,13 @@ function CreateProcedureForm({ isEdit }: CreateProcedureFormPropType) {
     resolver: zodResolver(procedureFormSchema),
   });
 
-  const onFormSubmit: SubmitHandler<ProcedureFormFields> = () => {
+  const onFormSubmit: SubmitHandler<ProcedureFormFields> = (
+    data: ProcedureFormFields,
+  ) => {
     if (isEdit) {
       handleEditProcedure();
     } else {
-      handleCreateProcedure();
+      handleCreateProcedure(data);
     }
   };
 
@@ -144,7 +180,7 @@ function CreateProcedureForm({ isEdit }: CreateProcedureFormPropType) {
       <Controller
         name="department"
         control={control}
-        render={({ field }) => <Select {...field} options={options} />}
+        render={({ field }) => <Select {...field} options={departmentList} />}
       />
       {errors.department && (
         <div className="mt-1 text-start font-lexend text-base font-normal text-error">
@@ -206,7 +242,7 @@ function CreateProcedureForm({ isEdit }: CreateProcedureFormPropType) {
           ] as ProcedureFormSchemaType;
 
           return (
-            <div key={data.locale}>
+            <div key={data.locale} className="mb-5 mt-6">
               <div className={procedureModalStyle.procedureReimbursementInput}>
                 <label
                   htmlFor="reimbursement"
@@ -254,7 +290,7 @@ function CreateProcedureForm({ isEdit }: CreateProcedureFormPropType) {
           style={{ marginTop: '64px' }}
         >
           <input
-            onClick={() => setCreateAnotherProcedure(!createAnotherProcedure)}
+            onChange={() => setCreateAnotherProcedure(!createAnotherProcedure)}
             checked={createAnotherProcedure}
             className={procedureModalStyle.checkbox}
             id="another-procedure"
@@ -274,14 +310,24 @@ function CreateProcedureForm({ isEdit }: CreateProcedureFormPropType) {
           style={{ marginTop: '64px' }}
           type="submit"
         >
-          Save changes
+          <span>Save changes</span>
         </button>
       ) : (
         <button
           className="flex items-center justify-center rounded-lg bg-darkteal px-6 py-3 font-poppins text-2xl font-normal text-white"
           type="submit"
         >
-          Create procedure
+          {createProcedure.isPending ? (
+            <ClipLoader
+              loading={createProcedure.isPending}
+              color="#fff"
+              size={30}
+              aria-label="Loading Spinner"
+              data-testid="loader"
+            />
+          ) : (
+            <span>Create procedure</span>
+          )}
         </button>
       )}
     </form>

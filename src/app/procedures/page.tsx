@@ -42,6 +42,7 @@ function ProceduresList() {
     React.useState<boolean>(false);
   const [isEditSubCategory, setIsEditSubCategory] =
     React.useState<boolean>(false);
+  const [updateId, setUpdateId] = React.useState<string>('');
   const [isEditData, setIsEditData] = React.useState<boolean>(false);
   const departmentProcedureList = useGetAllDepartmentWithProcedure();
   const router = useRouter();
@@ -51,6 +52,7 @@ function ProceduresList() {
         isOpen={editDepartmentModalOpen}
         onClose={() => setEditDepartmentModalOpen(false)}
         isEdit={isEditData}
+        updateId={updateId}
       />
       <ProcedureModal
         isOpen={
@@ -63,12 +65,14 @@ function ProceduresList() {
         }
         isEdit={isEditData}
         editSubCategory={isEditSubCategory}
+        updateId={updateId}
       />
       <ProcedureModal
         isOpen={editProcedureModalOpen}
         onClose={() => setEditProcedureModalOpen(false)}
         isEdit={isEditData}
         editSubCategory={false}
+        updateId={updateId}
       />
       <CustomHomePage
         heading="Procedure List"
@@ -122,6 +126,7 @@ function ProceduresList() {
                             <Accordion
                               editClickHandler={() => {
                                 console.log('department');
+                                setUpdateId(procedureData.id);
                                 setIsEditData(true);
                                 setEditDepartmentModalOpen(true);
                               }}
@@ -138,6 +143,7 @@ function ProceduresList() {
                                       <Accordion
                                         editClickHandler={() => {
                                           console.log('procedure');
+                                          setUpdateId(procedure.id);
                                           setIsEditData(true);
                                           setEditProcedureModalOpen(true);
                                         }}
@@ -182,6 +188,7 @@ function ProceduresList() {
                                             className="ml-2 cursor-pointer"
                                             onClick={() => {
                                               console.log('sub-cat1');
+                                              setUpdateId(subCategoryData.id);
                                               setIsEditData(true);
                                               setIsEditSubCategory(true);
                                               setEditSubCategoryModalOpen(true);
@@ -214,6 +221,7 @@ function ProceduresList() {
                                                     title={procedure.name.en}
                                                     editClickHandler={() => {
                                                       console.log('sub-cat');
+                                                      setUpdateId(procedure.id);
                                                       setIsEditData(true);
                                                       setEditProcedureModalOpen(
                                                         true,

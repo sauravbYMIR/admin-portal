@@ -8,7 +8,7 @@ import React from 'react';
 import type { SubmitHandler } from 'react-hook-form';
 import { useForm } from 'react-hook-form';
 import { ClipLoader } from 'react-spinners';
-import { toast, Toaster } from 'sonner';
+import { toast } from 'sonner';
 import { z } from 'zod';
 
 import { resendOTP, sendOTP, verifyOTP } from '@/hooks';
@@ -198,7 +198,6 @@ function LoginWithOtp() {
   };
   return (
     <form className={style.contentContainer}>
-      <Toaster position="top-center" richColors closeButton />
       <h2 className={style.otpHeadingText}>Verify with OTP</h2>
       <p className={style.otpDesc}>You will receive the OTP on your email</p>
       <div className={style.otpInputContainer}>

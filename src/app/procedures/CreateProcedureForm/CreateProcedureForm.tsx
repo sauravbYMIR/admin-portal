@@ -11,12 +11,17 @@ import { z } from 'zod';
 
 import procedureModalStyle from '@/components/Modal/ProcedureModal/procedureModal.module.scss';
 import { useGetAllDepartment } from '@/hooks/useDepartment';
-import { useCreateProcedure } from '@/hooks/useProcedure';
+import {
+  useCreateProcedure,
+  useEditProcedure,
+  useGetProcedureById,
+} from '@/hooks/useProcedure';
 import type { LanguagesType } from '@/types/components';
 import { countryData } from '@/utils/global';
 
 interface CreateProcedureFormPropType {
   isEdit: boolean;
+  updateId: string;
 }
 
 export type ProcedureFormSchemaType =
@@ -76,7 +81,16 @@ export type DepartmentType = {
   label: string;
 };
 
-function CreateProcedureForm({ isEdit }: CreateProcedureFormPropType) {
+function CreateProcedureForm({
+  isEdit,
+  updateId,
+}: CreateProcedureFormPropType) {
+  const [selectedOption, setSelectedOption] = React.useState<{
+    label: string;
+    value: string;
+  } | null>(null);
+  const reqProcedure = useGetProcedureById({ id: updateId });
+  const editProcedure = useEditProcedure();
   const createProcedure = useCreateProcedure();
   const allDepartment = useGetAllDepartment();
   const [activeLanguageTab, setActiveLanguageTab] =
@@ -123,8 +137,22 @@ function CreateProcedureForm({ isEdit }: CreateProcedureFormPropType) {
     setCreateAnotherProcedure(false);
     setActiveLanguageTab('English');
   };
-  const handleEditProcedure = () => {
-    // API call to create sub category
+  const handleEditProcedure = (data: ProcedureFormFields) => {
+    editProcedure.mutate({
+      procedureId: data.department.value,
+      name: {
+        en: data.procedureEn,
+        nb: data.procedureNb,
+        da: data.procedureDa,
+        sv: data.procedureSv,
+      },
+      reimbursement: {
+        en: Number(data.reimbursementEn),
+        nb: Number(data.reimbursementNb),
+        da: Number(data.reimbursementDa),
+        sv: Number(data.reimbursementSv),
+      },
+    });
     setCreateAnotherProcedure(false);
     setActiveLanguageTab('English');
   };
@@ -133,16 +161,64 @@ function CreateProcedureForm({ isEdit }: CreateProcedureFormPropType) {
     control,
     register,
     handleSubmit,
+    setValue,
     formState: { errors },
   } = useForm<ProcedureFormFields>({
     resolver: zodResolver(procedureFormSchema),
   });
 
+  React.useEffect(() => {
+    if (
+      updateId &&
+      reqProcedure.isSuccess &&
+      reqProcedure.data &&
+      reqProcedure.data.success &&
+      reqProcedure.data.data.id
+    ) {
+      setSelectedOption({
+        value:
+          reqProcedure.data.data.category.name.en ||
+          reqProcedure.data.data.category.name.da ||
+          reqProcedure.data.data.category.name.sv ||
+          reqProcedure.data.data.category.name.nb,
+        label: reqProcedure.data.data.category.id,
+      });
+      setValue(
+        'department.label',
+        reqProcedure.data.data.category.name.en ||
+          reqProcedure.data.data.category.name.nb ||
+          reqProcedure.data.data.category.name.da ||
+          reqProcedure.data.data.category.name.sv,
+      );
+      setValue('department.value', reqProcedure.data.data.category.id);
+      setValue('procedureEn', reqProcedure.data.data.name.en);
+      setValue('procedureDa', reqProcedure.data.data.name.da);
+      setValue('procedureSv', reqProcedure.data.data.name.sv);
+      setValue('procedureNb', reqProcedure.data.data.name.nb);
+      setValue(
+        'reimbursementEn',
+        reqProcedure.data.data.reimbursement.en.toString(),
+      );
+      setValue(
+        'reimbursementNb',
+        reqProcedure.data.data.reimbursement.nb.toString(),
+      );
+      setValue(
+        'reimbursementSv',
+        reqProcedure.data.data.reimbursement.sv.toString(),
+      );
+      setValue(
+        'reimbursementDa',
+        reqProcedure.data.data.reimbursement.da.toString(),
+      );
+    }
+  }, [reqProcedure.data, reqProcedure.isSuccess, setValue, updateId]);
+
   const onFormSubmit: SubmitHandler<ProcedureFormFields> = (
     data: ProcedureFormFields,
   ) => {
     if (isEdit) {
-      handleEditProcedure();
+      handleEditProcedure(data);
     } else {
       handleCreateProcedure(data);
     }
@@ -180,7 +256,19 @@ function CreateProcedureForm({ isEdit }: CreateProcedureFormPropType) {
       <Controller
         name="department"
         control={control}
-        render={({ field }) => <Select {...field} options={departmentList} />}
+        defaultValue={
+          selectedOption?.label ? selectedOption : { label: '', value: '' }
+        }
+        render={({ field }) => (
+          <Select
+            {...field}
+            options={departmentList}
+            onChange={(value) => {
+              setSelectedOption(value);
+              field.onChange(value);
+            }}
+          />
+        )}
       />
       {errors.department && (
         <div className="mt-1 text-start font-lexend text-base font-normal text-error">
@@ -306,15 +394,25 @@ function CreateProcedureForm({ isEdit }: CreateProcedureFormPropType) {
       )}
       {isEdit ? (
         <button
-          className="flex items-center justify-center rounded-lg bg-darkteal px-6 py-3 font-poppins text-2xl font-normal text-white"
+          className="flex w-[357px] items-center justify-center rounded-lg bg-darkteal px-6 py-3 font-poppins text-2xl font-normal text-white"
           style={{ marginTop: '64px' }}
           type="submit"
         >
-          <span>Save changes</span>
+          {editProcedure.isPending ? (
+            <ClipLoader
+              loading={editProcedure.isPending}
+              color="#fff"
+              size={30}
+              aria-label="Loading Spinner"
+              data-testid="loader"
+            />
+          ) : (
+            <span>Save changes</span>
+          )}
         </button>
       ) : (
         <button
-          className="flex items-center justify-center rounded-lg bg-darkteal px-6 py-3 font-poppins text-2xl font-normal text-white"
+          className="flex w-[357px] items-center justify-center rounded-lg bg-darkteal px-6 py-3 font-poppins text-2xl font-normal text-white"
           type="submit"
         >
           {createProcedure.isPending ? (

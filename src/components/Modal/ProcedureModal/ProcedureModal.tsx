@@ -22,6 +22,7 @@ interface DepartmentModalProps {
   onClose: () => void;
   isEdit: boolean;
   editSubCategory?: boolean;
+  updateId: string;
 }
 
 function ProcedureModal({
@@ -29,6 +30,7 @@ function ProcedureModal({
   onClose,
   isEdit,
   editSubCategory,
+  updateId,
 }: DepartmentModalProps) {
   const [radioType, setRadioType] = useState<'SUBCAT' | 'PROC'>(SUBCAT);
 
@@ -41,8 +43,6 @@ function ProcedureModal({
       }
     }
   }, [isEdit, editSubCategory]);
-
-  console.log({ radioType, v: radioType === PROC, b: radioType === SUBCAT });
 
   return (
     <div>
@@ -148,9 +148,11 @@ function ProcedureModal({
                 </div>
               )}
               {radioType === SUBCAT && (
-                <CreateSubCategoryForm isEdit={isEdit} />
+                <CreateSubCategoryForm isEdit={isEdit} updateId={updateId} />
               )}
-              {radioType === PROC && <CreateProcedureForm isEdit={isEdit} />}
+              {radioType === PROC && (
+                <CreateProcedureForm isEdit={isEdit} updateId={updateId} />
+              )}
             </div>
           </div>
         </div>

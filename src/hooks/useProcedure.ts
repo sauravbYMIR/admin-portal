@@ -1,4 +1,5 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
+import { toast } from 'sonner';
 
 import { axiosInstance } from '@/utils/axiosInstance';
 
@@ -22,6 +23,19 @@ export type GetAllProcudureResponse = {
   success: boolean;
   status: number;
   data: Array<ProcedureType>;
+};
+export type GetProcedureByIdResponse = {
+  success: boolean;
+  status: number;
+  data: {
+    id: string;
+    name: NameJSONType;
+    reimbursement: ReimbursementJSONType;
+    category: {
+      name: NameJSONType;
+      id: string;
+    };
+  };
 };
 
 export type EditProcedureResponse = {
@@ -80,6 +94,9 @@ export const useCreateProcedure = () => {
         queryKey: [`procedure`],
       });
     },
+    onError: (error) => {
+      toast(`Something went wrong: ${error.message}`);
+    },
   });
 };
 
@@ -113,5 +130,30 @@ export const useEditProcedure = () => {
         queryKey: [`procedure`],
       });
     },
+    onError: (error) => {
+      toast(`Something went wrong: ${error.message}`);
+    },
+  });
+};
+
+export const getProcedureById = async (
+  id: string,
+): Promise<GetProcedureByIdResponse> => {
+  const response = await axiosInstance.get<GetProcedureByIdResponse>(
+    `${process.env.BASE_URL}/procedure/${id}`,
+  );
+  return {
+    success: response.data.success,
+    status: response.data.status,
+    data: response.data.data,
+  };
+};
+
+export const useGetProcedureById = ({ id }: { id: string }) => {
+  return useQuery({
+    queryKey: [`procedure`, id],
+    queryFn: () => getProcedureById(id),
+    refetchOnWindowFocus: false,
+    enabled: !!id,
   });
 };

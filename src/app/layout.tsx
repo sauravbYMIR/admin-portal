@@ -1,11 +1,14 @@
 import '@/styles/global.css';
 
+import { Toaster } from 'sonner';
+
 import Providers from '@/utils/providers';
 
 export default function RootLayout(props: { children: React.ReactNode }) {
   return (
     <html lang="en">
       <body>
+        <Toaster position="top-center" richColors closeButton />
         <Providers>{props.children}</Providers>
       </body>
     </html>

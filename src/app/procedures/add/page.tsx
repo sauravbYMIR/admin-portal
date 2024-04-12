@@ -150,7 +150,6 @@ function AddProcedure() {
           List of all Procedures listed on the platform
         </p>
       </div>
-
       {procedureList.length > 0 && (
         <div className={proceduresStyle.addDeptProcedureBtnContainer}>
           <FbtButton
@@ -184,7 +183,6 @@ function AddProcedure() {
           </FbtButton>
         </div>
       )}
-
       {procedureList.length <= 0 && (
         <div className={proceduresStyle.addDepartmentContainer}>
           <h2 className={proceduresStyle.subTitle}>
@@ -202,7 +200,6 @@ function AddProcedure() {
           </FbtButton>
         </div>
       )}
-
       <div
         style={{ marginBottom: '80px' }}
         className={proceduresStyle.departmentAccordionContainer}
@@ -298,37 +295,37 @@ function AddProcedure() {
           );
         })}
       </div>
-
       <DepartmentModal
         isOpen={departmentModalOpen}
         onClose={() => setDepartmentModalOpen(false)}
         isEdit={false}
+        updateId=""
       />
-
       <DepartmentModal
         isOpen={editDepartmentModalOpen}
         onClose={() => setEditDepartmentModalOpen(false)}
         isEdit
+        updateId=""
       />
-
       <ProcedureModal
         isOpen={procedureModalOpen}
         onClose={() => setProcedureModalOpen(false)}
         isEdit={false}
+        updateId=""
       />
-
       <ProcedureModal
         isOpen={editProcedureModalOpen}
         onClose={() => setEditProcedureModalOpen(false)}
         isEdit
         editSubCategory={false}
+        updateId=""
       />
-
       <ProcedureModal
         isOpen={editSubCategoryModalOpen}
         onClose={() => setEditSubCategoryModalOpen(false)}
         isEdit
         editSubCategory
+        updateId=""
       />
     </div>
   );

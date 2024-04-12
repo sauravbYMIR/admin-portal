@@ -1,4 +1,5 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
+import { toast } from 'sonner';
 
 import { axiosInstance } from '@/utils/axiosInstance';
 
@@ -60,6 +61,19 @@ export type GetAllDepartmentResponse = {
   status: number;
   data: Array<DepartmentType>;
 };
+export type GetDepartmentByIdResponse = {
+  success: boolean;
+  status: number;
+  data: {
+    id: string;
+    name: NameJSONType;
+    parentCategory: {
+      id: string;
+      name: NameJSONType;
+      parentCategoryId: null;
+    };
+  };
+};
 
 export type EditDepartmentResponse = {
   success: true;
@@ -116,6 +130,9 @@ export const useCreateDepartment = () => {
         queryKey: [`department-with-procedure`],
       });
     },
+    onError: (error) => {
+      toast(`Something went wrong: ${error.message}`);
+    },
   });
 };
 
@@ -165,5 +182,30 @@ export const useEditDepartment = () => {
         queryKey: [`department-with-procedure`, `department`],
       });
     },
+    onError: (error) => {
+      toast(`Something went wrong: ${error.message}`);
+    },
+  });
+};
+
+export const getDepartmentById = async (
+  id: string,
+): Promise<GetDepartmentByIdResponse> => {
+  const response = await axiosInstance.get<GetDepartmentByIdResponse>(
+    `${process.env.BASE_URL}/category/${id}`,
+  );
+  return {
+    success: response.data.success,
+    status: response.data.status,
+    data: response.data.data,
+  };
+};
+
+export const useGetDepartmentById = ({ id }: { id: string }) => {
+  return useQuery({
+    queryKey: [`department`, id],
+    queryFn: () => getDepartmentById(id),
+    refetchOnWindowFocus: false,
+    enabled: !!id,
   });
 };

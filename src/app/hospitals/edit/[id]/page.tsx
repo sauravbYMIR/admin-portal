@@ -3,19 +3,19 @@
 'use client';
 
 /* eslint-disable jsx-a11y/label-has-associated-control */
-import { FbtButton, FbtFileUpload } from '@frontbase/components-react';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useRouter } from 'next/navigation';
 import React from 'react';
 import type { SubmitHandler } from 'react-hook-form';
-import { useForm } from 'react-hook-form';
+import { Controller, useForm } from 'react-hook-form';
 import { z } from 'zod';
 
 import { BackArrowIcon, Header, WithAuth } from '@/components';
+import { useGetHospitalById } from '@/hooks';
 import type { LanguagesType } from '@/types/components';
 import { countryData } from '@/utils/global';
 
-import addHospitalStyle from './style.module.scss';
+import addHospitalStyle from '../../add/style.module.scss';
 
 export type HospitalFormSchemaType =
   | 'hospitalDescEn'
@@ -23,7 +23,7 @@ export type HospitalFormSchemaType =
   | 'hospitalDescDa'
   | 'hospitalDescSv';
 
-const createHospitalFormSchema = z.object({
+const editHospitalFormSchema = z.object({
   hospitalName: z.string().min(1, { message: 'Hospital name is required' }),
   hospitalDescEn: z
     .string()
@@ -46,18 +46,28 @@ const createHospitalFormSchema = z.object({
   zipCode: z.string().refine((val) => !Number.isNaN(parseInt(val, 10)), {
     message: 'Zipcode is required',
   }),
+  logo: z.custom<File>((v) => v instanceof File, {
+    message: 'Image is required',
+  }),
+  gallery: z.custom<File>((v) => v instanceof File, {
+    message: 'Image is required',
+  }),
 });
-export type CreateHospitalFormFields = z.infer<typeof createHospitalFormSchema>;
-function AddHospital() {
+export type EditHospitalFormFields = z.infer<typeof editHospitalFormSchema>;
+function EditHospital({ params: { id } }: { params: { id: string } }) {
+  // const editHospital = useEditHospital();
+  const reqdHospital = useGetHospitalById({ id });
   const [activeLanguageTab, setActiveLanguageTab] =
     React.useState<LanguagesType>('English');
   const router = useRouter();
   const {
     register,
+    control,
     handleSubmit,
+    setValue,
     formState: { errors },
-  } = useForm<CreateHospitalFormFields>({
-    resolver: zodResolver(createHospitalFormSchema),
+  } = useForm<EditHospitalFormFields>({
+    resolver: zodResolver(editHospitalFormSchema),
   });
   const hospitalObj = {
     English: 'hospitalDescEn',
@@ -69,19 +79,32 @@ function AddHospital() {
     const lang = hospitalObj[c.language] as HospitalFormSchemaType;
     return errors[lang] && errors[lang]?.message;
   });
-  const handleCreateHospital = () => {
-    // API call to create sub category
-    setActiveLanguageTab('English');
-  };
-  // const handleEditHospital = () => {
-  //   // API call to create sub category
-  //   setActiveLanguageTab('English');
-  // };
-  const onFormSubmit: SubmitHandler<CreateHospitalFormFields> = () => {
-    // TODO: WIP
-    handleCreateHospital();
-    // handleEditHospital();
-  };
+  const onFormSubmit: SubmitHandler<EditHospitalFormFields> = () =>
+    // data: EditHospitalFormFields,
+    {
+      // TODO: WIP
+      // editHospital.mutate({
+      // })
+    };
+  React.useEffect(() => {
+    if (
+      id &&
+      reqdHospital.isSuccess &&
+      reqdHospital.data &&
+      reqdHospital.data.success
+    ) {
+      setValue('hospitalName', reqdHospital.data.data.name);
+      setValue('hospitalDescEn', reqdHospital.data.data.description.da);
+      setValue('hospitalDescNb', reqdHospital.data.data.description.sv);
+      setValue('hospitalDescDa', reqdHospital.data.data.description.nb);
+      setValue('hospitalDescSv', reqdHospital.data.data.description.nb);
+      setValue('streetName', reqdHospital.data.data.streetName);
+      setValue('city', reqdHospital.data.data.city);
+      setValue('country', reqdHospital.data.data.country);
+      setValue('streetNumber', reqdHospital.data.data.streetNumber);
+      setValue('zipCode', reqdHospital.data.data.zipcode);
+    }
+  }, [reqdHospital.data, reqdHospital.isSuccess, setValue, id]);
   return (
     <div>
       <Header />
@@ -106,8 +129,24 @@ function AddHospital() {
           >
             Hospital logo
           </label>
-          <FbtFileUpload message="PNG, JPG (max. 10 MB)" />
-
+          <Controller
+            name="logo"
+            control={control}
+            render={({ field: { ref, name, onBlur, onChange } }) => (
+              <input
+                type="file"
+                ref={ref}
+                name={name}
+                onBlur={onBlur}
+                onChange={(e) => onChange(e.target.files?.[0])}
+              />
+            )}
+          />
+          {errors.logo && (
+            <small className="mt-1 text-start font-lexend text-base font-normal text-error">
+              {errors.logo.message}
+            </small>
+          )}
           <label
             style={{ margin: '24px 0 8px' }}
             className={addHospitalStyle.label}
@@ -286,27 +325,32 @@ function AddHospital() {
           <p className={addHospitalStyle.hospitalGalleryDesc}>
             Upload a minimum of 3 media items and maximum 10 media items
           </p>
-
-          <FbtFileUpload message="PNG, JPG, MP4, MOV  (max. 10 MB)" />
-
+          <Controller
+            name="gallery"
+            control={control}
+            render={({ field: { ref, name, onBlur, onChange } }) => (
+              <input
+                type="file"
+                ref={ref}
+                name={name}
+                onBlur={onBlur}
+                onChange={(e) => onChange(e.target.files?.[0])}
+              />
+            )}
+          />
+          {errors.gallery && (
+            <small className="mt-1 text-start font-lexend text-base font-normal text-error">
+              {errors.gallery.message}
+            </small>
+          )}
           <div className={addHospitalStyle.footerBtnContainer}>
-            <FbtButton
-              className={addHospitalStyle.cancelBtn}
-              size="sm"
-              variant="outline"
-              type="submit"
-            >
+            <button className={addHospitalStyle.cancelBtn} type="submit">
               <p>Cancel</p>
-            </FbtButton>
+            </button>
 
-            <FbtButton
-              className={addHospitalStyle.publishBtn}
-              size="sm"
-              variant="solid"
-              type="submit"
-            >
+            <button className={addHospitalStyle.publishBtn} type="submit">
               <p>Publish</p>
-            </FbtButton>
+            </button>
           </div>
         </form>
       </div>
@@ -314,4 +358,4 @@ function AddHospital() {
   );
 }
 
-export default WithAuth(AddHospital);
+export default WithAuth(EditHospital);

@@ -1,6 +1,6 @@
 'use client';
 
-import { Header, PatientsTable, WithAuth } from '@/components';
+import { Header, WithAuth } from '@/components';
 
 import patientsStyle from './patients.module.scss';
 
@@ -15,7 +15,7 @@ function PatientsPage() {
           List of all of our bookings
         </p>
 
-        <PatientsTable />
+        {/* <PatientsTable /> */}
       </div>
     </div>
   );

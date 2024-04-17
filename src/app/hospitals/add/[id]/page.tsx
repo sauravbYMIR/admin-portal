@@ -3,7 +3,7 @@
 import { FbtButton } from '@frontbase/components-react';
 import Image from 'next/image';
 import Link from 'next/link';
-import { useRouter } from 'next/navigation';
+import { usePathname, useRouter } from 'next/navigation';
 import { useState } from 'react';
 import { z } from 'zod';
 
@@ -13,6 +13,7 @@ import {
   TeamMemberCard,
   WithAuth,
 } from '@/components';
+import { useGetHospitalById } from '@/hooks';
 import arrowForward from '@/public/assets/icons/arrowForward.svg';
 import backArrow from '@/public/assets/icons/backArrow.svg';
 import editIcon from '@/public/assets/icons/edit.svg';
@@ -51,12 +52,14 @@ export type CreateHospitalTeamMemberFormFields = z.infer<
   typeof createHospitalTeamMemberFormSchema
 >;
 
-function HospitalDetailsPage() {
+function HospitalDetailsPage({ params: { id } }: { params: { id: string } }) {
+  const pathname = usePathname();
+  const hospitalId = pathname.split('/')[3];
+  const hospitalById = useGetHospitalById({ id: hospitalId ?? '' });
   const [isCreateHospitalTeamModal, setIsCreateHospitalTeamModal] =
     useState(false);
 
   const router = useRouter();
-
   return (
     <div>
       <Header />
@@ -73,7 +76,9 @@ function HospitalDetailsPage() {
             />
 
             <div className={style.titleBreadCrumbContainer}>
-              <h3>Avanti hospital</h3>
+              {hospitalById.isSuccess && hospitalById.data.data && (
+                <h3>{hospitalById.data.data.name}</h3>
+              )}
 
               <div className={style.breadcrumb}>
                 <Link href="/">Hospitals</Link>
@@ -87,6 +92,7 @@ function HospitalDetailsPage() {
             className={style.editHospitalBtn}
             size="sm"
             variant="outline"
+            onClick={() => router.push(`/hospital/edit/${id}`)}
           >
             <Image width={24} height={24} src={editIcon} alt="edit icon" />
             <p>Edit Details</p>
@@ -94,55 +100,76 @@ function HospitalDetailsPage() {
         </div>
 
         <h3 className={style.subTitle}>About the hospital</h3>
-        <p className={style.hospitalDesc}>
-          Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do
-          eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad
-          minim veniammodo Lorem ipsum dolor sit amet, consectetur adipiscing
-          elit, sed do eiusmod tempor incididunt ut labore et dolore magna
-          aliqua. Ut enim ad minim veniammodo Lorem ipsum dolor sit amet,
-          consectetur adipiscing elit, sed do eiusmod tempor incididunt ut
-          labore et dolore magna aliqua. Ut enim ad minim veniammodo{' '}
-        </p>
+        {hospitalById.isSuccess && hospitalById.data.data && (
+          <p className={style.hospitalDesc}>
+            {hospitalById.data.data.description.en}
+          </p>
+        )}
 
         <h3 className={style.subTitle}>Address</h3>
 
-        <p className={style.address}>23 St Olavs street, Oslo, Norway, 2445</p>
+        {hospitalById.isSuccess && hospitalById.data.data && (
+          <p className={style.address}>
+            {hospitalById.data.data.streetNumber}{' '}
+            {hospitalById.data.data.streetName}, {hospitalById.data.data.city},{' '}
+            {hospitalById.data.data.country}
+          </p>
+        )}
 
         <h3 className={style.subTitle}>Team members</h3>
 
-        <div className={style.createTeamMemberContainer}>
-          <p className={style.title}>No team members have been created yet!</p>
+        {hospitalById.isSuccess && hospitalById.data.data && (
+          // eslint-disable-next-line react/jsx-no-useless-fragment
+          <>
+            {hospitalById.data.data.members.length === 0 ? (
+              <div className={style.createTeamMemberContainer}>
+                <p className={style.title}>
+                  No team members have been created yet!
+                </p>
 
-          <FbtButton
-            onClick={() => setIsCreateHospitalTeamModal(true)}
-            className={style.btn}
-            variant="solid"
-            size="sm"
-          >
-            <p>Create team members</p>
-          </FbtButton>
-        </div>
+                <FbtButton
+                  onClick={() => setIsCreateHospitalTeamModal(true)}
+                  className={style.btn}
+                  variant="solid"
+                  size="sm"
+                >
+                  <p>Create team members</p>
+                </FbtButton>
+              </div>
+            ) : (
+              <div className={style.teamMemberViewSection}>
+                <div className={style.headerSection}>
+                  <FbtButton className={style.addBtn} size="sm" variant="solid">
+                    <Image src={plusIcon} alt="plus icon" />
+                    <p>Add a team member</p>
+                  </FbtButton>
 
-        <div className={style.teamMemberViewSection}>
-          <div className={style.headerSection}>
-            <FbtButton className={style.addBtn} size="sm" variant="solid">
-              <Image src={plusIcon} alt="plus icon" />
-              <p>Add a team member</p>
-            </FbtButton>
+                  <FbtButton
+                    className={style.editBtn}
+                    size="sm"
+                    variant="solid"
+                  >
+                    <Image src={editIcon} alt="edit icon" />
+                    <p>Edit team members</p>
+                  </FbtButton>
+                </div>
 
-            <FbtButton className={style.editBtn} size="sm" variant="solid">
-              <Image src={editIcon} alt="edit icon" />
-              <p>Edit team members</p>
-            </FbtButton>
-          </div>
-
-          <div className={style.teamMemberCardsContainer}>
-            {[...Array(8)].map((_, index) => {
-              // eslint-disable-next-line react/no-array-index-key
-              return <TeamMemberCard key={index} />;
-            })}
-          </div>
-        </div>
+                <div className={style.teamMemberCardsContainer}>
+                  {hospitalById.data.data.members.map((member) => {
+                    return (
+                      <TeamMemberCard
+                        name={member.name}
+                        qualification={member.qualification}
+                        role={member.position.en}
+                        key={member.id}
+                      />
+                    );
+                  })}
+                </div>
+              </div>
+            )}
+          </>
+        )}
 
         <h3 className={style.subTitle}>Procedures</h3>
 
@@ -150,7 +177,9 @@ function HospitalDetailsPage() {
           <h2>Procedure management</h2>
 
           <button
-            onClick={() => router.push(`/hospitals/add/467/procedures`)}
+            onClick={() =>
+              router.push(`/hospitals/add/${hospitalId}/procedures`)
+            }
             className={style.linkBtn}
             type="button"
           >

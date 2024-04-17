@@ -4,16 +4,24 @@ import sampleProfile from '@/public/assets/icons/sampleProfile.svg';
 
 import style from './style.module.scss';
 
-function TeamMemberCard() {
+function TeamMemberCard({
+  name,
+  role,
+  qualification,
+}: {
+  name: string;
+  role: string;
+  qualification: string;
+}) {
   return (
     <div className={style.cardContainer}>
       <div className={style.cardHeader}>
         <Image src={sampleProfile} alt="sample profile image" />
-        <p>Heather Philip</p>
+        <p>{name}</p>
       </div>
 
-      <p className={style.memberPosition}>Head of Obgyn</p>
-      <p className={style.memberQualification}>Phd</p>
+      <p className={style.memberPosition}>{role}</p>
+      <p className={style.memberQualification}>{qualification}</p>
     </div>
   );
 }

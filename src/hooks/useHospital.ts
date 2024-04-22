@@ -66,9 +66,15 @@ export type CreateHospital = {
   zipcode: string;
 };
 
+export type EditHospitalAxios = {
+  success: boolean;
+  status: number;
+  data: { id: string };
+};
 export type EditHospitalResponse = {
   success: boolean;
   status: number;
+  data: string;
 };
 export type GetHospitalById = {
   success: boolean;
@@ -155,23 +161,24 @@ export const createHospital = async ({
   city: string;
   country: string;
   zipcode: string;
-}): Promise<CreateHospitalResponse> => {
-  const response = await axiosInstance.post<CreateHospitalResponse>(
-    `${process.env.BASE_URL}/hospital`,
-    {
-      name,
-      description,
-      streetName,
-      streetNumber,
-      city,
-      country,
-      zipcode,
-    },
-  );
+}): Promise<{ success: boolean; status: number; data: { id: string } }> => {
+  const response = await axiosInstance.post<{
+    success: boolean;
+    status: number;
+    data: string;
+  }>(`${process.env.BASE_URL}/hospital`, {
+    name,
+    description,
+    streetName,
+    streetNumber,
+    city,
+    country,
+    zipcode,
+  });
   return {
     success: response.data.success,
     status: response.data.status,
-    data: response.data.data,
+    data: { id: response.data.data },
   };
 };
 
@@ -209,7 +216,7 @@ export const editHospital = async ({
   zipcode: string;
   hospitalId: string;
 }): Promise<EditHospitalResponse> => {
-  const response = await axiosInstance.patch<EditHospitalResponse>(
+  const response = await axiosInstance.patch<EditHospitalAxios>(
     `${process.env.BASE_URL}/hospital/${hospitalId}`,
     {
       name,
@@ -224,6 +231,7 @@ export const editHospital = async ({
   return {
     success: response.data.success,
     status: response.data.status,
+    data: response.data.data.id,
   };
 };
 

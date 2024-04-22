@@ -92,7 +92,7 @@ function HospitalDetailsPage({ params: { id } }: { params: { id: string } }) {
             className={style.editHospitalBtn}
             size="sm"
             variant="outline"
-            onClick={() => router.push(`/hospital/edit/${id}`)}
+            onClick={() => router.push(`/hospitals/edit/${id}`)}
           >
             <Image width={24} height={24} src={editIcon} alt="edit icon" />
             <p>Edit Details</p>

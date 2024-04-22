@@ -3,15 +3,21 @@
 'use client';
 
 /* eslint-disable jsx-a11y/label-has-associated-control */
-import { FbtButton, FbtFileUpload } from '@frontbase/components-react';
+import { FbtButton } from '@frontbase/components-react';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useRouter } from 'next/navigation';
 import React from 'react';
 import type { SubmitHandler } from 'react-hook-form';
-import { useForm } from 'react-hook-form';
+import { Controller, useForm } from 'react-hook-form';
+import { ClipLoader } from 'react-spinners';
 import { z } from 'zod';
 
 import { BackArrowIcon, Header, WithAuth } from '@/components';
+import {
+  useCreateHospital,
+  useUpdateHospitalGallery,
+  useUpdateHospitalLogo,
+} from '@/hooks';
 import type { LanguagesType } from '@/types/components';
 import { countryData } from '@/utils/global';
 
@@ -46,15 +52,27 @@ const createHospitalFormSchema = z.object({
   zipCode: z.string().refine((val) => !Number.isNaN(parseInt(val, 10)), {
     message: 'Zipcode is required',
   }),
+  logo: z.custom<File>((v) => v instanceof File, {
+    message: 'Image is required',
+  }),
+  gallery: z.custom<File>((v) => v instanceof File, {
+    message: 'Image is required',
+  }),
 });
 export type CreateHospitalFormFields = z.infer<typeof createHospitalFormSchema>;
 function AddHospital() {
+  const updateHospitalLogo = useUpdateHospitalLogo();
+  const updateHospitalGallery = useUpdateHospitalGallery();
+  const createHospital = useCreateHospital();
   const [activeLanguageTab, setActiveLanguageTab] =
     React.useState<LanguagesType>('English');
   const router = useRouter();
   const {
     register,
+    control,
+    reset,
     handleSubmit,
+    getValues,
     formState: { errors },
   } = useForm<CreateHospitalFormFields>({
     resolver: zodResolver(createHospitalFormSchema),
@@ -69,19 +87,61 @@ function AddHospital() {
     const lang = hospitalObj[c.language] as HospitalFormSchemaType;
     return errors[lang] && errors[lang]?.message;
   });
-  const handleCreateHospital = () => {
-    // API call to create sub category
+  const onFormSubmit: SubmitHandler<CreateHospitalFormFields> = (
+    data: CreateHospitalFormFields,
+  ) => {
+    createHospital.mutate({
+      name: data.hospitalName,
+      description: {
+        en: data.hospitalDescEn,
+        nb: data.hospitalDescNb,
+        da: data.hospitalDescDa,
+        sv: data.hospitalDescSv,
+      },
+      streetName: data.streetName,
+      streetNumber: data.streetNumber,
+      city: data.city,
+      country: data.country,
+      zipcode: data.zipCode,
+    });
     setActiveLanguageTab('English');
   };
-  // const handleEditHospital = () => {
-  //   // API call to create sub category
-  //   setActiveLanguageTab('English');
-  // };
-  const onFormSubmit: SubmitHandler<CreateHospitalFormFields> = () => {
-    // TODO: WIP
-    handleCreateHospital();
-    // handleEditHospital();
-  };
+  React.useEffect(() => {
+    if (
+      createHospital.isSuccess &&
+      createHospital.data &&
+      createHospital.data.data.id
+    ) {
+      reset();
+      const logo = getValues('logo');
+      if (logo) {
+        const formData = new FormData();
+        formData.append('logo', logo as Blob);
+        updateHospitalLogo.mutate({
+          hospitalId: `${createHospital.data.data.id}`,
+          formData,
+        });
+      }
+      const gallery = getValues('gallery');
+      if (gallery) {
+        const formData = new FormData();
+        formData.append('gallery', gallery as Blob);
+        updateHospitalGallery.mutate({
+          hospitalId: `${createHospital.data.data.id}`,
+          formData,
+        });
+      }
+      router.push(`/hospitals/edit/${createHospital.data.data.id}`);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [
+    createHospital.data,
+    createHospital.isSuccess,
+    // getValues,
+    // updateHospitalLogo,
+    // updateHospitalGallery,
+    reset,
+  ]);
   return (
     <div>
       <Header />
@@ -106,7 +166,24 @@ function AddHospital() {
           >
             Hospital logo
           </label>
-          <FbtFileUpload message="PNG, JPG (max. 10 MB)" />
+          <Controller
+            name="logo"
+            control={control}
+            render={({ field: { ref, name, onBlur, onChange } }) => (
+              <input
+                type="file"
+                ref={ref}
+                name={name}
+                onBlur={onBlur}
+                onChange={(e) => onChange(e.target.files?.[0])}
+              />
+            )}
+          />
+          {errors.logo && (
+            <small className="mt-1 text-start font-lexend text-base font-normal text-error">
+              {errors.logo.message}
+            </small>
+          )}
 
           <label
             style={{ margin: '24px 0 8px' }}
@@ -144,6 +221,15 @@ function AddHospital() {
                   key={data.locale}
                   type="button"
                   onClick={() => setActiveLanguageTab(data.language)}
+                  style={
+                    data.language === activeLanguageTab
+                      ? {
+                          border: '1px solid rgba(9, 111, 144, 1)',
+                          color: 'rgba(9, 111, 144, 1)',
+                          backgroundColor: 'rgba(242, 250, 252, 1)',
+                        }
+                      : {}
+                  }
                   className={`${errors[lang] && errors[lang]?.message ? '!border !border-error !text-error' : ''}`}
                 >
                   {data.language}
@@ -287,7 +373,24 @@ function AddHospital() {
             Upload a minimum of 3 media items and maximum 10 media items
           </p>
 
-          <FbtFileUpload message="PNG, JPG, MP4, MOV  (max. 10 MB)" />
+          <Controller
+            name="gallery"
+            control={control}
+            render={({ field: { ref, name, onBlur, onChange } }) => (
+              <input
+                type="file"
+                ref={ref}
+                name={name}
+                onBlur={onBlur}
+                onChange={(e) => onChange(e.target.files?.[0])}
+              />
+            )}
+          />
+          {errors.gallery && (
+            <small className="mt-1 text-start font-lexend text-base font-normal text-error">
+              {errors.gallery.message}
+            </small>
+          )}
 
           <div className={addHospitalStyle.footerBtnContainer}>
             <FbtButton
@@ -305,7 +408,17 @@ function AddHospital() {
               variant="solid"
               type="submit"
             >
-              <p>Publish</p>
+              {createHospital.isPending ? (
+                <ClipLoader
+                  loading={createHospital.isPending}
+                  color="#fff"
+                  size={30}
+                  aria-label="Loading Spinner"
+                  data-testid="loader"
+                />
+              ) : (
+                <p>Publish</p>
+              )}
             </FbtButton>
           </div>
         </form>

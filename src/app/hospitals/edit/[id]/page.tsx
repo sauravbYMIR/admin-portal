@@ -8,10 +8,16 @@ import { useRouter } from 'next/navigation';
 import React from 'react';
 import type { SubmitHandler } from 'react-hook-form';
 import { Controller, useForm } from 'react-hook-form';
+import { ClipLoader } from 'react-spinners';
 import { z } from 'zod';
 
 import { BackArrowIcon, Header, WithAuth } from '@/components';
-import { useGetHospitalById } from '@/hooks';
+import {
+  useEditHospital,
+  useGetHospitalById,
+  useUpdateHospitalGallery,
+  useUpdateHospitalLogo,
+} from '@/hooks';
 import type { LanguagesType } from '@/types/components';
 import { countryData } from '@/utils/global';
 
@@ -55,8 +61,10 @@ const editHospitalFormSchema = z.object({
 });
 export type EditHospitalFormFields = z.infer<typeof editHospitalFormSchema>;
 function EditHospital({ params: { id } }: { params: { id: string } }) {
-  // const editHospital = useEditHospital();
+  const editHospital = useEditHospital();
   const reqdHospital = useGetHospitalById({ id });
+  const updateHospitalLogo = useUpdateHospitalLogo();
+  const updateHospitalGallery = useUpdateHospitalGallery();
   const [activeLanguageTab, setActiveLanguageTab] =
     React.useState<LanguagesType>('English');
   const router = useRouter();
@@ -65,6 +73,7 @@ function EditHospital({ params: { id } }: { params: { id: string } }) {
     control,
     handleSubmit,
     setValue,
+    getValues,
     formState: { errors },
   } = useForm<EditHospitalFormFields>({
     resolver: zodResolver(editHospitalFormSchema),
@@ -79,13 +88,25 @@ function EditHospital({ params: { id } }: { params: { id: string } }) {
     const lang = hospitalObj[c.language] as HospitalFormSchemaType;
     return errors[lang] && errors[lang]?.message;
   });
-  const onFormSubmit: SubmitHandler<EditHospitalFormFields> = () =>
-    // data: EditHospitalFormFields,
-    {
-      // TODO: WIP
-      // editHospital.mutate({
-      // })
-    };
+  const onFormSubmit: SubmitHandler<EditHospitalFormFields> = (
+    data: EditHospitalFormFields,
+  ) => {
+    editHospital.mutate({
+      name: data.hospitalName,
+      description: {
+        en: data.hospitalDescEn,
+        sv: data.hospitalDescSv,
+        da: data.hospitalDescDa,
+        nb: data.hospitalDescNb,
+      },
+      streetName: data.streetName,
+      streetNumber: data.streetNumber,
+      city: data.city,
+      country: data.country,
+      zipcode: data.zipCode,
+      hospitalId: id,
+    });
+  };
   React.useEffect(() => {
     if (
       id &&
@@ -105,6 +126,36 @@ function EditHospital({ params: { id } }: { params: { id: string } }) {
       setValue('zipCode', reqdHospital.data.data.zipcode);
     }
   }, [reqdHospital.data, reqdHospital.isSuccess, setValue, id]);
+  React.useEffect(() => {
+    if (editHospital.isSuccess && editHospital.data && editHospital.data.data) {
+      const logo = getValues('logo');
+      if (logo) {
+        const formData = new FormData();
+        formData.append('logo', logo as Blob);
+        updateHospitalLogo.mutate({
+          hospitalId: `${editHospital.data.data}`,
+          formData,
+        });
+      }
+      const gallery = getValues('gallery');
+      if (gallery) {
+        const formData = new FormData();
+        formData.append('gallery', gallery as Blob);
+        updateHospitalGallery.mutate({
+          hospitalId: `${editHospital.data.data}`,
+          formData,
+        });
+      }
+      // router.push(`/hospitals/edit/${editHospital.data.data.id}`);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [
+    editHospital.data,
+    editHospital.isSuccess,
+    // getValues,
+    // updateHospitalLogo,
+    // updateHospitalGallery,
+  ]);
   return (
     <div>
       <Header />
@@ -349,7 +400,17 @@ function EditHospital({ params: { id } }: { params: { id: string } }) {
             </button>
 
             <button className={addHospitalStyle.publishBtn} type="submit">
-              <p>Publish</p>
+              {editHospital.isPending ? (
+                <ClipLoader
+                  loading={editHospital.isPending}
+                  color="#fff"
+                  size={30}
+                  aria-label="Loading Spinner"
+                  data-testid="loader"
+                />
+              ) : (
+                <p>Publish</p>
+              )}
             </button>
           </div>
         </form>

@@ -4,7 +4,7 @@ function CustomHomePage({
   children,
 }: {
   heading: string;
-  subHeading: string;
+  subHeading: string | React.ReactNode;
   children: React.ReactNode;
 }) {
   return (

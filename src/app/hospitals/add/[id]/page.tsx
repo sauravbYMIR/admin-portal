@@ -67,7 +67,13 @@ function HospitalDetailsPage({ params: { id } }: { params: { id: string } }) {
       <Header />
 
       <div className={style.hospitalDetailPageContainer}>
-        <Image src={backArrow} alt="back arrow icon" />
+        <button
+          type="button"
+          className="cursor-pointer"
+          onClick={() => router.push('/hospitals')}
+        >
+          <Image src={backArrow} alt="back arrow icon" />
+        </button>
 
         <div className={style.headerSection}>
           <div className={style.titleContainer}>

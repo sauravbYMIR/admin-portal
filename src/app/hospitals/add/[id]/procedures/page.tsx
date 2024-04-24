@@ -2,6 +2,7 @@
 
 import type { CustomCellRendererProps } from 'ag-grid-react';
 import Image from 'next/image';
+import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
 import { toast } from 'sonner';
 
@@ -68,8 +69,31 @@ function HospitalProcedureManagement() {
     <div>
       <Header />
       <CustomHomePage
-        heading="Hospitals"
-        subHeading="List of all hospitals listed on the platform"
+        heading="Procedure management"
+        subHeading={
+          <div className="flex w-[320px] items-center justify-between">
+            <Link
+              href="/hospitals"
+              className="font-lexend text-base font-normal text-neutral-3"
+            >
+              Hospitals{' '}
+            </Link>
+            /
+            <Link
+              href={`/hospitals/add/${hospitalId}`}
+              className="font-lexend text-base font-normal text-neutral-3"
+            >
+              Details{' '}
+            </Link>
+            /
+            <Link
+              href={`/hospitals/add/${hospitalId}/procedures/`}
+              className="font-lexend text-base font-normal text-darkteal"
+            >
+              Procedure list
+            </Link>
+          </div>
+        }
       >
         {procedureByHospitalId.isSuccess &&
         procedureByHospitalId.data.data &&

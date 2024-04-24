@@ -82,7 +82,13 @@ function HospitalDetailsPage({
       <Header />
 
       <div className={style.hospitalDetailPageContainer}>
-        <Image src={backArrow} alt="back arrow icon" />
+        <button
+          type="button"
+          className="cursor-pointer"
+          onClick={() => router.back()}
+        >
+          <Image src={backArrow} alt="back arrow icon" />
+        </button>
 
         <div className={style.headerSection}>
           <div className={style.titleContainer}>
@@ -116,7 +122,11 @@ function HospitalDetailsPage({
             className={style.editHospitalBtn}
             size="sm"
             variant="outline"
-            onClick={() => router.push(`/hospitals/edit/${params.procedureId}`)}
+            onClick={() =>
+              router.push(
+                `/hospitals/add/${params.id}/procedures/${params.procedureId}/edit`,
+              )
+            }
           >
             <Image width={24} height={24} src={editIcon} alt="edit icon" />
             <p>Edit Details</p>

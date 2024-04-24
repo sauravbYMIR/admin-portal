@@ -50,6 +50,7 @@ module.exports = {
         error: 'rgba(203, 0, 25, 1)',
         'neutral-2': 'rgba(67, 73, 86, 1)',
         'neutral-4': 'rgba(192, 200, 216, 1)',
+        'neutral-3': 'rgba(117, 127, 149, 1)',
         'neutral-7': 'rgba(246, 248, 249, 1)',
         'neutral-1': 'rgba(24, 27, 32, 1)',
         darkslategray: 'rgba(12, 78, 100, 1)',

@@ -79,7 +79,10 @@ export type EditHospitalResponse = {
 export type GetHospitalById = {
   success: boolean;
   status: number;
-  data: HospitalByIdType;
+  data: HospitalByIdType & {
+    logo: boolean | string;
+    gallery: boolean | string;
+  };
 };
 export type GetProcedureByHospitalId = {
   success: boolean;

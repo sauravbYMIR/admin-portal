@@ -4,6 +4,7 @@
 
 /* eslint-disable jsx-a11y/label-has-associated-control */
 import { zodResolver } from '@hookform/resolvers/zod';
+import Image from 'next/image';
 import { useRouter } from 'next/navigation';
 import React from 'react';
 import type { SubmitHandler } from 'react-hook-form';
@@ -52,12 +53,16 @@ const editHospitalFormSchema = z.object({
   zipCode: z.string().refine((val) => !Number.isNaN(parseInt(val, 10)), {
     message: 'Zipcode is required',
   }),
-  logo: z.custom<File>((v) => v instanceof File, {
-    message: 'Image is required',
-  }),
-  gallery: z.custom<File>((v) => v instanceof File, {
-    message: 'Image is required',
-  }),
+  logo: z
+    .custom<File>((v) => v instanceof File, {
+      message: 'Image is required',
+    })
+    .optional(),
+  gallery: z
+    .custom<File>((v) => v instanceof File, {
+      message: 'Image is required',
+    })
+    .optional(),
 });
 export type EditHospitalFormFields = z.infer<typeof editHospitalFormSchema>;
 function EditHospital({ params: { id } }: { params: { id: string } }) {
@@ -146,7 +151,7 @@ function EditHospital({ params: { id } }: { params: { id: string } }) {
           formData,
         });
       }
-      // router.push(`/hospitals/edit/${editHospital.data.data.id}`);
+      router.push(`/hospitals/add/${editHospital.data.data}`);
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [
@@ -180,19 +185,32 @@ function EditHospital({ params: { id } }: { params: { id: string } }) {
           >
             Hospital logo
           </label>
-          <Controller
-            name="logo"
-            control={control}
-            render={({ field: { ref, name, onBlur, onChange } }) => (
-              <input
-                type="file"
-                ref={ref}
-                name={name}
-                onBlur={onBlur}
-                onChange={(e) => onChange(e.target.files?.[0])}
-              />
-            )}
-          />
+          {reqdHospital.data &&
+          reqdHospital.data.data.logo &&
+          typeof reqdHospital.data.data.logo === 'string' ? (
+            <Image
+              src={reqdHospital.data.data.logo}
+              width={64}
+              height={64}
+              alt="hospital-logo"
+              className="rounded-full"
+            />
+          ) : (
+            <Controller
+              name="logo"
+              control={control}
+              render={({ field: { ref, name, onBlur, onChange } }) => (
+                <input
+                  type="file"
+                  ref={ref}
+                  name={name}
+                  onBlur={onBlur}
+                  onChange={(e) => onChange(e.target.files?.[0])}
+                />
+              )}
+            />
+          )}
+
           {errors.logo && (
             <small className="mt-1 text-start font-lexend text-base font-normal text-error">
               {errors.logo.message}
@@ -373,22 +391,36 @@ function EditHospital({ params: { id } }: { params: { id: string } }) {
           <h3 className={addHospitalStyle.subTitleHospitalGallery}>
             Hospital gallery
           </h3>
-          <p className={addHospitalStyle.hospitalGalleryDesc}>
-            Upload a minimum of 3 media items and maximum 10 media items
-          </p>
-          <Controller
-            name="gallery"
-            control={control}
-            render={({ field: { ref, name, onBlur, onChange } }) => (
-              <input
-                type="file"
-                ref={ref}
-                name={name}
-                onBlur={onBlur}
-                onChange={(e) => onChange(e.target.files?.[0])}
+          {reqdHospital.data &&
+          reqdHospital.data.data &&
+          typeof reqdHospital.data.data.gallery === 'string' ? (
+            <Image
+              src={reqdHospital.data.data.gallery}
+              width={64}
+              height={64}
+              alt="hospital-gallery"
+              className="h-[250px] w-[264px] rounded-lg"
+            />
+          ) : (
+            <>
+              <p className={addHospitalStyle.hospitalGalleryDesc}>
+                Upload a minimum of 3 media items and maximum 10 media items
+              </p>
+              <Controller
+                name="gallery"
+                control={control}
+                render={({ field: { ref, name, onBlur, onChange } }) => (
+                  <input
+                    type="file"
+                    ref={ref}
+                    name={name}
+                    onBlur={onBlur}
+                    onChange={(e) => onChange(e.target.files?.[0])}
+                  />
+                )}
               />
-            )}
-          />
+            </>
+          )}
           {errors.gallery && (
             <small className="mt-1 text-start font-lexend text-base font-normal text-error">
               {errors.gallery.message}
@@ -409,7 +441,7 @@ function EditHospital({ params: { id } }: { params: { id: string } }) {
                   data-testid="loader"
                 />
               ) : (
-                <p>Publish</p>
+                <p>Edit</p>
               )}
             </button>
           </div>

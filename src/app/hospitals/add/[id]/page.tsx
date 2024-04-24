@@ -57,7 +57,9 @@ function HospitalDetailsPage({ params: { id } }: { params: { id: string } }) {
   const hospitalId = pathname.split('/')[3];
   const hospitalById = useGetHospitalById({ id: hospitalId ?? '' });
   const [isCreateHospitalTeamModal, setIsCreateHospitalTeamModal] =
-    useState(false);
+    useState<boolean>(false);
+  const [isEditTeamMember, setIsEditTeamMember] = useState<boolean>(false);
+  const [teamMemberId, setTeamMemberId] = useState<string>('');
 
   const router = useRouter();
   return (
@@ -139,7 +141,12 @@ function HospitalDetailsPage({ params: { id } }: { params: { id: string } }) {
             ) : (
               <div className={style.teamMemberViewSection}>
                 <div className={style.headerSection}>
-                  <FbtButton className={style.addBtn} size="sm" variant="solid">
+                  <FbtButton
+                    className={style.addBtn}
+                    size="sm"
+                    variant="solid"
+                    onClick={() => setIsCreateHospitalTeamModal(true)}
+                  >
                     <Image src={plusIcon} alt="plus icon" />
                     <p>Add a team member</p>
                   </FbtButton>
@@ -148,6 +155,7 @@ function HospitalDetailsPage({ params: { id } }: { params: { id: string } }) {
                     className={style.editBtn}
                     size="sm"
                     variant="solid"
+                    onClick={() => setIsEditTeamMember(true)}
                   >
                     <Image src={editIcon} alt="edit icon" />
                     <p>Edit team members</p>
@@ -158,10 +166,16 @@ function HospitalDetailsPage({ params: { id } }: { params: { id: string } }) {
                   {hospitalById.data.data.members.map((member) => {
                     return (
                       <TeamMemberCard
+                        teamMemberId={member.id}
                         name={member.name}
                         qualification={member.qualification}
                         role={member.position.en}
                         key={member.id}
+                        isEdit={isEditTeamMember}
+                        onOpen={() => {
+                          setTeamMemberId(member.id);
+                          setIsCreateHospitalTeamModal(true);
+                        }}
                       />
                     );
                   })}
@@ -190,7 +204,12 @@ function HospitalDetailsPage({ params: { id } }: { params: { id: string } }) {
 
         <CreateHospitalTeamMemberModal
           isOpen={isCreateHospitalTeamModal}
-          onClose={() => setIsCreateHospitalTeamModal(false)}
+          onClose={() => {
+            setTeamMemberId('');
+            setIsCreateHospitalTeamModal(false);
+          }}
+          hospitalId={id}
+          memberId={teamMemberId}
         />
       </div>
     </div>

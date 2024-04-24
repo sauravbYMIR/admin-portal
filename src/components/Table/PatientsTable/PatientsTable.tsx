@@ -62,9 +62,11 @@ import { AgGridReact } from 'ag-grid-react';
 function PatientsTable<T extends {}, U extends {}>({
   rowData,
   colDefs,
+  onCellClicked,
 }: {
   rowData: Array<T>;
   colDefs: Array<U>;
+  onCellClicked?: (params: any) => void;
 }): JSX.Element {
   // id, name, location
   // const [colDefs] = useState<any>([
@@ -111,7 +113,8 @@ function PatientsTable<T extends {}, U extends {}>({
         pagination
         paginationAutoPageSize
         cacheBlockSize={20}
-        // onCellValueChanged={(event) => console.log(event.value, event)}
+        // onCellClicked={onCellClicked}
+        onCellEditingStopped={onCellClicked}
       />
     </div>
   );

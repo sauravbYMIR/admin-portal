@@ -1,29 +1,69 @@
 'use client';
 
+import type { CustomCellRendererProps } from 'ag-grid-react';
 import Image from 'next/image';
 import { usePathname, useRouter } from 'next/navigation';
+import { toast } from 'sonner';
 
 import { CustomHomePage, Header, PatientsTable, WithAuth } from '@/components';
-import { useGetProcedureByHospitalId } from '@/hooks';
+import {
+  editHospitalProcedure,
+  useGetAllHospitalProcedure,
+} from '@/hooks/useHospitalProcedure';
+import infoLinkIcon from '@/public/assets/icons/linkArrow.svg';
 import plusIcon from '@/public/assets/icons/plus.svg';
 
-// const CustomStatusEditComponent = (props: CustomCellRendererProps) => {
-//   // const [showBtn, setShowBtn] = React.useState(true);
-//   const router = useRouter();
+import patientsTableStyle from '../../../../../components/Table/PatientsTable/patientsTable.module.scss';
 
-//   // const handleClickInfoLink = () => {
-//   //   const patientBookingId = props.data['Hospital id'];
-//   //   router.push(`/hospitals/add/${patientBookingId}`);
-//   // };
-// };
+const CustomStatusEditComponent = (props: CustomCellRendererProps) => {
+  const router = useRouter();
+  const pathname = usePathname();
+  const handleClickInfoLink = () => {
+    const procedureId = props.data.id;
+    const hospitalId = pathname.split('/')[3];
+    router.push(`/hospitals/add/${hospitalId}/procedures/${procedureId}`);
+  };
+  return (
+    <div className={patientsTableStyle.patientsTableBtnContainer}>
+      <Image
+        className={patientsTableStyle.patientsTableInfoLink}
+        src={infoLinkIcon}
+        alt="patients table info link arrow icon"
+        onClick={handleClickInfoLink}
+      />
+    </div>
+  );
+};
 
 function HospitalProcedureManagement() {
   const pathname = usePathname();
   const hospitalId = pathname.split('/')[3];
-  const procedureByHospitalId = useGetProcedureByHospitalId({
+  const procedureByHospitalId = useGetAllHospitalProcedure({
     id: hospitalId ?? '',
   });
   const router = useRouter();
+  const onCellClicked = async (params: any) => {
+    if (params.type === 'cellEditingStopped') {
+      try {
+        const r = await editHospitalProcedure({
+          waitingTime: params.data.waitTime,
+          stayInHospital: params.data.stayInHospital,
+          stayInCity: params.data.stayInCity,
+          description: params.data.desc,
+          cost: {
+            ...params.data.costObj,
+            en: params.data.cost,
+          },
+          hospitalProcedureId: params.data.id,
+        });
+        if (r.success) {
+          toast.success('Changes updated successfully');
+        }
+      } catch (e) {
+        toast.error('error while updated hospital procedure');
+      }
+    }
+  };
   return (
     <div>
       <Header />
@@ -36,10 +76,27 @@ function HospitalProcedureManagement() {
         Array(procedureByHospitalId.data.data) &&
         procedureByHospitalId.data.data.length > 0 ? (
           <PatientsTable
+            onCellClicked={onCellClicked}
             rowData={procedureByHospitalId.data.data.map((r) => ({
-              name: r.id,
-              department: r.description.en,
-              wait_time: r.waitingTime,
+              name: `${r.procedure.name.en}`,
+              department: r.procedure.category.name.en,
+              waitTime: r.waitingTime,
+              cost: r.cost.en,
+              id: r.id,
+              stayInHospital: r.stayInHospital,
+              stayInCity: r.stayInCity,
+              desc: {
+                en: r.description.en,
+                da: r.description.da,
+                sv: r.description.sv,
+                nb: r.description.nb,
+              },
+              costObj: {
+                en: r.cost.en,
+                da: r.cost.da,
+                sv: r.cost.sv,
+                nb: r.cost.nb,
+              },
             }))}
             colDefs={[
               {
@@ -48,6 +105,7 @@ function HospitalProcedureManagement() {
                 filter: true,
                 floatingFilter: true,
                 flex: 1,
+                editable: true,
               },
               {
                 headerName: 'Department',
@@ -55,18 +113,28 @@ function HospitalProcedureManagement() {
                 filter: true,
                 floatingFilter: true,
                 flex: 1,
+                editable: true,
               },
               {
                 headerName: 'Wait time',
-                field: 'wait_time',
+                field: 'waitTime',
                 filter: true,
                 floatingFilter: true,
                 flex: 1,
+                editable: true,
+              },
+              {
+                headerName: 'Cost of procedure',
+                field: 'cost',
+                filter: true,
+                floatingFilter: true,
+                flex: 1,
+                editable: true,
               },
               {
                 field: '',
                 flex: 1,
-                // cellRenderer: CustomStatusEditComponent,
+                cellRenderer: CustomStatusEditComponent,
               },
             ]}
           />

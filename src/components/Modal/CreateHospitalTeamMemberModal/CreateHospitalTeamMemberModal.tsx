@@ -1,12 +1,19 @@
 /* eslint-disable jsx-a11y/label-has-associated-control */
-import { FbtButton, FbtFileUpload } from '@frontbase/components-react';
+import { FbtButton } from '@frontbase/components-react';
 import { zodResolver } from '@hookform/resolvers/zod';
 import Image from 'next/image';
 import React from 'react';
 import type { SubmitHandler } from 'react-hook-form';
-import { useForm } from 'react-hook-form';
+import { Controller, useForm } from 'react-hook-form';
+import { ClipLoader } from 'react-spinners';
 import { z } from 'zod';
 
+import {
+  useCreateHospitalMember,
+  useEditHospitalMember,
+  useGetHospitalTeamMemberById,
+  useUpdateHospitalProfile,
+} from '@/hooks/useMember';
 import closeIcon from '@/public/assets/icons/close.svg';
 import type { LanguagesType } from '@/types/components';
 import { countryData } from '@/utils/global';
@@ -16,6 +23,8 @@ import modalStyle from './style.module.scss';
 interface ModalProps {
   isOpen: boolean;
   onClose: () => void;
+  hospitalId: string;
+  memberId: string;
 }
 
 export type HospitalFormSchemaType =
@@ -39,18 +48,36 @@ const createTeamMemberFormSchema = z.object({
   positionSv: z
     .string()
     .min(1, { message: 'Fill in details in all the languages' }),
+  profile: z.custom<File>((v) => v instanceof File, {
+    message: 'Image is required',
+  }),
 });
 export type CreateHospitalTeamMemberFormFields = z.infer<
   typeof createTeamMemberFormSchema
 >;
 
-function CreateHospitalTeamMemberModal({ isOpen, onClose }: ModalProps) {
+function CreateHospitalTeamMemberModal({
+  isOpen,
+  onClose,
+  hospitalId,
+  memberId,
+}: ModalProps) {
+  const editHospitalMember = useEditHospitalMember();
+  const memberByIdDetails = useGetHospitalTeamMemberById({ id: memberId });
+  const [isAnotherMemberChecked, setIsAnotherMemberChecked] =
+    React.useState<boolean>(false);
+  const hospitalMember = useCreateHospitalMember();
+  const updateHospitalProfile = useUpdateHospitalProfile();
   const [activeLanguageTab, setActiveLanguageTab] =
     React.useState<LanguagesType>('English');
   const {
     register,
     handleSubmit,
-    formState: { errors, isSubmitting },
+    control,
+    getValues,
+    setValue,
+    reset,
+    formState: { errors },
   } = useForm<CreateHospitalTeamMemberFormFields>({
     resolver: zodResolver(createTeamMemberFormSchema),
   });
@@ -64,21 +91,80 @@ function CreateHospitalTeamMemberModal({ isOpen, onClose }: ModalProps) {
     const lang = hospitalObj[c.language] as HospitalFormSchemaType;
     return errors[lang] && errors[lang]?.message;
   });
-  const handleCreateHospitalTeamMember = () => {
-    // API call to create sub category
+  const onFormSubmit: SubmitHandler<CreateHospitalTeamMemberFormFields> = (
+    data: CreateHospitalTeamMemberFormFields,
+  ) => {
+    if (memberId) {
+      editHospitalMember.mutate({
+        name: data.name,
+        position: {
+          en: data.positionEn,
+          da: data.positionDa,
+          nb: data.positionNb,
+          sv: data.positionSv,
+        },
+        qualification: data.qualification,
+        hospitalMemberId: memberId,
+      });
+    } else {
+      hospitalMember.mutate({
+        name: data.name,
+        position: {
+          en: data.positionEn,
+          nb: data.positionNb,
+          da: data.positionDa,
+          sv: data.positionSv,
+        },
+        qualification: data.qualification,
+        hospitalId,
+      });
+    }
     setActiveLanguageTab('English');
   };
-  const handleEditHospitalTeamMember = () => {
-    // API call to create sub category
-    setActiveLanguageTab('English');
-  };
-  const onFormSubmit: SubmitHandler<
-    CreateHospitalTeamMemberFormFields
-  > = () => {
-    // TODO: WIP
-    handleCreateHospitalTeamMember();
-    handleEditHospitalTeamMember();
-  };
+  React.useEffect(() => {
+    if (
+      hospitalMember.isSuccess &&
+      hospitalMember.data &&
+      hospitalMember.data.data
+    ) {
+      const profile = getValues('profile');
+      if (profile) {
+        const formData = new FormData();
+        formData.append('profile', profile as Blob);
+        updateHospitalProfile.mutate({
+          hospitalId,
+          formData,
+        });
+      }
+      if (isAnotherMemberChecked) {
+        reset();
+      } else {
+        onClose();
+      }
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [hospitalMember.data, hospitalMember.isSuccess]);
+  React.useEffect(() => {
+    if (
+      memberId &&
+      memberByIdDetails.isSuccess &&
+      memberByIdDetails.data &&
+      memberByIdDetails.data.success
+    ) {
+      setValue('name', memberByIdDetails.data.data.name);
+      setValue('positionDa', memberByIdDetails.data.data.position.da);
+      setValue('positionEn', memberByIdDetails.data.data.position.en);
+      setValue('positionNb', memberByIdDetails.data.data.position.nb);
+      setValue('positionSv', memberByIdDetails.data.data.position.sv);
+      setValue('qualification', memberByIdDetails.data.data.qualification);
+      // if (
+      //   memberByIdDetails.data.data.profile &&
+      //   typeof memberByIdDetails.data.data.profile === 'string'
+      // ) {
+      //   setValue('profile', memberByIdDetails.data.data.profile);
+      // }
+    }
+  }, [memberByIdDetails.data, memberByIdDetails.isSuccess, setValue, memberId]);
   return (
     <div>
       {isOpen && (
@@ -93,7 +179,10 @@ function CreateHospitalTeamMemberModal({ isOpen, onClose }: ModalProps) {
                 alt="modal close icon"
                 width={24}
                 height={24}
-                onClick={onClose}
+                onClick={() => {
+                  reset();
+                  onClose();
+                }}
               />
             </div>
 
@@ -108,8 +197,25 @@ function CreateHospitalTeamMemberModal({ isOpen, onClose }: ModalProps) {
 
                 <div className={modalStyle.languageTabContainer}>
                   {countryData.map((data) => {
+                    const lang = hospitalObj[
+                      data.language
+                    ] as HospitalFormSchemaType;
                     return (
-                      <button key={data.locale} type="button">
+                      <button
+                        key={data.locale}
+                        type="button"
+                        style={
+                          data.language === activeLanguageTab
+                            ? {
+                                border: '1px solid rgba(9, 111, 144, 1)',
+                                color: 'rgba(9, 111, 144, 1)',
+                                backgroundColor: 'rgba(242, 250, 252, 1)',
+                              }
+                            : {}
+                        }
+                        onClick={() => setActiveLanguageTab(data.language)}
+                        className={`${errors[lang] && errors[lang]?.message ? '!border !border-error !text-error' : ''}`}
+                      >
                         {data.language}
                       </button>
                     );
@@ -175,15 +281,44 @@ function CreateHospitalTeamMemberModal({ isOpen, onClose }: ModalProps) {
                   </small>
                 )}
               </div>
-
-              <FbtFileUpload message="PNG, JPG  (max. 10 MB)" />
-
-              <div className={modalStyle.checkboxContainer}>
-                <input className={modalStyle.checkbox} type="checkbox" />
-                <label className={modalStyle.checkboxLabel}>
-                  Create another member
-                </label>
-              </div>
+              <Controller
+                name="profile"
+                control={control}
+                render={({ field: { ref, name, onBlur, onChange } }) => (
+                  <input
+                    type="file"
+                    ref={ref}
+                    name={name}
+                    onBlur={onBlur}
+                    onChange={(e) => onChange(e.target.files?.[0])}
+                  />
+                )}
+              />
+              {errors.profile && (
+                <small className="mt-1 text-start font-lexend text-base font-normal text-error">
+                  {errors.profile.message}
+                </small>
+              )}
+              {!memberId && (
+                <div className={modalStyle.checkboxContainer}>
+                  <input
+                    className={modalStyle.checkbox}
+                    type="checkbox"
+                    name="another-member"
+                    // value=""
+                    checked={isAnotherMemberChecked}
+                    onChange={() =>
+                      setIsAnotherMemberChecked((prevState) => !prevState)
+                    }
+                  />
+                  <label
+                    htmlFor="another-member"
+                    className={modalStyle.checkboxLabel}
+                  >
+                    Create another member
+                  </label>
+                </div>
+              )}
 
               <FbtButton
                 className={modalStyle.createMemberBtn}
@@ -191,7 +326,20 @@ function CreateHospitalTeamMemberModal({ isOpen, onClose }: ModalProps) {
                 size="sm"
                 type="submit"
               >
-                {isSubmitting ? <p>Loading...</p> : <p>Create member</p>}
+                {hospitalMember.isPending || editHospitalMember.isPending ? (
+                  <ClipLoader
+                    loading={
+                      hospitalMember.isPending || editHospitalMember.isPending
+                    }
+                    color="#fff"
+                    size={30}
+                    aria-label="Loading Spinner"
+                    data-testid="loader"
+                  />
+                ) : (
+                  // eslint-disable-next-line react/jsx-no-useless-fragment
+                  <>{memberId ? <p>Edit member</p> : <p>Create member</p>}</>
+                )}
               </FbtButton>
             </form>
           </div>

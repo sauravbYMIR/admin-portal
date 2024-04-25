@@ -14,12 +14,11 @@ import plusIcon from '@/public/assets/icons/plus.svg';
 import patientsTableStyle from '../../components/Table/PatientsTable/patientsTable.module.scss';
 
 const CustomStatusEditComponent = (props: CustomCellRendererProps) => {
-  // const [showBtn, setShowBtn] = React.useState(true);
   const router = useRouter();
 
   const handleClickInfoLink = () => {
-    const patientBookingId = props.data['Hospital id'];
-    router.push(`/hospitals/add/${patientBookingId}`);
+    const hospitalId = props.data.hospital_id;
+    router.push(`/hospitals/add/${hospitalId}`);
   };
 
   return (

@@ -218,15 +218,27 @@ function HospitalDetailsPage({
                       <p>Add a team member</p>
                     </FbtButton>
 
-                    <FbtButton
-                      className={style.editBtn}
-                      size="sm"
-                      variant="solid"
-                      onClick={() => setIsEditTeamMember(true)}
-                    >
-                      <Image src={editIcon} alt="edit icon" />
-                      <p>Edit team members</p>
-                    </FbtButton>
+                    {isEditTeamMember ? (
+                      <FbtButton
+                        className={style.editBtn}
+                        size="sm"
+                        variant="solid"
+                        onClick={() => setIsEditTeamMember(false)}
+                      >
+                        <Image src={editIcon} alt="edit icon" />
+                        <p>Cancel editing</p>
+                      </FbtButton>
+                    ) : (
+                      <FbtButton
+                        className={style.editBtn}
+                        size="sm"
+                        variant="solid"
+                        onClick={() => setIsEditTeamMember(true)}
+                      >
+                        <Image src={editIcon} alt="edit icon" />
+                        <p>Edit team members</p>
+                      </FbtButton>
+                    )}
                   </div>
                 </div>
 
@@ -257,6 +269,7 @@ function HospitalDetailsPage({
         <CreateHospitalTeamMemberModal
           isOpen={isCreateHospitalTeamModal}
           onClose={() => {
+            setIsEditTeamMember(false);
             setTeamMemberId('');
             setIsCreateHospitalTeamModal(false);
           }}

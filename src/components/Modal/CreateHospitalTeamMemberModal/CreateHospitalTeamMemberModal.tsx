@@ -48,9 +48,11 @@ const createTeamMemberFormSchema = z.object({
   positionSv: z
     .string()
     .min(1, { message: 'Fill in details in all the languages' }),
-  profile: z.custom<File>((v) => v instanceof File, {
-    message: 'Image is required',
-  }),
+  profile: z
+    .custom<File>((v) => v instanceof File, {
+      message: 'Image is required',
+    })
+    .optional(),
 });
 export type CreateHospitalTeamMemberFormFields = z.infer<
   typeof createTeamMemberFormSchema
@@ -322,6 +324,7 @@ function CreateHospitalTeamMemberModal({
 
               <FbtButton
                 className={modalStyle.createMemberBtn}
+                style={{ marginTop: '64px' }}
                 variant="solid"
                 size="sm"
                 type="submit"
@@ -337,8 +340,9 @@ function CreateHospitalTeamMemberModal({
                     data-testid="loader"
                   />
                 ) : (
-                  // eslint-disable-next-line react/jsx-no-useless-fragment
-                  <>{memberId ? <p>Edit member</p> : <p>Create member</p>}</>
+                  <div>
+                    {memberId ? <p>Save changes</p> : <p>Create member</p>}
+                  </div>
                 )}
               </FbtButton>
             </form>

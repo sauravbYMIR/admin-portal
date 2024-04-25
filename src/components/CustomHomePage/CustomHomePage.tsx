@@ -9,7 +9,7 @@ function CustomHomePage({
 }) {
   return (
     <div className="p-20">
-      <div className="mb-[72px] flex flex-col gap-3 pl-[7px]">
+      <div className="mb-[32px] flex flex-col gap-3 pl-[7px]">
         <h2 className="font-poppins text-4xl font-medium text-darkslategray">
           {heading}
         </h2>

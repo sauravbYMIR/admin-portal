@@ -102,7 +102,7 @@ function HospitalProcedureManagement() {
           <div className="flex flex-col items-start justify-between">
             <button
               type="button"
-              className="mb-3 flex items-center justify-between rounded-[6.4px] bg-darkteal px-6 py-3 text-white"
+              className="mb-5 flex items-center justify-between rounded-[6.4px] bg-darkteal px-6 py-3 text-white"
               onClick={() =>
                 router.push(`/hospitals/add/${hospitalId}/procedures`)
               }

@@ -391,6 +391,7 @@ function AddHospital() {
               size="sm"
               variant="outline"
               type="submit"
+              onClick={() => reset()}
             >
               <p>Cancel</p>
             </FbtButton>

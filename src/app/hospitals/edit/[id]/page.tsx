@@ -250,6 +250,15 @@ function EditHospital({ params: { id } }: { params: { id: string } }) {
               return (
                 <button
                   key={data.locale}
+                  style={
+                    data.language === activeLanguageTab
+                      ? {
+                          border: '1px solid rgba(9, 111, 144, 1)',
+                          color: 'rgba(9, 111, 144, 1)',
+                          backgroundColor: 'rgba(242, 250, 252, 1)',
+                        }
+                      : {}
+                  }
                   type="button"
                   onClick={() => setActiveLanguageTab(data.language)}
                   className={`${errors[lang] && errors[lang]?.message ? '!border !border-error !text-error' : ''}`}

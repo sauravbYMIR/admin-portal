@@ -99,69 +99,83 @@ function HospitalProcedureManagement() {
         procedureByHospitalId.data.data &&
         Array(procedureByHospitalId.data.data) &&
         procedureByHospitalId.data.data.length > 0 ? (
-          <PatientsTable
-            onCellClicked={onCellClicked}
-            rowData={procedureByHospitalId.data.data.map((r) => ({
-              name: `${r.procedure.name.en}`,
-              department: r.procedure.category.name.en,
-              waitTime: r.waitingTime,
-              cost: r.cost.en,
-              id: r.id,
-              stayInHospital: r.stayInHospital,
-              stayInCity: r.stayInCity,
-              desc: {
-                en: r.description.en,
-                da: r.description.da,
-                sv: r.description.sv,
-                nb: r.description.nb,
-              },
-              costObj: {
-                en: r.cost.en,
-                da: r.cost.da,
-                sv: r.cost.sv,
-                nb: r.cost.nb,
-              },
-            }))}
-            colDefs={[
-              {
-                headerName: 'Procedure /Procedure + sub-category',
-                field: 'name',
-                filter: true,
-                floatingFilter: true,
-                flex: 1,
-                editable: true,
-              },
-              {
-                headerName: 'Department',
-                field: 'department',
-                filter: true,
-                floatingFilter: true,
-                flex: 1,
-                editable: true,
-              },
-              {
-                headerName: 'Wait time',
-                field: 'waitTime',
-                filter: true,
-                floatingFilter: true,
-                flex: 1,
-                editable: true,
-              },
-              {
-                headerName: 'Cost of procedure',
-                field: 'cost',
-                filter: true,
-                floatingFilter: true,
-                flex: 1,
-                editable: true,
-              },
-              {
-                field: '',
-                flex: 1,
-                cellRenderer: CustomStatusEditComponent,
-              },
-            ]}
-          />
+          <div className="flex flex-col items-start justify-between">
+            <button
+              type="button"
+              className="mb-3 flex items-center justify-between rounded-[6.4px] bg-darkteal px-6 py-3 text-white"
+              onClick={() =>
+                router.push(`/hospitals/add/${hospitalId}/procedures`)
+              }
+            >
+              <Image src={plusIcon} alt="cta btn text" width={25} height={25} />
+              <p className="font-poppins text-base font-medium">
+                Add new procedure
+              </p>
+            </button>
+            <PatientsTable
+              onCellClicked={onCellClicked}
+              rowData={procedureByHospitalId.data.data.map((r) => ({
+                name: `${r.procedure.name.en}`,
+                department: r.procedure.category.name.en,
+                waitTime: r.waitingTime,
+                cost: r.cost.en,
+                id: r.id,
+                stayInHospital: r.stayInHospital,
+                stayInCity: r.stayInCity,
+                desc: {
+                  en: r.description.en,
+                  da: r.description.da,
+                  sv: r.description.sv,
+                  nb: r.description.nb,
+                },
+                costObj: {
+                  en: r.cost.en,
+                  da: r.cost.da,
+                  sv: r.cost.sv,
+                  nb: r.cost.nb,
+                },
+              }))}
+              colDefs={[
+                {
+                  headerName: 'Procedure /Procedure + sub-category',
+                  field: 'name',
+                  filter: true,
+                  floatingFilter: true,
+                  flex: 1,
+                  editable: true,
+                },
+                {
+                  headerName: 'Department',
+                  field: 'department',
+                  filter: true,
+                  floatingFilter: true,
+                  flex: 1,
+                  editable: true,
+                },
+                {
+                  headerName: 'Wait time',
+                  field: 'waitTime',
+                  filter: true,
+                  floatingFilter: true,
+                  flex: 1,
+                  editable: true,
+                },
+                {
+                  headerName: 'Cost of procedure',
+                  field: 'cost',
+                  filter: true,
+                  floatingFilter: true,
+                  flex: 1,
+                  editable: true,
+                },
+                {
+                  field: '',
+                  flex: 1,
+                  cellRenderer: CustomStatusEditComponent,
+                },
+              ]}
+            />
+          </div>
         ) : (
           <div
             style={{ boxShadow: '2px 2px 4px 1px rgba(9, 111, 144, 0.1)' }}

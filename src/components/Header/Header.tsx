@@ -9,9 +9,13 @@ import {
 } from '@frontbase/components-react';
 import Image from 'next/image';
 import Link from 'next/link';
-import { usePathname } from 'next/navigation';
+import { usePathname, useRouter } from 'next/navigation';
 
 import brandLogo from '@/public/assets/images/brandLogo.svg';
+import {
+  handleGetLocalStorage,
+  handleRemoveFromLocalStorage,
+} from '@/utils/global';
 
 import headerStyle from './header.module.scss';
 
@@ -33,7 +37,14 @@ const menuItems = {
 };
 
 function Header() {
+  const router = useRouter();
   const pathname = usePathname();
+  const accessToken = handleGetLocalStorage({ tokenKey: 'access_token' });
+  const handleLogoutUser = () => {
+    handleRemoveFromLocalStorage({ tokenKey: 'access_token' });
+    handleRemoveFromLocalStorage({ tokenKey: 'refresh_token' });
+    router.push('/');
+  };
   return (
     <FbtHeader className={headerStyle.headerContainer}>
       <FbtHeaderBrand>
@@ -57,13 +68,24 @@ function Header() {
 
       <FbtHeaderContent>
         <FbtHeaderItem>
-          <FbtButton
-            className={headerStyle.headerLoginBtn}
-            size="lg"
-            variant="outline"
-          >
-            Log in
-          </FbtButton>
+          {!accessToken ? (
+            <FbtButton
+              className={headerStyle.headerLoginBtn}
+              size="lg"
+              variant="outline"
+            >
+              Log in
+            </FbtButton>
+          ) : (
+            <FbtButton
+              className={headerStyle.headerLoginBtn}
+              size="lg"
+              variant="outline"
+              onClick={handleLogoutUser}
+            >
+              Log out
+            </FbtButton>
+          )}
         </FbtHeaderItem>
       </FbtHeaderContent>
     </FbtHeader>

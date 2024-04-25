@@ -127,7 +127,7 @@ function EditHospitalProcedure({
   };
   React.useEffect(() => {
     if (
-      params.id &&
+      params.procedureId &&
       hospitalProcedureDetails.isSuccess &&
       hospitalProcedureDetails.data &&
       hospitalProcedureDetails.data.success
@@ -168,7 +168,7 @@ function EditHospitalProcedure({
     hospitalProcedureDetails.data,
     hospitalProcedureDetails.isSuccess,
     setValue,
-    params.id,
+    params.procedureId,
   ]);
   // React.useEffect(() => {
   //   if (editHospital.isSuccess && editHospital.data && editHospital.data.data) {
@@ -277,6 +277,15 @@ function EditHospitalProcedure({
               return (
                 <button
                   key={data.locale}
+                  style={
+                    data.language === activeLanguageTab
+                      ? {
+                          border: '1px solid rgba(9, 111, 144, 1)',
+                          color: 'rgba(9, 111, 144, 1)',
+                          backgroundColor: 'rgba(242, 250, 252, 1)',
+                        }
+                      : {}
+                  }
                   type="button"
                   onClick={() => setActiveLanguageTab(data.language)}
                   className={`${errors[lang] && errors[lang]?.message ? '!border !border-error !text-error' : ''}`}

@@ -4,66 +4,70 @@
 
 /* eslint-disable jsx-a11y/label-has-associated-control */
 import { zodResolver } from '@hookform/resolvers/zod';
-import Image from 'next/image';
 import { useRouter } from 'next/navigation';
 import React from 'react';
 import type { SubmitHandler } from 'react-hook-form';
-import { Controller, useForm } from 'react-hook-form';
+import { useForm } from 'react-hook-form';
 import { ClipLoader } from 'react-spinners';
 import { z } from 'zod';
 
 import { BackArrowIcon, Header, WithAuth } from '@/components';
 import {
-  useEditHospital,
-  useGetHospitalById,
-  useUpdateHospitalGallery,
-  useUpdateHospitalLogo,
-} from '@/hooks';
-// import { useGetHospitalProcedureById } from '@/hooks/useHospitalProcedure';
+  useEditHospitalProcedure,
+  useGetHospitalProcedureById,
+} from '@/hooks/useHospitalProcedure';
 import type { LanguagesType } from '@/types/components';
 import { countryData } from '@/utils/global';
 
 import addHospitalStyle from '../../../../style.module.scss';
 
-export type HospitalFormSchemaType =
-  | 'hospitalDescEn'
-  | 'hospitalDescNb'
-  | 'hospitalDescDa'
-  | 'hospitalDescSv';
+export type HospitalProcedureFormSchemaType =
+  | 'procedureDescEn'
+  | 'procedureDescNb'
+  | 'procedureDescDa'
+  | 'procedureDescSv';
 
 const editHospitalProcedureFormSchema = z.object({
-  hospitalName: z.string().min(1, { message: 'Hospital name is required' }),
-  hospitalDescEn: z
+  departmentName: z.string(),
+  procedureName: z.string(),
+  procedureDescEn: z
     .string()
     .min(1, { message: 'Fill in details in all the languages' }),
-  hospitalDescNb: z
+  procedureDescNb: z
     .string()
     .min(1, { message: 'Fill in details in all the languages' }),
-  hospitalDescDa: z
+  procedureDescDa: z
     .string()
     .min(1, { message: 'Fill in details in all the languages' }),
-  hospitalDescSv: z
+  procedureDescSv: z
     .string()
     .min(1, { message: 'Fill in details in all the languages' }),
-  streetName: z.string().min(1, { message: 'Street name is required' }),
-  city: z.string().min(1, { message: 'City is required' }),
-  country: z.string().min(1, { message: 'Country is required' }),
-  streetNumber: z.string().refine((val) => !Number.isNaN(parseInt(val, 10)), {
-    message: 'Street number is required',
+  costEn: z.number({
+    required_error: 'Cost in all language is required',
+    invalid_type_error: 'Cost must be a number',
   }),
-  zipCode: z.string().refine((val) => !Number.isNaN(parseInt(val, 10)), {
-    message: 'Zipcode is required',
+  costNb: z.number({
+    required_error: 'Cost in all language is required',
+    invalid_type_error: 'Cost must be a number',
   }),
-  logo: z
-    .custom<File>((v) => v instanceof File, {
-      message: 'Image is required',
-    })
-    .optional(),
-  gallery: z
-    .custom<File>((v) => v instanceof File, {
-      message: 'Image is required',
-    })
-    .optional(),
+  costDa: z.number({
+    required_error: 'Cost in all language is required',
+    invalid_type_error: 'Cost must be a number',
+  }),
+  costSv: z.number({
+    required_error: 'Cost in all language is required',
+    invalid_type_error: 'Cost must be a number',
+  }),
+  waitingTime: z.string().min(1, { message: 'Waiting time is required' }),
+  stayInHospital: z
+    .string()
+    .min(1, { message: 'Stay in hospital is required' }),
+  stayInCity: z.string().min(1, { message: 'Stay in city is required' }),
+  // gallery: z
+  //   .custom<File>((v) => v instanceof File, {
+  //     message: 'Image is required',
+  //   })
+  //   .optional(),
 });
 export type EditHospitalProcedureFormFields = z.infer<
   typeof editHospitalProcedureFormSchema
@@ -73,104 +77,129 @@ function EditHospitalProcedure({
 }: {
   params: { id: string; procedureId: string };
 }) {
-  // const hospitalProcedureDetails = useGetHospitalProcedureById({
-  //   id: params.procedureId,
-  // });
-  const editHospital = useEditHospital();
-  const reqdHospital = useGetHospitalById({ id: params.id });
-  const updateHospitalLogo = useUpdateHospitalLogo();
-  const updateHospitalGallery = useUpdateHospitalGallery();
+  const editHospitalProcedure = useEditHospitalProcedure();
+  const hospitalProcedureDetails = useGetHospitalProcedureById({
+    id: params.procedureId,
+  });
   const [activeLanguageTab, setActiveLanguageTab] =
     React.useState<LanguagesType>('English');
   const router = useRouter();
   const {
     register,
-    control,
+    // control,
     handleSubmit,
     setValue,
-    getValues,
     formState: { errors },
   } = useForm<EditHospitalProcedureFormFields>({
     resolver: zodResolver(editHospitalProcedureFormSchema),
   });
   const hospitalObj = {
-    English: 'hospitalDescEn',
-    Norwegian: 'hospitalDescNb',
-    Danish: 'hospitalDescDa',
-    Swedish: 'hospitalDescSv',
+    English: 'procedureDescEn',
+    Norwegian: 'procedureDescNb',
+    Danish: 'procedureDescDa',
+    Swedish: 'procedureDescSv',
   };
   const shouldRenderProcedureError = countryData.some((c) => {
-    const lang = hospitalObj[c.language] as HospitalFormSchemaType;
+    const lang = hospitalObj[c.language] as HospitalProcedureFormSchemaType;
     return errors[lang] && errors[lang]?.message;
   });
   const onFormSubmit: SubmitHandler<EditHospitalProcedureFormFields> = (
     data: EditHospitalProcedureFormFields,
   ) => {
-    editHospital.mutate({
-      name: data.hospitalName,
+    editHospitalProcedure.mutate({
+      waitingTime: data.waitingTime,
+      stayInHospital: data.stayInHospital,
+      stayInCity: data.stayInCity,
       description: {
-        en: data.hospitalDescEn,
-        sv: data.hospitalDescSv,
-        da: data.hospitalDescDa,
-        nb: data.hospitalDescNb,
+        en: data.procedureDescEn,
+        da: data.procedureDescDa,
+        nb: data.procedureDescNb,
+        sv: data.procedureDescSv,
       },
-      streetName: data.streetName,
-      streetNumber: data.streetNumber,
-      city: data.city,
-      country: data.country,
-      zipcode: data.zipCode,
-      hospitalId: params.id,
+      cost: {
+        en: data.costEn,
+        da: data.costDa,
+        nb: data.costNb,
+        sv: data.costSv,
+      },
+      hospitalProcedureId: params.procedureId,
     });
   };
   React.useEffect(() => {
     if (
       params.id &&
-      reqdHospital.isSuccess &&
-      reqdHospital.data &&
-      reqdHospital.data.success
+      hospitalProcedureDetails.isSuccess &&
+      hospitalProcedureDetails.data &&
+      hospitalProcedureDetails.data.success
     ) {
-      setValue('hospitalName', reqdHospital.data.data.name);
-      setValue('hospitalDescEn', reqdHospital.data.data.description.da);
-      setValue('hospitalDescNb', reqdHospital.data.data.description.sv);
-      setValue('hospitalDescDa', reqdHospital.data.data.description.nb);
-      setValue('hospitalDescSv', reqdHospital.data.data.description.nb);
-      setValue('streetName', reqdHospital.data.data.streetName);
-      setValue('city', reqdHospital.data.data.city);
-      setValue('country', reqdHospital.data.data.country);
-      setValue('streetNumber', reqdHospital.data.data.streetNumber);
-      setValue('zipCode', reqdHospital.data.data.zipcode);
+      setValue(
+        'departmentName',
+        hospitalProcedureDetails.data.data.procedure.category.name.en,
+      );
+      setValue(
+        'procedureName',
+        hospitalProcedureDetails.data.data.procedure.name.en,
+      );
+      setValue(
+        'procedureDescEn',
+        hospitalProcedureDetails.data.data.description.en,
+      );
+      setValue(
+        'procedureDescNb',
+        hospitalProcedureDetails.data.data.description.nb,
+      );
+      setValue(
+        'procedureDescDa',
+        hospitalProcedureDetails.data.data.description.da,
+      );
+      setValue(
+        'procedureDescSv',
+        hospitalProcedureDetails.data.data.description.sv,
+      );
+      setValue('costEn', hospitalProcedureDetails.data.data.cost.en);
+      setValue('costNb', hospitalProcedureDetails.data.data.cost.nb);
+      setValue('costDa', hospitalProcedureDetails.data.data.cost.da);
+      setValue('costSv', hospitalProcedureDetails.data.data.cost.sv);
+      setValue('waitingTime', hospitalProcedureDetails.data.data.waitingTime);
+      setValue('stayInCity', hospitalProcedureDetails.data.data.stayInCity);
+      setValue('stayInHospital', hospitalProcedureDetails.data.data.stayInCity);
     }
-  }, [reqdHospital.data, reqdHospital.isSuccess, setValue, params.id]);
-  React.useEffect(() => {
-    if (editHospital.isSuccess && editHospital.data && editHospital.data.data) {
-      const logo = getValues('logo');
-      if (logo) {
-        const formData = new FormData();
-        formData.append('logo', logo as Blob);
-        updateHospitalLogo.mutate({
-          hospitalId: `${editHospital.data.data}`,
-          formData,
-        });
-      }
-      const gallery = getValues('gallery');
-      if (gallery) {
-        const formData = new FormData();
-        formData.append('gallery', gallery as Blob);
-        updateHospitalGallery.mutate({
-          hospitalId: `${editHospital.data.data}`,
-          formData,
-        });
-      }
-      router.push(`/hospitals/add/${editHospital.data.data}`);
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [
-    editHospital.data,
-    editHospital.isSuccess,
-    // getValues,
-    // updateHospitalLogo,
-    // updateHospitalGallery,
+    hospitalProcedureDetails.data,
+    hospitalProcedureDetails.isSuccess,
+    setValue,
+    params.id,
   ]);
+  // React.useEffect(() => {
+  //   if (editHospital.isSuccess && editHospital.data && editHospital.data.data) {
+  //     const logo = getValues('logo');
+  //     if (logo) {
+  //       const formData = new FormData();
+  //       formData.append('logo', logo as Blob);
+  //       updateHospitalLogo.mutate({
+  //         hospitalId: `${editHospital.data.data}`,
+  //         formData,
+  //       });
+  //     }
+  //     const gallery = getValues('gallery');
+  //     if (gallery) {
+  //       const formData = new FormData();
+  //       formData.append('gallery', gallery as Blob);
+  //       updateHospitalGallery.mutate({
+  //         hospitalId: `${editHospital.data.data}`,
+  //         formData,
+  //       });
+  //     }
+  //     router.push(`/hospitals/add/${editHospital.data.data}`);
+  //   }
+  //   // eslint-disable-next-line react-hooks/exhaustive-deps
+  // }, [
+  //   editHospital.data,
+  //   editHospital.isSuccess,
+  //   // getValues,
+  //   // updateHospitalLogo,
+  //   // updateHospitalGallery,
+  // ]);
   return (
     <div>
       <Header />
@@ -183,80 +212,68 @@ function EditHospitalProcedure({
         >
           <BackArrowIcon />
         </button>
-        <h2 className={addHospitalStyle.title}>Hospital profile</h2>
+        <h2 className={addHospitalStyle.title}>Edit procedure</h2>
 
         <form
           className={addHospitalStyle.hospitalProfileForm}
           onSubmit={handleSubmit(onFormSubmit)}
         >
           <label
-            style={{ marginBottom: '6px' }}
+            style={{ margin: '24px 0 8px' }}
             className={addHospitalStyle.label}
+            htmlFor="deparment-sub-category"
           >
-            Hospital logo
+            Department/Sub-category
           </label>
-          {reqdHospital.data &&
-          reqdHospital.data.data?.logo &&
-          typeof reqdHospital.data.data?.logo === 'string' ? (
-            <Image
-              src={reqdHospital.data.data?.logo}
-              width={64}
-              height={64}
-              alt="hospital-logo"
-              className="rounded-full"
-            />
-          ) : (
-            <Controller
-              name="logo"
-              control={control}
-              render={({ field: { ref, name, onBlur, onChange } }) => (
-                <input
-                  type="file"
-                  ref={ref}
-                  name={name}
-                  onBlur={onBlur}
-                  onChange={(e) => onChange(e.target.files?.[0])}
-                />
-              )}
-            />
-          )}
-
-          {errors.logo && (
+          <input
+            className={addHospitalStyle.input}
+            style={{ backgroundColor: 'rgba(224, 228, 235, 1)' }}
+            type="text"
+            placeholder="Type here"
+            id="deparment-sub-category"
+            disabled
+            {...register('departmentName')}
+          />
+          {errors.departmentName && (
             <small className="mt-1 text-start font-lexend text-base font-normal text-error">
-              {errors.logo.message}
+              {errors.departmentName.message}
             </small>
           )}
           <label
             style={{ margin: '24px 0 8px' }}
             className={addHospitalStyle.label}
-            htmlFor="hospital-name"
+            htmlFor="procedure"
           >
-            Hospital name
+            Procedure
           </label>
           <input
             className={addHospitalStyle.input}
+            style={{ backgroundColor: 'rgba(224, 228, 235, 1)' }}
             type="text"
             placeholder="Type here"
-            id="hospital-name"
-            {...register('hospitalName')}
+            id="procedure"
+            disabled
+            {...register('procedureName')}
           />
-          {errors.hospitalName && (
+          {errors.procedureName && (
             <small className="mt-1 text-start font-lexend text-base font-normal text-error">
-              {errors.hospitalName.message}
+              {errors.procedureName.message}
             </small>
           )}
 
           <label
             style={{ margin: '32px 0 0' }}
             className={addHospitalStyle.label}
-            htmlFor="hospital-description"
+            htmlFor="hospital-procedure-description"
           >
-            Hospital Description
+            Procedure Description
           </label>
 
           <div className={addHospitalStyle.langTabContainer}>
             {countryData.map((data) => {
-              const lang = hospitalObj[data.language] as HospitalFormSchemaType;
+              const lang = hospitalObj[
+                data.language
+              ] as HospitalProcedureFormSchemaType;
               return (
                 <button
                   key={data.locale}
@@ -271,14 +288,16 @@ function EditHospitalProcedure({
           </div>
 
           {countryData.map((c) => {
-            const lang = hospitalObj[c.language] as HospitalFormSchemaType;
+            const lang = hospitalObj[
+              c.language
+            ] as HospitalProcedureFormSchemaType;
             return (
               <div key={c.countryCode}>
                 {c.language === activeLanguageTab && (
                   <textarea
                     className={addHospitalStyle.textarea}
                     placeholder="Type here"
-                    id="hospital-description"
+                    id="hospital-procedure-description"
                     {...register(lang)}
                   />
                 )}
@@ -292,114 +311,125 @@ function EditHospitalProcedure({
             </small>
           )}
 
-          <h3 className={addHospitalStyle.subTitleAddress}>Address</h3>
-
-          <label
-            style={{ marginBottom: '8px' }}
-            className={addHospitalStyle.label}
-            htmlFor="street-name"
-          >
-            Street name
-          </label>
-          <input
-            style={{ marginBottom: '32px' }}
-            className={addHospitalStyle.input}
-            type="text"
-            id="street-name"
-            {...register('streetName')}
-          />
-          {errors.streetName && (
-            <small className="mt-1 text-start font-lexend text-base font-normal text-error">
-              {errors.streetName.message}
-            </small>
-          )}
-
-          <label
-            style={{ marginBottom: '8px' }}
-            className={addHospitalStyle.label}
-            htmlFor="street-number"
-          >
-            Street number
-          </label>
-          <input
-            style={{ marginBottom: '32px' }}
-            className={addHospitalStyle.input}
-            type="text"
-            id="street-number"
-            {...register('streetNumber')}
-          />
-          {errors.streetNumber && (
-            <small className="mt-1 text-start font-lexend text-base font-normal text-error">
-              {errors.streetNumber.message}
-            </small>
-          )}
-
-          <div className={addHospitalStyle.cityCountryInputWrapper}>
-            <div className={addHospitalStyle.cityInputWrapper}>
+          <div className="grid grid-cols-2 gap-4">
+            <div className="my-4 flex w-full flex-col items-start">
               <label
-                style={{ marginBottom: '8px' }}
+                style={{ margin: '32px 0 0' }}
                 className={addHospitalStyle.label}
-                htmlFor="city"
+                htmlFor="cost-of-procedure"
               >
-                City
+                Expected cost of procedure
               </label>
-              <input
-                className={addHospitalStyle.input}
-                type="text"
-                id="city"
-                {...register('city')}
-              />
+
+              <div className={addHospitalStyle.langTabContainer}>
+                {countryData.map((data) => {
+                  const lang = hospitalObj[
+                    data.language
+                  ] as HospitalProcedureFormSchemaType;
+                  return (
+                    <button
+                      key={data.locale}
+                      type="button"
+                      onClick={() => setActiveLanguageTab(data.language)}
+                      className={`${errors[lang] && errors[lang]?.message ? '!border !border-error !text-error' : ''}`}
+                    >
+                      {data.language}
+                    </button>
+                  );
+                })}
+              </div>
+
+              {countryData.map((c) => {
+                const lang = hospitalObj[
+                  c.language
+                ] as HospitalProcedureFormSchemaType;
+                return (
+                  <div key={c.countryCode} className="w-full">
+                    {c.language === activeLanguageTab && (
+                      <input
+                        className={addHospitalStyle.input}
+                        placeholder="Type here"
+                        id="cost-of-procedure"
+                        {...register(lang)}
+                      />
+                    )}
+                  </div>
+                );
+              })}
+
+              {shouldRenderProcedureError && (
+                <small className="mb-5 mt-1 text-start font-lexend text-base font-normal text-error">
+                  Fill in details in all the languages
+                </small>
+              )}
             </div>
-            {errors.city && (
-              <small className="mt-1 text-start font-lexend text-base font-normal text-error">
-                {errors.city.message}
-              </small>
-            )}
-
-            <div className={addHospitalStyle.countryInputWrapper}>
+            <div className="my-4 flex w-full flex-col items-start">
               <label
                 style={{ marginBottom: '8px' }}
                 className={addHospitalStyle.label}
-                htmlFor="country"
+                htmlFor="waiting-time"
               >
-                Country
+                Expected waiting time for the procedure in days
               </label>
               <input
+                style={{ marginBottom: '32px' }}
                 className={addHospitalStyle.input}
-                type="text"
-                id="country"
-                {...register('country')}
+                type="number"
+                id="waiting-time"
+                {...register('waitingTime')}
               />
-              {errors.country && (
+              {errors.waitingTime && (
                 <small className="mt-1 text-start font-lexend text-base font-normal text-error">
-                  {errors.country.message}
+                  {errors.waitingTime.message}
+                </small>
+              )}
+            </div>
+            <div className="my-4 flex w-full flex-col items-start">
+              <label
+                style={{ marginBottom: '8px' }}
+                className={addHospitalStyle.label}
+                htmlFor="stay-in-hospital"
+              >
+                Expected length of stay in the hospital in days
+              </label>
+              <input
+                style={{ marginBottom: '32px' }}
+                className={addHospitalStyle.input}
+                type="number"
+                id="stay-in-hospital"
+                {...register('stayInHospital')}
+              />
+              {errors.stayInHospital && (
+                <small className="mt-1 text-start font-lexend text-base font-normal text-error">
+                  {errors.stayInHospital.message}
+                </small>
+              )}
+            </div>
+            <div className="my-4 flex w-full flex-col items-start">
+              <label
+                style={{ marginBottom: '8px' }}
+                className={addHospitalStyle.label}
+                htmlFor="stay-in-city"
+              >
+                Expected length of stay in the city in days
+              </label>
+              <input
+                style={{ marginBottom: '32px' }}
+                className={addHospitalStyle.input}
+                type="number"
+                id="stay-in-city"
+                {...register('stayInCity')}
+              />
+              {errors.stayInCity && (
+                <small className="mt-1 text-start font-lexend text-base font-normal text-error">
+                  {errors.stayInCity.message}
                 </small>
               )}
             </div>
           </div>
 
-          <label
-            style={{ marginBottom: '8px' }}
-            className={addHospitalStyle.label}
-            htmlFor="zipCode"
-          >
-            Zip code
-          </label>
-          <input
-            style={{ marginBottom: '64px' }}
-            className={addHospitalStyle.input}
-            type="text"
-            id="zidCode"
-            {...register('zipCode')}
-          />
-          {errors.zipCode && (
-            <small className="mt-1 text-start font-lexend text-base font-normal text-error">
-              {errors.zipCode.message}
-            </small>
-          )}
-
-          <h3 className={addHospitalStyle.subTitleHospitalGallery}>
-            Hospital gallery
+          {/* <h3 className={addHospitalStyle.subTitleHospitalGallery}>
+            Procedure related images
           </h3>
           {reqdHospital.data &&
           reqdHospital.data.data &&
@@ -435,16 +465,15 @@ function EditHospitalProcedure({
             <small className="mt-1 text-start font-lexend text-base font-normal text-error">
               {errors.gallery.message}
             </small>
-          )}
+          )} */}
           <div className={addHospitalStyle.footerBtnContainer}>
             <button className={addHospitalStyle.cancelBtn} type="submit">
               <p>Cancel</p>
             </button>
-
             <button className={addHospitalStyle.publishBtn} type="submit">
-              {editHospital.isPending ? (
+              {editHospitalProcedure.isPending ? (
                 <ClipLoader
-                  loading={editHospital.isPending}
+                  loading={editHospitalProcedure.isPending}
                   color="#fff"
                   size={30}
                   aria-label="Loading Spinner"

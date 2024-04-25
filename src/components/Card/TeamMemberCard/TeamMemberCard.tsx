@@ -1,4 +1,6 @@
 import Image from 'next/image';
+import React from 'react';
+import { toast } from 'sonner';
 
 import { useDeleteTeamMember } from '@/hooks/useMember';
 import sampleProfile from '@/public/assets/icons/sampleProfile.svg';
@@ -21,6 +23,12 @@ function TeamMemberCard({
   onOpen: () => void;
 }) {
   const deleteTeamMember = useDeleteTeamMember();
+  React.useEffect(() => {
+    if (deleteTeamMember.isSuccess) {
+      toast('Team member removed successfully');
+    }
+  }, [deleteTeamMember.isSuccess]);
+
   return (
     <div className={style.cardContainer}>
       <div className={style.cardHeader}>

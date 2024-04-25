@@ -12,7 +12,7 @@ import { Controller, useForm } from 'react-hook-form';
 import { ClipLoader } from 'react-spinners';
 import { z } from 'zod';
 
-import { BackArrowIcon, Header, WithAuth } from '@/components';
+import { BackArrowIcon, CancelModal, Header, WithAuth } from '@/components';
 import {
   useCreateHospital,
   useUpdateHospitalGallery,
@@ -66,6 +66,8 @@ function AddHospital() {
   const createHospital = useCreateHospital();
   const [activeLanguageTab, setActiveLanguageTab] =
     React.useState<LanguagesType>('English');
+  const [isActiveCancelModal, setIsActiveCancelModal] =
+    React.useState<boolean>(false);
   const router = useRouter();
   const {
     register,
@@ -135,6 +137,10 @@ function AddHospital() {
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [createHospital.data, createHospital.isSuccess, reset]);
+  const handleCancelBtn = () => {
+    reset();
+    router.back();
+  };
   return (
     <div>
       <Header />
@@ -391,7 +397,7 @@ function AddHospital() {
               size="sm"
               variant="outline"
               type="submit"
-              onClick={() => reset()}
+              onClick={handleCancelBtn}
             >
               <p>Cancel</p>
             </FbtButton>
@@ -417,6 +423,20 @@ function AddHospital() {
           </div>
         </form>
       </div>
+      {isActiveCancelModal && (
+        <CancelModal
+          msg={`Are you sure you want to cancel adding the hospital. You'll lose all responses collected. We can't recover them once you go back?`}
+          onCancelHandler={() => {
+            setIsActiveCancelModal(false);
+          }}
+          onAcceptHandler={() => {
+            setIsActiveCancelModal(false);
+            router.back();
+            reset();
+          }}
+          cancelMsg="No, Continue adding"
+        />
+      )}
     </div>
   );
 }

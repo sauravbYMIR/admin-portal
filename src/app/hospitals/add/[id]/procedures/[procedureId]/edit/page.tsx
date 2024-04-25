@@ -11,7 +11,7 @@ import { useForm } from 'react-hook-form';
 import { ClipLoader } from 'react-spinners';
 import { z } from 'zod';
 
-import { BackArrowIcon, Header, WithAuth } from '@/components';
+import { BackArrowIcon, CancelModal, Header, WithAuth } from '@/components';
 import {
   useEditHospitalProcedure,
   useGetHospitalProcedureById,
@@ -83,10 +83,12 @@ function EditHospitalProcedure({
   });
   const [activeLanguageTab, setActiveLanguageTab] =
     React.useState<LanguagesType>('English');
+  const [isActiveCancelModal, setIsActiveCancelModal] =
+    React.useState<boolean>(false);
   const router = useRouter();
   const {
     register,
-    // control,
+    reset,
     handleSubmit,
     setValue,
     formState: { errors },
@@ -495,6 +497,20 @@ function EditHospitalProcedure({
           </div>
         </form>
       </div>
+      {isActiveCancelModal && (
+        <CancelModal
+          msg={`Are you sure you want to cancel editing the hospital procedure. You'll lose all responses collected. We can't recover them once you go back?`}
+          onCancelHandler={() => {
+            setIsActiveCancelModal(false);
+          }}
+          onAcceptHandler={() => {
+            setIsActiveCancelModal(false);
+            router.back();
+            reset();
+          }}
+          cancelMsg="No, Continue editing"
+        />
+      )}
     </div>
   );
 }

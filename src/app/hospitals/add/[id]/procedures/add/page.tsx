@@ -3,8 +3,8 @@
 'use client';
 
 /* eslint-disable jsx-a11y/label-has-associated-control */
+import { FbtButton } from '@frontbase/components-react';
 import { zodResolver } from '@hookform/resolvers/zod';
-import Image from 'next/image';
 import { useRouter } from 'next/navigation';
 import React from 'react';
 import type { SubmitHandler } from 'react-hook-form';
@@ -12,17 +12,16 @@ import { Controller, useForm } from 'react-hook-form';
 import { ClipLoader } from 'react-spinners';
 import { z } from 'zod';
 
-import { BackArrowIcon, CancelModal, Header, WithAuth } from '@/components';
+import { BackArrowIcon, Header, WithAuth } from '@/components';
 import {
-  useEditHospital,
-  useGetHospitalById,
+  useCreateHospital,
   useUpdateHospitalGallery,
   useUpdateHospitalLogo,
 } from '@/hooks';
 import type { LanguagesType } from '@/types/components';
 import { countryData } from '@/utils/global';
 
-import addHospitalStyle from '../../add/style.module.scss';
+import addHospitalStyle from './style.module.scss';
 
 export type HospitalFormSchemaType =
   | 'hospitalDescEn'
@@ -30,7 +29,7 @@ export type HospitalFormSchemaType =
   | 'hospitalDescDa'
   | 'hospitalDescSv';
 
-const editHospitalFormSchema = z.object({
+const createHospitalProcedureFormSchema = z.object({
   hospitalName: z.string().min(1, { message: 'Hospital name is required' }),
   hospitalDescEn: z
     .string()
@@ -53,38 +52,32 @@ const editHospitalFormSchema = z.object({
   zipCode: z.string().refine((val) => !Number.isNaN(parseInt(val, 10)), {
     message: 'Zipcode is required',
   }),
-  logo: z
-    .custom<File>((v) => v instanceof File, {
-      message: 'Image is required',
-    })
-    .optional(),
-  gallery: z
-    .custom<File>((v) => v instanceof File, {
-      message: 'Image is required',
-    })
-    .optional(),
+  logo: z.custom<File>((v) => v instanceof File, {
+    message: 'Image is required',
+  }),
+  gallery: z.custom<File>((v) => v instanceof File, {
+    message: 'Image is required',
+  }),
 });
-export type EditHospitalFormFields = z.infer<typeof editHospitalFormSchema>;
-function EditHospital({ params: { id } }: { params: { id: string } }) {
-  const editHospital = useEditHospital();
-  const reqdHospital = useGetHospitalById({ id });
+export type CreateHospitalProcedureFormFields = z.infer<
+  typeof createHospitalProcedureFormSchema
+>;
+function AddHospitalProcedure() {
   const updateHospitalLogo = useUpdateHospitalLogo();
   const updateHospitalGallery = useUpdateHospitalGallery();
+  const createHospital = useCreateHospital();
   const [activeLanguageTab, setActiveLanguageTab] =
     React.useState<LanguagesType>('English');
-  const [isActiveCancelModal, setIsActiveCancelModal] =
-    React.useState<boolean>(false);
   const router = useRouter();
   const {
     register,
     control,
-    handleSubmit,
-    setValue,
-    getValues,
     reset,
+    handleSubmit,
+    getValues,
     formState: { errors },
-  } = useForm<EditHospitalFormFields>({
-    resolver: zodResolver(editHospitalFormSchema),
+  } = useForm<CreateHospitalProcedureFormFields>({
+    resolver: zodResolver(createHospitalProcedureFormSchema),
   });
   const hospitalObj = {
     English: 'hospitalDescEn',
@@ -96,52 +89,38 @@ function EditHospital({ params: { id } }: { params: { id: string } }) {
     const lang = hospitalObj[c.language] as HospitalFormSchemaType;
     return errors[lang] && errors[lang]?.message;
   });
-  const onFormSubmit: SubmitHandler<EditHospitalFormFields> = (
-    data: EditHospitalFormFields,
+  const onFormSubmit: SubmitHandler<CreateHospitalProcedureFormFields> = (
+    data: CreateHospitalProcedureFormFields,
   ) => {
-    editHospital.mutate({
+    createHospital.mutate({
       name: data.hospitalName,
       description: {
         en: data.hospitalDescEn,
-        sv: data.hospitalDescSv,
-        da: data.hospitalDescDa,
         nb: data.hospitalDescNb,
+        da: data.hospitalDescDa,
+        sv: data.hospitalDescSv,
       },
       streetName: data.streetName,
       streetNumber: data.streetNumber,
       city: data.city,
       country: data.country,
       zipcode: data.zipCode,
-      hospitalId: id,
     });
+    setActiveLanguageTab('English');
   };
   React.useEffect(() => {
     if (
-      id &&
-      reqdHospital.isSuccess &&
-      reqdHospital.data &&
-      reqdHospital.data.success
+      createHospital.isSuccess &&
+      createHospital.data &&
+      createHospital.data.data.id
     ) {
-      setValue('hospitalName', reqdHospital.data.data.name);
-      setValue('hospitalDescEn', reqdHospital.data.data.description.da);
-      setValue('hospitalDescNb', reqdHospital.data.data.description.sv);
-      setValue('hospitalDescDa', reqdHospital.data.data.description.nb);
-      setValue('hospitalDescSv', reqdHospital.data.data.description.nb);
-      setValue('streetName', reqdHospital.data.data.streetName);
-      setValue('city', reqdHospital.data.data.city);
-      setValue('country', reqdHospital.data.data.country);
-      setValue('streetNumber', reqdHospital.data.data.streetNumber);
-      setValue('zipCode', reqdHospital.data.data.zipcode);
-    }
-  }, [reqdHospital.data, reqdHospital.isSuccess, setValue, id]);
-  React.useEffect(() => {
-    if (editHospital.isSuccess && editHospital.data && editHospital.data.data) {
+      reset();
       const logo = getValues('logo');
       if (logo) {
         const formData = new FormData();
         formData.append('logo', logo as Blob);
         updateHospitalLogo.mutate({
-          hospitalId: `${editHospital.data.data}`,
+          hospitalId: `${createHospital.data.data.id}`,
           formData,
         });
       }
@@ -150,20 +129,14 @@ function EditHospital({ params: { id } }: { params: { id: string } }) {
         const formData = new FormData();
         formData.append('gallery', gallery as Blob);
         updateHospitalGallery.mutate({
-          hospitalId: `${editHospital.data.data}`,
+          hospitalId: `${createHospital.data.data.id}`,
           formData,
         });
       }
-      router.push(`/hospitals/add/${editHospital.data.data}`);
+      router.push(`/hospitals/edit/${createHospital.data.data.id}`);
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [
-    editHospital.data,
-    editHospital.isSuccess,
-    // getValues,
-    // updateHospitalLogo,
-    // updateHospitalGallery,
-  ]);
+  }, [createHospital.data, createHospital.isSuccess, reset]);
   const handleCancelBtn = () => {
     reset();
     router.back();
@@ -192,37 +165,25 @@ function EditHospital({ params: { id } }: { params: { id: string } }) {
           >
             Hospital logo
           </label>
-          {reqdHospital.data &&
-          reqdHospital.data.data.logo &&
-          typeof reqdHospital.data.data.logo === 'string' ? (
-            <Image
-              src={reqdHospital.data.data.logo}
-              width={64}
-              height={64}
-              alt="hospital-logo"
-              className="rounded-full"
-            />
-          ) : (
-            <Controller
-              name="logo"
-              control={control}
-              render={({ field: { ref, name, onBlur, onChange } }) => (
-                <input
-                  type="file"
-                  ref={ref}
-                  name={name}
-                  onBlur={onBlur}
-                  onChange={(e) => onChange(e.target.files?.[0])}
-                />
-              )}
-            />
-          )}
-
+          <Controller
+            name="logo"
+            control={control}
+            render={({ field: { ref, name, onBlur, onChange } }) => (
+              <input
+                type="file"
+                ref={ref}
+                name={name}
+                onBlur={onBlur}
+                onChange={(e) => onChange(e.target.files?.[0])}
+              />
+            )}
+          />
           {errors.logo && (
             <small className="mt-1 text-start font-lexend text-base font-normal text-error">
               {errors.logo.message}
             </small>
           )}
+
           <label
             style={{ margin: '24px 0 8px' }}
             className={addHospitalStyle.label}
@@ -257,6 +218,8 @@ function EditHospital({ params: { id } }: { params: { id: string } }) {
               return (
                 <button
                   key={data.locale}
+                  type="button"
+                  onClick={() => setActiveLanguageTab(data.language)}
                   style={
                     data.language === activeLanguageTab
                       ? {
@@ -266,8 +229,6 @@ function EditHospital({ params: { id } }: { params: { id: string } }) {
                         }
                       : {}
                   }
-                  type="button"
-                  onClick={() => setActiveLanguageTab(data.language)}
                   className={`${errors[lang] && errors[lang]?.message ? '!border !border-error !text-error' : ''}`}
                 >
                   {data.language}
@@ -407,82 +368,63 @@ function EditHospital({ params: { id } }: { params: { id: string } }) {
           <h3 className={addHospitalStyle.subTitleHospitalGallery}>
             Hospital gallery
           </h3>
-          {reqdHospital.data &&
-          reqdHospital.data.data &&
-          typeof reqdHospital.data.data.gallery === 'string' ? (
-            <Image
-              src={reqdHospital.data.data.gallery}
-              width={64}
-              height={64}
-              alt="hospital-gallery"
-              className="h-[250px] w-[264px] rounded-lg"
-            />
-          ) : (
-            <>
-              <p className={addHospitalStyle.hospitalGalleryDesc}>
-                Upload a minimum of 3 media items and maximum 10 media items
-              </p>
-              <Controller
-                name="gallery"
-                control={control}
-                render={({ field: { ref, name, onBlur, onChange } }) => (
-                  <input
-                    type="file"
-                    ref={ref}
-                    name={name}
-                    onBlur={onBlur}
-                    onChange={(e) => onChange(e.target.files?.[0])}
-                  />
-                )}
+          <p className={addHospitalStyle.hospitalGalleryDesc}>
+            Upload a minimum of 3 media items and maximum 10 media items
+          </p>
+
+          <Controller
+            name="gallery"
+            control={control}
+            render={({ field: { ref, name, onBlur, onChange } }) => (
+              <input
+                type="file"
+                ref={ref}
+                name={name}
+                onBlur={onBlur}
+                onChange={(e) => onChange(e.target.files?.[0])}
               />
-            </>
-          )}
+            )}
+          />
           {errors.gallery && (
             <small className="mt-1 text-start font-lexend text-base font-normal text-error">
               {errors.gallery.message}
             </small>
           )}
+
           <div className={addHospitalStyle.footerBtnContainer}>
-            <button
+            <FbtButton
               className={addHospitalStyle.cancelBtn}
+              size="sm"
+              variant="outline"
               type="submit"
               onClick={handleCancelBtn}
             >
               <p>Cancel</p>
-            </button>
+            </FbtButton>
 
-            <button className={addHospitalStyle.publishBtn} type="submit">
-              {editHospital.isPending ? (
+            <FbtButton
+              className={addHospitalStyle.publishBtn}
+              size="sm"
+              variant="solid"
+              type="submit"
+            >
+              {createHospital.isPending ? (
                 <ClipLoader
-                  loading={editHospital.isPending}
+                  loading={createHospital.isPending}
                   color="#fff"
                   size={30}
                   aria-label="Loading Spinner"
                   data-testid="loader"
                 />
               ) : (
-                <p>Edit</p>
+                <p>Publish</p>
               )}
-            </button>
+            </FbtButton>
           </div>
         </form>
       </div>
-      {isActiveCancelModal && (
-        <CancelModal
-          msg={`Are you sure you want to cancel editing the hospital procedure. You'll lose all responses collected. We can't recover them once you go back?`}
-          onCancelHandler={() => {
-            setIsActiveCancelModal(false);
-          }}
-          onAcceptHandler={() => {
-            setIsActiveCancelModal(false);
-            router.back();
-            reset();
-          }}
-          cancelMsg="No, Continue editing"
-        />
-      )}
     </div>
   );
 }
 
-export default WithAuth(EditHospital);
+export default WithAuth(AddHospitalProcedure);

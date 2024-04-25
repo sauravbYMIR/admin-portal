@@ -187,7 +187,9 @@ function HospitalProcedureManagement() {
             <button
               type="button"
               className="flex h-16 items-center gap-3 rounded-lg bg-darkteal px-6 py-[14px]"
-              onClick={() => router.push('/hospitals/add')}
+              onClick={() =>
+                router.push(`/hospitals/add/${hospitalId}/procedures/add`)
+              }
             >
               <Image src={plusIcon} alt="cta btn text" width={25} height={25} />
               <p className="font-poppins text-2xl font-normal text-primary-6">

@@ -476,7 +476,6 @@ function EditHospital({ params: { id } }: { params: { id: string } }) {
           onAcceptHandler={() => {
             setIsActiveCancelModal(false);
             router.back();
-            reset();
           }}
           cancelMsg="No, Continue editing"
         />

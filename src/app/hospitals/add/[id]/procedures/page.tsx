@@ -6,7 +6,13 @@ import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
 import { toast } from 'sonner';
 
-import { CustomHomePage, Header, PatientsTable, WithAuth } from '@/components';
+import {
+  CustomHomePage,
+  DataTable,
+  Header,
+  PatientsTable,
+  WithAuth,
+} from '@/components';
 import {
   editHospitalProcedure,
   useGetAllHospitalProcedure,
@@ -104,7 +110,7 @@ function HospitalProcedureManagement() {
               type="button"
               className="mb-5 flex items-center justify-between rounded-[6.4px] bg-darkteal px-6 py-3 text-white"
               onClick={() =>
-                router.push(`/hospitals/add/${hospitalId}/procedures`)
+                router.push(`/hospitals/add/${hospitalId}/procedures/add`)
               }
             >
               <Image src={plusIcon} alt="cta btn text" width={25} height={25} />
@@ -112,90 +118,105 @@ function HospitalProcedureManagement() {
                 Add new procedure
               </p>
             </button>
-            <PatientsTable
-              onCellClicked={onCellClicked}
-              rowData={procedureByHospitalId.data.data.map((r) => ({
-                name: `${r.procedure.name.en}`,
-                department: r.procedure.category.name.en,
-                waitTime: r.waitingTime,
-                cost: r.cost.en,
-                id: r.id,
-                stayInHospital: r.stayInHospital,
-                stayInCity: r.stayInCity,
-                desc: {
-                  en: r.description.en,
-                  da: r.description.da,
-                  sv: r.description.sv,
-                  nb: r.description.nb,
-                },
-                costObj: {
-                  en: r.cost.en,
-                  da: r.cost.da,
-                  sv: r.cost.sv,
-                  nb: r.cost.nb,
-                },
-              }))}
-              colDefs={[
-                {
-                  headerName: 'Procedure /Procedure + sub-category',
-                  field: 'name',
-                  filter: true,
-                  floatingFilter: true,
-                  flex: 1,
-                  editable: true,
-                },
-                {
-                  headerName: 'Department',
-                  field: 'department',
-                  filter: true,
-                  floatingFilter: true,
-                  flex: 1,
-                  editable: true,
-                },
-                {
-                  headerName: 'Wait time',
-                  field: 'waitTime',
-                  filter: true,
-                  floatingFilter: true,
-                  flex: 1,
-                  editable: true,
-                },
-                {
-                  headerName: 'Cost of procedure',
-                  field: 'cost',
-                  filter: true,
-                  floatingFilter: true,
-                  flex: 1,
-                  editable: true,
-                },
-                {
-                  field: '',
-                  flex: 1,
-                  cellRenderer: CustomStatusEditComponent,
-                },
-              ]}
-            />
+            {procedureByHospitalId.isLoading ? (
+              <DataTable />
+            ) : (
+              <PatientsTable
+                onCellClicked={onCellClicked}
+                rowData={procedureByHospitalId.data.data.map((r) => ({
+                  name: `${r.procedure.name.en}`,
+                  department: r.procedure.category.name.en,
+                  waitTime: r.waitingTime,
+                  cost: r.cost.en,
+                  id: r.id,
+                  stayInHospital: r.stayInHospital,
+                  stayInCity: r.stayInCity,
+                  desc: {
+                    en: r.description.en,
+                    da: r.description.da,
+                    sv: r.description.sv,
+                    nb: r.description.nb,
+                  },
+                  costObj: {
+                    en: r.cost.en,
+                    da: r.cost.da,
+                    sv: r.cost.sv,
+                    nb: r.cost.nb,
+                  },
+                }))}
+                colDefs={[
+                  {
+                    headerName: 'Procedure /Procedure + sub-category',
+                    field: 'name',
+                    filter: true,
+                    floatingFilter: true,
+                    flex: 1,
+                    editable: true,
+                  },
+                  {
+                    headerName: 'Department',
+                    field: 'department',
+                    filter: true,
+                    floatingFilter: true,
+                    flex: 1,
+                    editable: true,
+                  },
+                  {
+                    headerName: 'Wait time',
+                    field: 'waitTime',
+                    filter: true,
+                    floatingFilter: true,
+                    flex: 1,
+                    editable: true,
+                  },
+                  {
+                    headerName: 'Cost of procedure',
+                    field: 'cost',
+                    filter: true,
+                    floatingFilter: true,
+                    flex: 1,
+                    editable: true,
+                  },
+                  {
+                    field: '',
+                    flex: 1,
+                    cellRenderer: CustomStatusEditComponent,
+                  },
+                ]}
+              />
+            )}
           </div>
         ) : (
-          <div
-            style={{ boxShadow: '2px 2px 4px 1px rgba(9, 111, 144, 0.1)' }}
-            className="box-border flex w-full flex-col items-center gap-12 rounded-xl border border-lightskyblue bg-neutral-7 px-[178px] py-12"
-          >
-            <h2 className="text-center font-poppins text-4xl font-medium text-neutral-1">
-              No procedures have been added yet!
-            </h2>
-            <button
-              type="button"
-              className="flex h-16 items-center gap-3 rounded-lg bg-darkteal px-6 py-[14px]"
-              onClick={() =>
-                router.push(`/hospitals/add/${hospitalId}/procedures/add`)
-              }
-            >
-              <Image src={plusIcon} alt="cta btn text" width={25} height={25} />
-              <p className="font-poppins text-2xl font-normal text-primary-6">
-                Add procedures
-              </p>
-            </button>
+          <div>
+            {procedureByHospitalId.isLoading ? (
+              <DataTable />
+            ) : (
+              <div
+                style={{ boxShadow: '2px 2px 4px 1px rgba(9, 111, 144, 0.1)' }}
+                className="box-border flex w-full flex-col items-center gap-12 rounded-xl border border-lightskyblue bg-neutral-7 px-[178px] py-12"
+              >
+                <h2 className="text-center font-poppins text-4xl font-medium text-neutral-1">
+                  No procedures have been added yet!
+                </h2>
+                <button
+                  type="button"
+                  className="flex h-16 items-center gap-3 rounded-lg bg-darkteal px-6 py-[14px]"
+                  onClick={() =>
+                    router.push(`/hospitals/add/${hospitalId}/procedures/add`)
+                  }
+                >
+                  <Image
+                    src={plusIcon}
+                    alt="cta btn text"
+                    width={25}
+                    height={25}
+                  />
+                  <p className="font-poppins text-2xl font-normal text-primary-6">
+                    Add procedures
+                  </p>
+                </button>
+              </div>
+            )}
           </div>
         )}
       </CustomHomePage>

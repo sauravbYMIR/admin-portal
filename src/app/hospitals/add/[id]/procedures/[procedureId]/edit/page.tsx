@@ -26,7 +26,17 @@ export type HospitalProcedureFormSchemaType =
   | 'procedureDescNb'
   | 'procedureDescDa'
   | 'procedureDescSv';
-
+export type HospitalCostFormSchemaType =
+  | 'costEn'
+  | 'costNb'
+  | 'costDa'
+  | 'costSv';
+const costObj = {
+  English: 'costEn',
+  Norwegian: 'costNb',
+  Danish: 'costDa',
+  Swedish: 'costSv',
+};
 const editHospitalProcedureFormSchema = z.object({
   departmentName: z.string(),
   procedureName: z.string(),
@@ -83,12 +93,13 @@ function EditHospitalProcedure({
   });
   const [activeLanguageTab, setActiveLanguageTab] =
     React.useState<LanguagesType>('English');
+  const [activeCostTab, setActiveCostTab] =
+    React.useState<LanguagesType>('English');
   const [isActiveCancelModal, setIsActiveCancelModal] =
     React.useState<boolean>(false);
   const router = useRouter();
   const {
     register,
-    reset,
     handleSubmit,
     setValue,
     formState: { errors },
@@ -103,6 +114,10 @@ function EditHospitalProcedure({
   };
   const shouldRenderProcedureError = countryData.some((c) => {
     const lang = hospitalObj[c.language] as HospitalProcedureFormSchemaType;
+    return errors[lang] && errors[lang]?.message;
+  });
+  const shouldRenderCostError = countryData.some((c) => {
+    const lang = costObj[c.language] as HospitalCostFormSchemaType;
     return errors[lang] && errors[lang]?.message;
   });
   const onFormSubmit: SubmitHandler<EditHospitalProcedureFormFields> = (
@@ -323,52 +338,52 @@ function EditHospitalProcedure({
           )}
 
           <div className="grid grid-cols-2 gap-4">
-            <div className="my-4 flex w-full flex-col items-start">
+            <div className="relative my-4 flex w-full flex-col items-start">
               <label
-                style={{ margin: '32px 0 0' }}
+                style={{ margin: '0 0 8px 0' }}
                 className={addHospitalStyle.label}
                 htmlFor="cost-of-procedure"
               >
                 Expected cost of procedure
               </label>
 
-              <div className={addHospitalStyle.langTabContainer}>
-                {countryData.map((data) => {
-                  const lang = hospitalObj[
-                    data.language
-                  ] as HospitalProcedureFormSchemaType;
-                  return (
-                    <button
-                      key={data.locale}
-                      type="button"
-                      onClick={() => setActiveLanguageTab(data.language)}
-                      className={`${errors[lang] && errors[lang]?.message ? '!border !border-error !text-error' : ''}`}
-                    >
-                      {data.language}
-                    </button>
-                  );
-                })}
+              <div className="absolute top-[30px]">
+                <select
+                  name="cost-of-procedure"
+                  id="cost-of-procedure"
+                  className="rounded-md border-2 border-neutral-4 bg-neutral-6 px-5 py-[18px]"
+                  onChange={(e) =>
+                    setActiveCostTab(e.target.value as LanguagesType)
+                  }
+                >
+                  {countryData.map((country) => {
+                    return (
+                      <option value={country.language} key={country.language}>
+                        <span>{country.currency}</span>
+                      </option>
+                    );
+                  })}
+                </select>
               </div>
 
               {countryData.map((c) => {
-                const lang = hospitalObj[
+                const costLang = costObj[
                   c.language
                 ] as HospitalProcedureFormSchemaType;
                 return (
                   <div key={c.countryCode} className="w-full">
-                    {c.language === activeLanguageTab && (
+                    {c.language === activeCostTab && (
                       <input
                         className={addHospitalStyle.input}
-                        placeholder="Type here"
                         id="cost-of-procedure"
-                        {...register(lang)}
+                        {...register(costLang)}
                       />
                     )}
                   </div>
                 );
               })}
 
-              {shouldRenderProcedureError && (
+              {shouldRenderCostError && (
                 <small className="mb-5 mt-1 text-start font-lexend text-base font-normal text-error">
                   Fill in details in all the languages
                 </small>
@@ -478,7 +493,13 @@ function EditHospitalProcedure({
             </small>
           )} */}
           <div className={addHospitalStyle.footerBtnContainer}>
-            <button className={addHospitalStyle.cancelBtn} type="submit">
+            <button
+              className={addHospitalStyle.cancelBtn}
+              type="button"
+              onClick={() => {
+                router.push('/hospitals');
+              }}
+            >
               <p>Cancel</p>
             </button>
             <button className={addHospitalStyle.publishBtn} type="submit">
@@ -506,7 +527,6 @@ function EditHospitalProcedure({
           onAcceptHandler={() => {
             setIsActiveCancelModal(false);
             router.back();
-            reset();
           }}
           cancelMsg="No, Continue editing"
         />

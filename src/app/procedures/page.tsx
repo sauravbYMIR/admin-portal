@@ -14,6 +14,7 @@ import {
   DepartmentModal,
   PlusIcon,
   ProcedureModal,
+  TaskList,
   WithAuth,
 } from '@/components';
 import { useGetAllDepartmentWithProcedure } from '@/hooks/useDepartment';
@@ -125,7 +126,6 @@ function ProceduresList() {
                           <div key={procedureData.id} className="mb-3">
                             <Accordion
                               editClickHandler={() => {
-                                console.log('department');
                                 setUpdateId(procedureData.id);
                                 setIsEditData(true);
                                 setEditDepartmentModalOpen(true);
@@ -142,7 +142,6 @@ function ProceduresList() {
                                     return (
                                       <Accordion
                                         editClickHandler={() => {
-                                          console.log('procedure');
                                           setUpdateId(procedure.id);
                                           setIsEditData(true);
                                           setEditProcedureModalOpen(true);
@@ -187,7 +186,6 @@ function ProceduresList() {
                                             type="button"
                                             className="ml-2 cursor-pointer"
                                             onClick={() => {
-                                              console.log('sub-cat1');
                                               setUpdateId(subCategoryData.id);
                                               setIsEditData(true);
                                               setIsEditSubCategory(true);
@@ -220,7 +218,6 @@ function ProceduresList() {
                                                     key={procedure.id}
                                                     title={procedure.name.en}
                                                     editClickHandler={() => {
-                                                      console.log('sub-cat');
                                                       setUpdateId(procedure.id);
                                                       setIsEditData(true);
                                                       setEditProcedureModalOpen(
@@ -285,23 +282,34 @@ function ProceduresList() {
             </div>
           )
         ) : (
-          <div
-            style={{ boxShadow: '2px 2px 4px 1px rgba(9, 111, 144, 0.1)' }}
-            className="box-border flex w-full flex-col items-center gap-12 rounded-xl border border-lightskyblue bg-neutral-7 px-[178px] py-12"
-          >
-            <h2 className="text-center font-poppins text-4xl font-medium text-neutral-1">
-              No departments have been added yet!
-            </h2>
-            <button
-              type="button"
-              className="flex h-16 cursor-pointer items-center gap-3 rounded-lg bg-darkteal px-6 py-[14px]"
-              onClick={() => router.push('/procedures/add')}
-            >
-              <Image src={plusIcon} alt="cta btn text" width={25} height={25} />
-              <p className="font-poppins text-2xl font-normal text-primary-6">
-                Add a department
-              </p>
-            </button>
+          <div>
+            {departmentProcedureList.isLoading ? (
+              <TaskList />
+            ) : (
+              <div
+                style={{ boxShadow: '2px 2px 4px 1px rgba(9, 111, 144, 0.1)' }}
+                className="box-border flex w-full flex-col items-center gap-12 rounded-xl border border-lightskyblue bg-neutral-7 px-[178px] py-12"
+              >
+                <h2 className="text-center font-poppins text-4xl font-medium text-neutral-1">
+                  No departments have been added yet!
+                </h2>
+                <button
+                  type="button"
+                  className="flex h-16 cursor-pointer items-center gap-3 rounded-lg bg-darkteal px-6 py-[14px]"
+                  onClick={() => router.push('/procedures/add')}
+                >
+                  <Image
+                    src={plusIcon}
+                    alt="cta btn text"
+                    width={25}
+                    height={25}
+                  />
+                  <p className="font-poppins text-2xl font-normal text-primary-6">
+                    Add a department
+                  </p>
+                </button>
+              </div>
+            )}
           </div>
         )}
       </CustomHomePage>

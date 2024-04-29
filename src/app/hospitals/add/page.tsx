@@ -138,7 +138,6 @@ function AddHospital() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [createHospital.data, createHospital.isSuccess, reset]);
   const handleCancelBtn = () => {
-    reset();
     router.back();
   };
   return (
@@ -392,15 +391,13 @@ function AddHospital() {
           )}
 
           <div className={addHospitalStyle.footerBtnContainer}>
-            <FbtButton
+            <button
               className={addHospitalStyle.cancelBtn}
-              size="sm"
-              variant="outline"
-              type="submit"
+              type="button"
               onClick={handleCancelBtn}
             >
               <p>Cancel</p>
-            </FbtButton>
+            </button>
 
             <FbtButton
               className={addHospitalStyle.publishBtn}
@@ -432,7 +429,6 @@ function AddHospital() {
           onAcceptHandler={() => {
             setIsActiveCancelModal(false);
             router.back();
-            reset();
           }}
           cancelMsg="No, Continue adding"
         />

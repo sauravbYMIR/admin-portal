@@ -8,6 +8,7 @@ import type {
   ProcedureType,
   ReimbursementJSONType,
 } from './useDepartment';
+import type { HospitalMemberType } from './useMember';
 
 export type GetAllHospitalResponse = {
   success: boolean;
@@ -83,6 +84,11 @@ export type GetHospitalById = {
     logo: boolean | string;
     gallery: boolean | string;
   };
+};
+export type GetHospitalTeamMembersByHospitalId = {
+  success: boolean;
+  status: number;
+  data: Array<HospitalMemberType>;
 };
 export type GetProcedureByHospitalId = {
   success: boolean;
@@ -341,6 +347,31 @@ export const useGetProcedureByHospitalId = ({ id }: { id: string }) => {
   return useQuery({
     queryKey: [`hospital-procedure`, id],
     queryFn: () => getProcedureByHospitalId(id),
+    refetchOnWindowFocus: false,
+    enabled: !!id,
+  });
+};
+export const getHospitalTeamMembersByHospitalId = async (
+  id: string,
+): Promise<GetHospitalTeamMembersByHospitalId> => {
+  const response = await axiosInstance.get<GetHospitalTeamMembersByHospitalId>(
+    `${process.env.BASE_URL}/hospital/team-members/${id}`,
+  );
+  return {
+    success: response.data.success,
+    status: 200,
+    data: response.data.data,
+  };
+};
+
+export const useGetHospitalTeamMembersByHospitalId = ({
+  id,
+}: {
+  id: string;
+}) => {
+  return useQuery({
+    queryKey: [`hospital`, `team-members`, id],
+    queryFn: () => getHospitalTeamMembersByHospitalId(id),
     refetchOnWindowFocus: false,
     enabled: !!id,
   });

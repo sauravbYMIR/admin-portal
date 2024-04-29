@@ -50,6 +50,22 @@ export type HospitalProcedureByIdType = {
   updatedAt: string | null;
   waitingTime: string;
 };
+export type CreateHospitalProcedureType = {
+  success: boolean;
+  status: number;
+  data: {
+    id: string;
+    hospitalMembers: Array<any>;
+    procedureMembers: Array<any>;
+    procedureId: string;
+    hospitalId: string;
+    description: NameJSONType;
+    cost: ReimbursementJSONType;
+    waitingTime: string;
+    stayInHospital: string;
+    stayInCity: string;
+  };
+};
 
 export const getAllHospitalProcedure = async (
   id: string,
@@ -147,5 +163,62 @@ export const useGetHospitalProcedureById = ({ id }: { id: string }) => {
     queryFn: () => getHospitalProcedureById(id),
     refetchOnWindowFocus: false,
     enabled: !!id,
+  });
+};
+export const createHospitalProcedure = async ({
+  procedureId,
+  hospitalId,
+  description,
+  cost,
+  waitingTime,
+  stayInHospital,
+  stayInCity,
+  procedureMembers,
+}: {
+  procedureId: string;
+  hospitalId: string;
+  description: NameJSONType;
+  cost: ReimbursementJSONType;
+  waitingTime: string;
+  stayInHospital: string;
+  stayInCity: string;
+  procedureMembers: Array<any>;
+}): Promise<{
+  success: boolean;
+  status: number;
+  data: string;
+}> => {
+  const response = await axiosInstance.post<CreateHospitalProcedureType>(
+    `${process.env.BASE_URL}/hospital-procedure`,
+    {
+      procedureId,
+      hospitalId,
+      description,
+      cost,
+      waitingTime,
+      stayInHospital,
+      stayInCity,
+      procedureMembers,
+    },
+  );
+  return {
+    success: response.data.success,
+    status: response.data.status,
+    data: response.data.data.id,
+  };
+};
+
+export const useCreateHospitalProcedure = () => {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: createHospitalProcedure,
+    onSuccess: () => {
+      queryClient.invalidateQueries({
+        queryKey: [`hospital-procedure`],
+      });
+    },
+    onError: (error) => {
+      toast(`Something went wrong: ${error.message}`);
+    },
   });
 };

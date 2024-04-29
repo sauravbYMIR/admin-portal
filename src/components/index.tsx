@@ -13,6 +13,7 @@ export * from './CustomHomePage/CustomHomePage';
 export * from './Icons/Icons';
 export * from './Login/Login';
 export * from './Modal';
+export * from './SkeletonLoader';
 export * from './ToastMsgContainer/ToastMsgContainer';
 export * from './WithAuth/WithAuth';
 export {

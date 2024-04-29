@@ -60,6 +60,41 @@ export const useGetAllDepartmentWithProcedure = () => {
     refetchOnWindowFocus: false,
   });
 };
+export const getAllProcedureByDeptId = async (
+  id: string,
+): Promise<{
+  success: boolean;
+  status: number;
+  data: Array<{
+    categoryId: string;
+    id: string;
+    name: NameJSONType;
+    reimbursement: ReimbursementJSONType;
+  }>;
+}> => {
+  const response = await axiosInstance.get<
+    Array<{
+      categoryId: string;
+      id: string;
+      name: NameJSONType;
+      reimbursement: ReimbursementJSONType;
+    }>
+  >(`${process.env.BASE_URL}/procedure/department/${id}`);
+  return {
+    success: true,
+    status: 200,
+    data: response.data,
+  };
+};
+
+export const useGetAllProcedureByDeptId = ({ id }: { id: string }) => {
+  return useQuery({
+    queryKey: [`procedure`, id],
+    queryFn: () => getAllProcedureByDeptId(id),
+    refetchOnWindowFocus: false,
+    enabled: !!id,
+  });
+};
 
 export const createProcedure = async ({
   name,

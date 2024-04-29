@@ -53,6 +53,8 @@ module.exports = {
         'neutral-3': 'rgba(117, 127, 149, 1)',
         'neutral-7': 'rgba(246, 248, 249, 1)',
         'neutral-1': 'rgba(24, 27, 32, 1)',
+        'neutral-5': 'rgba(224, 228, 235, 1)',
+        'neutral-6': 'rgba(236, 239, 243, 1)',
         darkslategray: 'rgba(12, 78, 100, 1)',
         lightskyblue: 'rgba(61, 161, 194, 1)',
         'primary-6': 'rgba(242, 250, 252, 1)',

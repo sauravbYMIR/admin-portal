@@ -139,7 +139,7 @@ function CreateProcedureForm({
   };
   const handleEditProcedure = (data: ProcedureFormFields) => {
     editProcedure.mutate({
-      procedureId: data.department.value,
+      procedureId: updateId,
       name: {
         en: data.procedureEn,
         nb: data.procedureNb,

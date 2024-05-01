@@ -55,12 +55,12 @@ const editHospitalFormSchema = z.object({
   }),
   logo: z
     .custom<File>((v) => v instanceof File, {
-      message: 'Image is required',
+      // message: 'Image is required',
     })
     .optional(),
   gallery: z
     .custom<File>((v) => v instanceof File, {
-      message: 'Image is required',
+      // message: 'Image is required',
     })
     .optional(),
 });

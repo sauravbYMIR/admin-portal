@@ -57,12 +57,16 @@ const createHospitalFormSchema = z.object({
   zipCode: z.string().refine((val) => !Number.isNaN(parseInt(val, 10)), {
     message: 'Zipcode is required',
   }),
-  logo: z.custom<File>((v) => v instanceof File, {
-    message: 'Image is required',
-  }),
-  gallery: z.custom<File>((v) => v instanceof File, {
-    message: 'Image is required',
-  }),
+  logo: z
+    .custom<File>((v) => v instanceof File, {
+      // message: 'Image is required',
+    })
+    .optional(),
+  gallery: z
+    .custom<File>((v) => v instanceof File, {
+      // message: 'Image is required',
+    })
+    .optional(),
 });
 export type CreateHospitalFormFields = z.infer<typeof createHospitalFormSchema>;
 function HospitalDetailsPage({

@@ -50,7 +50,7 @@ const createTeamMemberFormSchema = z.object({
     .min(1, { message: 'Fill in details in all the languages' }),
   profile: z
     .custom<File>((v) => v instanceof File, {
-      message: 'Image is required',
+      // message: 'Image is required',
     })
     .optional(),
 });

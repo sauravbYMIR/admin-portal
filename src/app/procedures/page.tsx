@@ -114,144 +114,124 @@ function ProceduresList() {
           departmentProcedureList.data.data.allCategoryWithProcedure.length >
             0 ? (
             departmentProcedureList.data.data.allCategoryWithProcedure.map(
-              (departmentData) => {
+              (procedureData) => {
                 return (
-                  <div
-                    key={departmentData.id}
-                    className={proceduresStyle.departmentAccordionContainer}
-                  >
-                    {departmentProcedureList.data.data.allCategoryWithProcedure.map(
-                      (procedureData) => {
-                        return (
-                          <div key={procedureData.id} className="mb-3">
-                            <Accordion
-                              editClickHandler={() => {
-                                setUpdateId(procedureData.id);
-                                setIsEditData(true);
-                                setEditDepartmentModalOpen(true);
-                              }}
-                              title={procedureData.name.en}
-                            >
-                              {procedureData.procedures.length > 0 && (
-                                <div
-                                  className={
-                                    proceduresStyle.proceduresAccordionContainer
-                                  }
-                                >
-                                  {procedureData.procedures.map((procedure) => {
-                                    return (
-                                      <Accordion
-                                        editClickHandler={() => {
-                                          setUpdateId(procedure.id);
-                                          setIsEditData(true);
-                                          setEditProcedureModalOpen(true);
-                                        }}
-                                        key={procedure.id}
-                                        title={procedure.name.en}
-                                      >
-                                        <div className="flex flex-wrap items-center">
-                                          {Object.entries(
-                                            procedure.reimbursement,
-                                          ).map(([key, value]) => {
-                                            return (
-                                              <ReimbursementWrapper
-                                                key={key}
-                                                value={value}
-                                              />
-                                            );
-                                          })}
-                                        </div>
-                                      </Accordion>
-                                    );
-                                  })}
-                                </div>
-                              )}
+                  <div key={procedureData.id} className="mb-3">
+                    <Accordion
+                      editClickHandler={() => {
+                        setUpdateId(procedureData.id);
+                        setIsEditData(true);
+                        setEditDepartmentModalOpen(true);
+                      }}
+                      title={procedureData.name.en}
+                    >
+                      {procedureData.subCategoryWithProcedures.length > 0 &&
+                        procedureData.subCategoryWithProcedures.map(
+                          (subCategoryData, index) => {
+                            return (
+                              <ol key={subCategoryData.id}>
+                                <li className="flex items-center justify-between px-4 py-2">
+                                  <p className="font-poppins text-sm font-medium text-darkteal">
+                                    <span className="mr-1">{index + 1}.</span>
+                                    <span>{subCategoryData.name.en}</span>
+                                  </p>
+                                  <button
+                                    type="button"
+                                    className="ml-2 cursor-pointer"
+                                    onClick={() => {
+                                      setUpdateId(subCategoryData.id);
+                                      setIsEditData(true);
+                                      setIsEditSubCategory(true);
+                                      setEditSubCategoryModalOpen(true);
+                                    }}
+                                  >
+                                    <Image
+                                      className={
+                                        proceduresStyle.subCategoryEditIcon
+                                      }
+                                      src={editIcon}
+                                      width={16}
+                                      height={16}
+                                      alt="sub category edit icon"
+                                    />
+                                  </button>
+                                </li>
 
-                              {procedureData.subCategoryWithProcedures.length >
-                                0 &&
-                                procedureData.subCategoryWithProcedures.map(
-                                  (subCategoryData, index) => {
-                                    return (
-                                      <ol key={subCategoryData.id}>
-                                        <li className="flex items-center justify-between px-4 py-2">
-                                          <p className="font-poppins text-sm font-medium text-darkteal">
-                                            <span className="mr-1">
-                                              {index + 1}.
-                                            </span>
-                                            <span>
-                                              {subCategoryData.name.en}
-                                            </span>
-                                          </p>
-                                          <button
-                                            type="button"
-                                            className="ml-2 cursor-pointer"
-                                            onClick={() => {
-                                              setUpdateId(subCategoryData.id);
+                                {subCategoryData.procedures.length > 0 && (
+                                  <div
+                                    className={
+                                      proceduresStyle.subCategoryAccordionContainer
+                                    }
+                                  >
+                                    {subCategoryData.procedures.map(
+                                      (procedure) => {
+                                        return (
+                                          <Accordion
+                                            key={procedure.id}
+                                            title={procedure.name.en}
+                                            editClickHandler={() => {
+                                              setUpdateId(procedure.id);
                                               setIsEditData(true);
-                                              setIsEditSubCategory(true);
-                                              setEditSubCategoryModalOpen(true);
+                                              setEditProcedureModalOpen(true);
                                             }}
                                           >
-                                            <Image
-                                              className={
-                                                proceduresStyle.subCategoryEditIcon
-                                              }
-                                              src={editIcon}
-                                              width={16}
-                                              height={16}
-                                              alt="sub category edit icon"
-                                            />
-                                          </button>
-                                        </li>
-
-                                        {subCategoryData.procedures.length >
-                                          0 && (
-                                          <div
-                                            className={
-                                              proceduresStyle.subCategoryAccordionContainer
-                                            }
-                                          >
-                                            {subCategoryData.procedures.map(
-                                              (procedure) => {
+                                            <div className="flex flex-wrap items-center">
+                                              {Object.entries(
+                                                procedure.reimbursement,
+                                              ).map(([key, value]) => {
                                                 return (
-                                                  <Accordion
-                                                    key={procedure.id}
-                                                    title={procedure.name.en}
-                                                    editClickHandler={() => {
-                                                      setUpdateId(procedure.id);
-                                                      setIsEditData(true);
-                                                      setEditProcedureModalOpen(
-                                                        true,
-                                                      );
-                                                    }}
-                                                  >
-                                                    <div className="flex flex-wrap items-center">
-                                                      {Object.entries(
-                                                        procedure.reimbursement,
-                                                      ).map(([key, value]) => {
-                                                        return (
-                                                          <ReimbursementWrapper
-                                                            key={key}
-                                                            value={value}
-                                                          />
-                                                        );
-                                                      })}
-                                                    </div>
-                                                  </Accordion>
+                                                  <ReimbursementWrapper
+                                                    key={key}
+                                                    value={value}
+                                                  />
                                                 );
-                                              },
-                                            )}
-                                          </div>
-                                        )}
-                                      </ol>
-                                    );
-                                  },
+                                              })}
+                                            </div>
+                                          </Accordion>
+                                        );
+                                      },
+                                    )}
+                                  </div>
                                 )}
-                            </Accordion>
-                          </div>
-                        );
-                      },
-                    )}
+                              </ol>
+                            );
+                          },
+                        )}
+                      {procedureData.procedures.length > 0 && (
+                        <div
+                          className={
+                            proceduresStyle.proceduresAccordionContainer
+                          }
+                        >
+                          {procedureData.procedures.map((procedure) => {
+                            return (
+                              <Accordion
+                                editClickHandler={() => {
+                                  setUpdateId(procedure.id);
+                                  setIsEditData(true);
+                                  setEditProcedureModalOpen(true);
+                                }}
+                                key={procedure.id}
+                                title={procedure.name.en}
+                              >
+                                <div className="flex flex-wrap items-center">
+                                  {Object.entries(procedure.reimbursement).map(
+                                    ([key, value]) => {
+                                      return (
+                                        <ReimbursementWrapper
+                                          key={key}
+                                          value={value}
+                                        />
+                                      );
+                                    },
+                                  )}
+                                </div>
+                              </Accordion>
+                            );
+                          })}
+                        </div>
+                      )}
+                    </Accordion>
                   </div>
                 );
               },

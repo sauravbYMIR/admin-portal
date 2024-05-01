@@ -1,7 +1,6 @@
 'use client';
 
 /* eslint-disable jsx-a11y/label-has-associated-control */
-import { FbtButton } from '@frontbase/components-react';
 import { zodResolver } from '@hookform/resolvers/zod';
 import Image from 'next/image';
 import React, { useState } from 'react';
@@ -202,10 +201,8 @@ function DepartmentModal({
               )}
 
               {isEdit ? (
-                <FbtButton
+                <button
                   className={departmentModalStyle.createDepartmentBtn}
-                  size="sm"
-                  variant="solid"
                   type="submit"
                 >
                   {editDept.isPending ? (
@@ -219,12 +216,10 @@ function DepartmentModal({
                   ) : (
                     <p className={departmentModalStyle.btnText}>Save changes</p>
                   )}
-                </FbtButton>
+                </button>
               ) : (
-                <FbtButton
+                <button
                   className={departmentModalStyle.createDepartmentBtn}
-                  size="sm"
-                  variant="solid"
                   type="submit"
                 >
                   {createDept.isPending ? (
@@ -240,7 +235,7 @@ function DepartmentModal({
                       Create department
                     </p>
                   )}
-                </FbtButton>
+                </button>
               )}
             </form>
           </div>

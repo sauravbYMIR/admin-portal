@@ -3,7 +3,6 @@
 'use client';
 
 /* eslint-disable jsx-a11y/label-has-associated-control */
-import { FbtButton } from '@frontbase/components-react';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useRouter } from 'next/navigation';
 import React from 'react';
@@ -618,12 +617,7 @@ function AddHospitalProcedure({ params }: { params: { id: string } }) {
               <p>Cancel</p>
             </button>
 
-            <FbtButton
-              className={addHospitalStyle.publishBtn}
-              size="sm"
-              variant="solid"
-              type="submit"
-            >
+            <button className={addHospitalStyle.publishBtn} type="submit">
               {createHospitalProcedure.isPending ? (
                 <ClipLoader
                   loading={createHospitalProcedure.isPending}
@@ -635,7 +629,7 @@ function AddHospitalProcedure({ params }: { params: { id: string } }) {
               ) : (
                 <p>Publish</p>
               )}
-            </FbtButton>
+            </button>
           </div>
         </form>
         <AddTeamMemberToHospitalProcedure

@@ -1,6 +1,5 @@
 'use client';
 
-import { FbtButton } from '@frontbase/components-react';
 import { zodResolver } from '@hookform/resolvers/zod';
 import Image from 'next/image';
 import { useRouter, useSearchParams } from 'next/navigation';
@@ -107,11 +106,9 @@ function LoginWithMail({
           )}
         </label>
 
-        <FbtButton
+        <button
           type="submit"
           className={style.landingPageCtaBtn}
-          size="sm"
-          variant="solid"
           disabled={isSubmitting}
         >
           {isSubmitting ? (
@@ -128,7 +125,7 @@ function LoginWithMail({
               <Image src={arrowIcon} alt="arrow icon cta button" />
             </>
           )}
-        </FbtButton>
+        </button>
       </form>
     </div>
   );
@@ -234,10 +231,8 @@ function LoginWithOtp() {
           )}
         </button>
       )}
-      <FbtButton
+      <button
         className={`${style.landingPageCtaBtn} ${otp.length < 4 ? 'cursor-not-allowed' : ''}`}
-        size="sm"
-        variant="solid"
         onClick={(e) => handleOtpLogin(e)}
         type="submit"
         disabled={otp.length < 4}
@@ -256,7 +251,7 @@ function LoginWithOtp() {
             <Image src={arrowIcon} alt="arrow icon cta button" />
           </>
         )}
-      </FbtButton>
+      </button>
     </form>
   );
 }

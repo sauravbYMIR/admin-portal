@@ -1,12 +1,5 @@
 'use client';
 
-import {
-  FbtButton,
-  FbtHeader,
-  FbtHeaderBrand,
-  FbtHeaderContent,
-  FbtHeaderItem,
-} from '@frontbase/components-react';
 import Image from 'next/image';
 import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
@@ -46,49 +39,45 @@ function Header() {
     router.push('/');
   };
   return (
-    <FbtHeader className={headerStyle.headerContainer}>
-      <FbtHeaderBrand>
+    <nav className={` h-24 w-full items-center ${headerStyle.headerContainer}`}>
+      <div>
         <Image src={brandLogo} alt="branch icon" width={120} height={48} />
-      </FbtHeaderBrand>
-
-      <FbtHeaderContent className={headerStyle.headerLinkContainer}>
+      </div>
+      <ul
+        className={` flex list-none items-center gap-8 ${headerStyle.headerLinkContainer}`}
+      >
         {menuItems.links.map((menu) => {
           return (
-            <FbtHeaderItem key={`${menu.name}`}>
+            <li key={`${menu.name}`}>
               <Link
                 className={`text-left font-poppins text-base font-semibold  ${pathname.startsWith(menu.link) ? 'text-darkteal underline decoration-2 underline-offset-4' : ''}`}
                 href={menu.link}
               >
                 {menu.name}
               </Link>
-            </FbtHeaderItem>
+            </li>
           );
         })}
-      </FbtHeaderContent>
+      </ul>
 
-      <FbtHeaderContent>
-        <FbtHeaderItem>
+      <ul className="flex list-none items-center gap-8">
+        <li>
           {!accessToken ? (
-            <FbtButton
-              className={headerStyle.headerLoginBtn}
-              size="lg"
-              variant="outline"
-            >
+            <button className={headerStyle.headerLoginBtn} type="button">
               Log in
-            </FbtButton>
+            </button>
           ) : (
-            <FbtButton
-              className={headerStyle.headerLoginBtn}
-              size="lg"
-              variant="outline"
+            <button
+              className={`flex items-center justify-center ${headerStyle.headerLoginBtn}`}
+              type="button"
               onClick={handleLogoutUser}
             >
               Log out
-            </FbtButton>
+            </button>
           )}
-        </FbtHeaderItem>
-      </FbtHeaderContent>
-    </FbtHeader>
+        </li>
+      </ul>
+    </nav>
   );
 }
 

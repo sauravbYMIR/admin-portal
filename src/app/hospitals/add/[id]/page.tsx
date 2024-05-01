@@ -1,6 +1,7 @@
+/* eslint-disable react/button-has-type */
+
 'use client';
 
-import { FbtButton } from '@frontbase/components-react';
 import Image from 'next/image';
 import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
@@ -100,15 +101,14 @@ function HospitalDetailsPage({ params: { id } }: { params: { id: string } }) {
               </div>
             </div>
 
-            <FbtButton
+            <button
               className={style.editHospitalBtn}
-              size="sm"
-              variant="outline"
+              type="button"
               onClick={() => router.push(`/hospitals/edit/${id}`)}
             >
               <Image width={24} height={24} src={editIcon} alt="edit icon" />
               <p>Edit Details</p>
-            </FbtButton>
+            </button>
           </div>
 
           <h3 className={style.subTitle}>About the hospital</h3>
@@ -139,48 +139,40 @@ function HospitalDetailsPage({ params: { id } }: { params: { id: string } }) {
                     No team members have been created yet!
                   </p>
 
-                  <FbtButton
+                  <button
                     onClick={() => setIsCreateHospitalTeamModal(true)}
                     className={style.btn}
-                    variant="solid"
-                    size="sm"
                   >
                     <p>Create team members</p>
-                  </FbtButton>
+                  </button>
                 </div>
               ) : (
                 <div className={style.teamMemberViewSection}>
                   <div className={style.headerSection}>
-                    <FbtButton
+                    <button
                       className={style.addBtn}
-                      size="sm"
-                      variant="solid"
                       onClick={() => setIsCreateHospitalTeamModal(true)}
                     >
                       <Image src={plusIcon} alt="plus icon" />
                       <p>Add a team member</p>
-                    </FbtButton>
+                    </button>
 
                     {isEditTeamMember ? (
-                      <FbtButton
+                      <button
                         className={style.editBtn}
-                        size="sm"
-                        variant="solid"
                         onClick={() => setIsEditTeamMember(false)}
                       >
                         <Image src={editIcon} alt="edit icon" />
                         <p>Cancel editing</p>
-                      </FbtButton>
+                      </button>
                     ) : (
-                      <FbtButton
+                      <button
                         className={style.editBtn}
-                        size="sm"
-                        variant="solid"
                         onClick={() => setIsEditTeamMember(true)}
                       >
                         <Image src={editIcon} alt="edit icon" />
                         <p>Edit team members</p>
-                      </FbtButton>
+                      </button>
                     )}
                   </div>
 

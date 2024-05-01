@@ -1,5 +1,4 @@
 /* eslint-disable jsx-a11y/label-has-associated-control */
-import { FbtButton } from '@frontbase/components-react';
 import { zodResolver } from '@hookform/resolvers/zod';
 import Image from 'next/image';
 import React from 'react';
@@ -322,11 +321,9 @@ function CreateHospitalTeamMemberModal({
                 </div>
               )}
 
-              <FbtButton
+              <button
                 className={modalStyle.createMemberBtn}
                 style={{ marginTop: '64px' }}
-                variant="solid"
-                size="sm"
                 type="submit"
               >
                 {hospitalMember.isPending || editHospitalMember.isPending ? (
@@ -344,7 +341,7 @@ function CreateHospitalTeamMemberModal({
                     {memberId ? <p>Save changes</p> : <p>Create member</p>}
                   </div>
                 )}
-              </FbtButton>
+              </button>
             </form>
           </div>
         </div>

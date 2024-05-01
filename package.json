@@ -18,7 +18,6 @@
     "postbuild": "next-sitemap"
   },
   "dependencies": {
-    "@frontbase/components-react": "^0.0.22-beta",
     "@hookform/resolvers": "^3.3.4",
     "@t3-oss/env-nextjs": "^0.8.0",
     "@tanstack/react-query": "^5.29.0",

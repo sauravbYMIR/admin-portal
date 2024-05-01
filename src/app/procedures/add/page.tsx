@@ -1,6 +1,5 @@
 'use client';
 
-import { FbtButton } from '@frontbase/components-react';
 import Image from 'next/image';
 import React from 'react';
 
@@ -152,10 +151,9 @@ function AddProcedure() {
       </div>
       {procedureList.length > 0 && (
         <div className={proceduresStyle.addDeptProcedureBtnContainer}>
-          <FbtButton
+          <button
             className={proceduresStyle.addDepartmentBtn}
-            size="sm"
-            variant="solid"
+            type="submit"
             onClick={() => setDepartmentModalOpen(true)}
           >
             <Image
@@ -165,12 +163,11 @@ function AddProcedure() {
               height={25}
             />
             <p className={proceduresStyle.btnText}>Create a department</p>
-          </FbtButton>
+          </button>
 
-          <FbtButton
+          <button
             className={proceduresStyle.addDepartmentBtn}
-            size="sm"
-            variant="solid"
+            type="submit"
             onClick={() => setProcedureModalOpen(true)}
           >
             <Image
@@ -180,7 +177,7 @@ function AddProcedure() {
               height={25}
             />
             <p className={proceduresStyle.btnText}>Create a procedure</p>
-          </FbtButton>
+          </button>
         </div>
       )}
       {procedureList.length <= 0 && (
@@ -189,15 +186,14 @@ function AddProcedure() {
             No departments have been add yet!
           </h2>
 
-          <FbtButton
+          <button
             className={proceduresStyle.addDepartmentBtn}
-            size="sm"
-            variant="solid"
+            type="submit"
             onClick={() => setDepartmentModalOpen(true)}
           >
             <Image src={plusIcon} alt="plus icon cta button" />
             <p className={proceduresStyle.btnText}>Add a department</p>
-          </FbtButton>
+          </button>
         </div>
       )}
       <div

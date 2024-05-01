@@ -1,5 +1,4 @@
 /* eslint-disable jsx-a11y/label-has-associated-control */
-import { FbtButton } from '@frontbase/components-react';
 import { zodResolver } from '@hookform/resolvers/zod';
 import Image from 'next/image';
 import React from 'react';
@@ -289,15 +288,13 @@ export function AddTeamMemberToHospitalProcedure({
                   Add another member
                 </label>
               </div>
-              <FbtButton
+              <button
                 className={modalStyle.createMemberBtn}
                 style={{ marginTop: '24px' }}
-                variant="solid"
-                size="sm"
                 type="submit"
               >
                 <p>Add member</p>
-              </FbtButton>
+              </button>
             </form>
           </div>
         </div>

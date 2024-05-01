@@ -3,7 +3,6 @@
 'use client';
 
 /* eslint-disable jsx-a11y/label-has-associated-control */
-import { FbtButton } from '@frontbase/components-react';
 import Image from 'next/image';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
@@ -132,10 +131,9 @@ function HospitalDetailsPage({
                 </div>
               </div>
 
-              <FbtButton
+              <button
                 className={style.editHospitalBtn}
-                size="sm"
-                variant="outline"
+                type="button"
                 onClick={() =>
                   router.push(
                     `/hospitals/add/${params.id}/procedures/${params.procedureId}/edit`,
@@ -144,7 +142,7 @@ function HospitalDetailsPage({
               >
                 <Image width={24} height={24} src={editIcon} alt="edit icon" />
                 <p>Edit Details</p>
-              </FbtButton>
+              </button>
             </div>
 
             <h3 className={style.subTitle}>About the procedure</h3>
@@ -203,14 +201,13 @@ function HospitalDetailsPage({
                       No team members have been created yet!
                     </p>
 
-                    <FbtButton
+                    <button
                       onClick={() => setIsCreateHospitalTeamModal(true)}
                       className={style.btn}
-                      variant="solid"
-                      size="sm"
+                      type="button"
                     >
                       <p>Create team members</p>
-                    </FbtButton>
+                    </button>
                   </div>
                 ) : (
                   <div className={style.teamMemberViewSection}>

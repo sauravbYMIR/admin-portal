@@ -27,12 +27,7 @@ const patientBookingAdditionalData = [
   { label: 'Reimbursement offered', value: '800,000 euros' },
 ];
 
-const PatientBooking: React.FC<{ params: { id: string } }> = ({
-  params,
-}: {
-  params: { id: string };
-}) => {
-  console.log(params.id);
+const PatientBooking = () => {
   const router = useRouter();
   return (
     <div>

@@ -164,7 +164,7 @@ function LoginWithOtp() {
         });
         handleSetLocalStorage({
           tokenKey: 'refresh_token',
-          tokenValue: response.accessToken,
+          tokenValue: response.refreshToken,
         });
         router.push('/patients');
       }

@@ -8,6 +8,7 @@ export type VerifyOtpResponse = {
   success: boolean;
   accessToken: string;
   refreshToken: string;
+  userId: string;
 };
 export type ServerError = {
   response: {
@@ -91,6 +92,7 @@ export const verifyOTP = async ({
       success: response.data.success,
       accessToken: response.data.accessToken,
       refreshToken: response.data.refreshToken,
+      userId: response.data.userId,
     };
   } catch (err) {
     if (axios.isAxiosError(err)) {

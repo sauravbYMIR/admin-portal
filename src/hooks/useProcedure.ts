@@ -63,8 +63,6 @@ export const useGetAllDepartmentWithProcedure = () => {
 export const getAllProcedureByDeptId = async (
   id: string,
 ): Promise<{
-  success: boolean;
-  status: number;
   data: Array<{
     categoryId: string;
     id: string;
@@ -72,19 +70,15 @@ export const getAllProcedureByDeptId = async (
     reimbursement: ReimbursementJSONType;
   }>;
 }> => {
-  const response = await axiosInstance.get<
-    Array<{
+  const response = await axiosInstance.get<{
+    data: Array<{
       categoryId: string;
       id: string;
       name: NameJSONType;
       reimbursement: ReimbursementJSONType;
-    }>
-  >(`${process.env.BASE_URL}/procedure/department/${id}`);
-  return {
-    success: true,
-    status: 200,
-    data: response.data,
-  };
+    }>;
+  }>(`${process.env.BASE_URL}/procedure/department/${id}`);
+  return { data: response.data.data };
 };
 
 export const useGetAllProcedureByDeptId = ({ id }: { id: string }) => {

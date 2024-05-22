@@ -30,7 +30,7 @@ const CustomStatusEditComponent = (props: CustomCellRendererProps) => {
   }, [updateBookingStatus.isSuccess]);
   return (
     <div className={patientsTableStyle.patientsTableBtnContainer}>
-      {props.data.status === 'pending' && (
+      {props.data.status === 'requested' && (
         <>
           <button
             type="button"
@@ -40,7 +40,6 @@ const CustomStatusEditComponent = (props: CustomCellRendererProps) => {
               updateBookingStatus.mutate({
                 bookingId,
                 status: true,
-                userId: props.data.userId ?? '',
               });
             }}
           >
@@ -64,7 +63,6 @@ const CustomStatusEditComponent = (props: CustomCellRendererProps) => {
               updateBookingStatus.mutate({
                 bookingId,
                 status: false,
-                userId: props.data.userId ?? '',
               });
             }}
           >
@@ -130,52 +128,54 @@ function PatientsPage() {
         </p>
 
         {allBookings &&
-          allBookings.data &&
-          allBookings.data.data &&
-          Array.isArray(allBookings.data.data) &&
-          allBookings.data.data.length > 0 && (
-            <PatientsTable
-              // onCellClicked={onCellClicked}
-              rowData={allBookings.data.data.map((r) => ({
-                procedure: r.procedureName.en,
-                hospital: r.hospitalName,
-                status: r.applicationStatus,
-                bookingId: r.id,
-                userId: r.userId,
-              }))}
-              colDefs={[
-                {
-                  headerName: 'Procedure',
-                  field: 'procedure',
-                  filter: true,
-                  floatingFilter: true,
-                  flex: 1,
-                  editable: true,
-                },
-                {
-                  headerName: 'Hospital',
-                  field: 'hospital',
-                  filter: true,
-                  floatingFilter: true,
-                  flex: 1,
-                  editable: true,
-                },
-                {
-                  headerName: 'Status',
-                  field: 'status',
-                  filter: true,
-                  floatingFilter: true,
-                  flex: 1,
-                  editable: true,
-                },
-                {
-                  field: '',
-                  flex: 1,
-                  cellRenderer: CustomStatusEditComponent,
-                },
-              ]}
-            />
-          )}
+        allBookings.data &&
+        allBookings.data.data &&
+        Array.isArray(allBookings.data.data) &&
+        allBookings.data.data.length > 0 ? (
+          <PatientsTable
+            // onCellClicked={onCellClicked}
+            rowData={allBookings.data.data.map((r) => ({
+              procedure: r.procedureName.en,
+              hospital: r.hospitalName,
+              status: r.applicationStatus,
+              bookingId: r.id,
+              userId: r.userId,
+            }))}
+            colDefs={[
+              {
+                headerName: 'Procedure',
+                field: 'procedure',
+                filter: true,
+                floatingFilter: true,
+                flex: 1,
+                editable: true,
+              },
+              {
+                headerName: 'Hospital',
+                field: 'hospital',
+                filter: true,
+                floatingFilter: true,
+                flex: 1,
+                editable: true,
+              },
+              {
+                headerName: 'Status',
+                field: 'status',
+                filter: true,
+                floatingFilter: true,
+                flex: 1,
+                editable: true,
+              },
+              {
+                field: '',
+                flex: 1,
+                cellRenderer: CustomStatusEditComponent,
+              },
+            ]}
+          />
+        ) : (
+          <p>No Bookings present</p>
+        )}
       </div>
     </div>
   );

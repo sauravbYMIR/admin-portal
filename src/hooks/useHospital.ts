@@ -82,7 +82,16 @@ export type GetHospitalById = {
   status: number;
   data: HospitalByIdType & {
     logo: boolean | string;
-    gallery: boolean | string;
+    hospitalImages: Array<{
+      id: string;
+      hospitalId: string;
+      fileName: string;
+      originalFileName: string;
+      createdAt: string;
+      updatedAt: string;
+      deletedAt: null | string;
+      imageUrl: string;
+    }>;
   };
 };
 export type GetHospitalTeamMembersByHospitalId = {
@@ -129,6 +138,7 @@ export type HospitalMember = {
   name: string;
   qualification: string;
   profilePictureUploaded: boolean;
+  profile: string;
   hospitalId: string;
   createdAt: string | null;
   updatedAt: string | null;
@@ -374,5 +384,38 @@ export const useGetHospitalTeamMembersByHospitalId = ({
     queryFn: () => getHospitalTeamMembersByHospitalId(id),
     refetchOnWindowFocus: false,
     enabled: !!id,
+  });
+};
+
+export const removeGallery = async ({
+  id,
+}: {
+  id: string;
+}): Promise<{
+  success: boolean;
+  status: number;
+}> => {
+  const response = await axiosInstance.delete<{
+    success: boolean;
+    status: number;
+  }>(`${process.env.BASE_URL}/hospital/remove-gallery/${id}`);
+  return {
+    success: true,
+    status: response.data.status,
+  };
+};
+
+export const useRemoveGallery = ({ id }: { id: string }) => {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: removeGallery,
+    onSuccess: () => {
+      queryClient.invalidateQueries({
+        queryKey: [`hospital`, id],
+      });
+    },
+    onError: (error) => {
+      toast(`Something went wrong: ${error.message}`);
+    },
   });
 };

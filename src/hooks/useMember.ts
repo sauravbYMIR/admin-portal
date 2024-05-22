@@ -58,7 +58,7 @@ export type HospitalByIdType = {
 export type EditHospitalMemberAxios = {
   success: boolean;
   status: number;
-  data: { id: string };
+  data: string;
 };
 export type EditHospitalMemberResponse = {
   success: boolean;
@@ -86,6 +86,7 @@ export type HospitalMember = {
   name: string;
   qualification: string;
   profilePictureUploaded: boolean;
+  profile: string;
   hospitalId: string;
   createdAt: string | null;
   updatedAt: string | null;
@@ -145,7 +146,7 @@ export const useCreateHospitalMember = () => {
     mutationFn: createHospitalMember,
     onSuccess: () => {
       queryClient.invalidateQueries({
-        queryKey: [`hospital-member`],
+        queryKey: [`hospital`],
       });
     },
     onError: (error) => {
@@ -176,7 +177,7 @@ export const editHospitalMember = async ({
   return {
     success: response.data.success,
     status: response.data.status,
-    data: response.data.data.id,
+    data: response.data.data,
   };
 };
 
@@ -186,7 +187,7 @@ export const useEditHospitalMember = () => {
     mutationFn: editHospitalMember,
     onSuccess: () => {
       queryClient.invalidateQueries({
-        queryKey: [`hospital-member`],
+        queryKey: [`hospital`],
       });
     },
     onError: (error) => {
@@ -197,17 +198,17 @@ export const useEditHospitalMember = () => {
 
 export const updateHospitalProfile = async ({
   formData,
-  hospitalId,
+  memberId,
 }: {
   formData: FormData;
-  hospitalId: string;
+  memberId: string;
 }): Promise<{
   success: boolean;
 }> => {
   await axiosInstance.post<{
     success: boolean;
   }>(
-    `${process.env.BASE_URL}/hospital-member/upload-profile/${hospitalId}`,
+    `${process.env.BASE_URL}/hospital-member/upload-profile/${memberId}`,
     formData,
   );
   return {
@@ -220,7 +221,7 @@ export const useUpdateHospitalProfile = () => {
   return useMutation({
     mutationFn: updateHospitalProfile,
     onSuccess: () => {
-      return queryClient.invalidateQueries({ queryKey: ['hospital-member'] });
+      return queryClient.invalidateQueries({ queryKey: ['hospital'] });
     },
   });
 };

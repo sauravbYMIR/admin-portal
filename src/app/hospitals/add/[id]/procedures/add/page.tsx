@@ -215,7 +215,10 @@ function AddHospitalProcedure({ params }: { params: { id: string } }) {
       waitingTime: data.waitingTime,
       stayInCity: data.stayInCity,
       stayInHospital: data.stayInHospital,
-      procedureMembers: teamMembers,
+      procedureMembers: teamMembers.map((teamMemberInfo) => ({
+        id: teamMemberInfo.member.id,
+        role: teamMemberInfo.role,
+      })),
     });
     setActiveLanguageTab('English');
   };
@@ -244,7 +247,7 @@ function AddHospitalProcedure({ params }: { params: { id: string } }) {
       //     formData,
       //   });
       // }
-      // router.push(`/hospitals/edit/${createHospital.data.data.id}`);
+      router.push(`/hospitals/edit/${createHospitalProcedure.data.data}`);
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [createHospitalProcedure.data, createHospitalProcedure.isSuccess, reset]);
@@ -271,6 +274,7 @@ function AddHospitalProcedure({ params }: { params: { id: string } }) {
     if (
       allProcedureByDeptId.isSuccess &&
       allProcedureByDeptId.data &&
+      allProcedureByDeptId.data.data &&
       Array.isArray(allProcedureByDeptId.data.data) &&
       allProcedureByDeptId.data.data.length > 0
     ) {
@@ -481,8 +485,9 @@ function AddHospitalProcedure({ params }: { params: { id: string } }) {
                     {c.language === activeCostTab && (
                       <input
                         className={addHospitalStyle.input}
+                        style={{ paddingLeft: '110px' }}
                         id="cost-of-procedure"
-                        {...register(costLang)}
+                        {...register(costLang, { valueAsNumber: true })}
                       />
                     )}
                   </div>
@@ -567,17 +572,19 @@ function AddHospitalProcedure({ params }: { params: { id: string } }) {
               <h3 className="my-8 font-poppins text-2xl font-medium text-black">
                 Team members
               </h3>
-              {teamMembers.map((member) => {
-                return (
-                  <HospitalMemberCard
-                    name={member.member.name}
-                    role={member.role.en}
-                    key={`${member.member.name}-${member.role.en}`}
-                    setTeamMembers={setTeamMembers}
-                    memberId={member.member.id}
-                  />
-                );
-              })}
+              <div className="flex flex-wrap items-center gap-6">
+                {teamMembers.map((member) => {
+                  return (
+                    <HospitalMemberCard
+                      name={member.member.name}
+                      role={member.role.en}
+                      key={`${member.member.name}-${member.role.en}`}
+                      setTeamMembers={setTeamMembers}
+                      memberId={member.member.id}
+                    />
+                  );
+                })}
+              </div>
               <button
                 type="button"
                 className="mt-6 flex w-[188px] items-center justify-between text-darkteal"

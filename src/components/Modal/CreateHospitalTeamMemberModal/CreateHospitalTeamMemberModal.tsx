@@ -7,6 +7,7 @@ import { Controller, useForm } from 'react-hook-form';
 import { ClipLoader } from 'react-spinners';
 import { z } from 'zod';
 
+import { FileUploadIcon } from '@/components/Icons/Icons';
 import {
   useCreateHospitalMember,
   useEditHospitalMember,
@@ -47,11 +48,7 @@ const createTeamMemberFormSchema = z.object({
   positionSv: z
     .string()
     .min(1, { message: 'Fill in details in all the languages' }),
-  profile: z
-    .custom<File>((v) => v instanceof File, {
-      // message: 'Image is required',
-    })
-    .optional(),
+  profile: z.instanceof(File, { message: 'A file is required' }),
 });
 export type CreateHospitalTeamMemberFormFields = z.infer<
   typeof createTeamMemberFormSchema
@@ -63,6 +60,8 @@ function CreateHospitalTeamMemberModal({
   hospitalId,
   memberId,
 }: ModalProps) {
+  const [showLogoOverlay, setShowLogoOverlay] = React.useState<boolean>(false);
+  const profileRef = React.useRef<HTMLInputElement>(null);
   const editHospitalMember = useEditHospitalMember();
   const memberByIdDetails = useGetHospitalTeamMemberById({ id: memberId });
   const [isAnotherMemberChecked, setIsAnotherMemberChecked] =
@@ -78,6 +77,7 @@ function CreateHospitalTeamMemberModal({
     getValues,
     setValue,
     reset,
+    watch,
     formState: { errors },
   } = useForm<CreateHospitalTeamMemberFormFields>({
     resolver: zodResolver(createTeamMemberFormSchema),
@@ -124,16 +124,16 @@ function CreateHospitalTeamMemberModal({
   };
   React.useEffect(() => {
     if (
-      hospitalMember.isSuccess &&
-      hospitalMember.data &&
-      hospitalMember.data.data
+      editHospitalMember.isSuccess &&
+      editHospitalMember.data &&
+      editHospitalMember.data.data
     ) {
       const profile = getValues('profile');
       if (profile) {
         const formData = new FormData();
         formData.append('profile', profile as Blob);
         updateHospitalProfile.mutate({
-          hospitalId,
+          memberId: editHospitalMember.data.data,
           formData,
         });
       }
@@ -144,7 +144,48 @@ function CreateHospitalTeamMemberModal({
       }
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [hospitalMember.data, hospitalMember.isSuccess]);
+  }, [
+    // getValues,
+    hospitalId,
+    hospitalMember.data,
+    hospitalMember.isSuccess,
+    isAnotherMemberChecked,
+    // onClose,
+    // reset,
+    editHospitalMember?.data?.data,
+  ]);
+  React.useEffect(() => {
+    if (
+      hospitalMember.isSuccess &&
+      hospitalMember.data &&
+      hospitalMember.data.data.id
+    ) {
+      const profile = getValues('profile');
+      if (profile) {
+        const formData = new FormData();
+        formData.append('profile', profile as Blob);
+        updateHospitalProfile.mutate({
+          memberId: hospitalMember.data.data.id,
+          formData,
+        });
+      }
+      if (isAnotherMemberChecked) {
+        reset();
+      } else {
+        onClose();
+      }
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [
+    // getValues,
+    hospitalId,
+    hospitalMember.data,
+    hospitalMember.isSuccess,
+    isAnotherMemberChecked,
+    // onClose,
+    // reset,
+    editHospitalMember?.data?.data,
+  ]);
   React.useEffect(() => {
     if (
       memberId &&
@@ -166,6 +207,7 @@ function CreateHospitalTeamMemberModal({
       // }
     }
   }, [memberByIdDetails.data, memberByIdDetails.isSuccess, setValue, memberId]);
+  const profile = watch('profile');
   return (
     <div>
       {isOpen && (
@@ -285,14 +327,72 @@ function CreateHospitalTeamMemberModal({
               <Controller
                 name="profile"
                 control={control}
-                render={({ field: { ref, name, onBlur, onChange } }) => (
-                  <input
-                    type="file"
-                    ref={ref}
-                    name={name}
-                    onBlur={onBlur}
-                    onChange={(e) => onChange(e.target.files?.[0])}
-                  />
+                render={({ field: { name, onBlur, onChange } }) => (
+                  <button
+                    type="button"
+                    className="relative flex size-[220px] flex-col items-center justify-center rounded-full border border-neutral-4"
+                    onClick={() => profileRef.current?.click()}
+                    onMouseEnter={() => setShowLogoOverlay(true)}
+                    onMouseLeave={() => setShowLogoOverlay(false)}
+                  >
+                    {showLogoOverlay && profile && (
+                      <div
+                        className="absolute left-0 top-0 flex size-full flex-col items-center justify-center rounded-full"
+                        style={{
+                          backgroundColor: 'rgba(0, 0, 0, 0.4)',
+                        }}
+                      >
+                        <div className="flex size-10 items-center justify-center rounded-full border border-white p-2">
+                          <FileUploadIcon stroke="#fff" />
+                        </div>
+                        <p className="mt-3 font-poppins text-sm font-medium text-white">
+                          Replace image
+                        </p>
+                        <p className="font-lexend text-sm font-normal text-white">
+                          PNG, JPG (max. 10 MB)
+                        </p>
+                      </div>
+                    )}
+                    {!getValues('profile') && (
+                      <div className="flex size-10 items-center justify-center rounded-full border border-darkgray p-2">
+                        <FileUploadIcon />
+                      </div>
+                    )}
+                    <input
+                      type="file"
+                      ref={profileRef}
+                      name={name}
+                      onBlur={onBlur}
+                      accept="image/*"
+                      // onChange={(e) => onChange(e.target.files?.[0])}
+                      onChange={(e) => {
+                        const file = e.target.files?.[0];
+                        onChange(file);
+                      }}
+                      className="invisible absolute"
+                    />
+                    {profile ? (
+                      <Image
+                        src={`${URL.createObjectURL(profile)}`}
+                        alt="hospitalLogo"
+                        key={`${profile}`}
+                        fill
+                        priority
+                        unoptimized
+                        style={{ backgroundImage: 'contain' }}
+                        className="inline-block rounded-full"
+                      />
+                    ) : (
+                      <>
+                        <p className="mt-3 font-poppins text-sm font-medium text-darkgray">
+                          Click to upload a image
+                        </p>
+                        <p className="font-lexend text-sm font-normal text-neutral-3">
+                          PNG, JPG (max. 10 MB)
+                        </p>
+                      </>
+                    )}
+                  </button>
                 )}
               />
               {errors.profile && (

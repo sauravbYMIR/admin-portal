@@ -4,14 +4,22 @@
 
 /* eslint-disable jsx-a11y/label-has-associated-control */
 import { zodResolver } from '@hookform/resolvers/zod';
+import Image from 'next/image';
 import { useRouter } from 'next/navigation';
 import React from 'react';
 import type { SubmitHandler } from 'react-hook-form';
-import { useForm } from 'react-hook-form';
+import { Controller, useForm } from 'react-hook-form';
 import { ClipLoader } from 'react-spinners';
 import { z } from 'zod';
 
-import { BackArrowIcon, CancelModal, Header, WithAuth } from '@/components';
+import {
+  BackArrowIcon,
+  CancelModal,
+  FileUploadIcon,
+  Header,
+  PlusIcon,
+  WithAuth,
+} from '@/components';
 import {
   useEditHospitalProcedure,
   useGetHospitalProcedureById,
@@ -73,11 +81,10 @@ const editHospitalProcedureFormSchema = z.object({
     .string()
     .min(1, { message: 'Stay in hospital is required' }),
   stayInCity: z.string().min(1, { message: 'Stay in city is required' }),
-  // gallery: z
-  //   .custom<File>((v) => v instanceof File, {
-  //     message: 'Image is required',
-  //   })
-  //   .optional(),
+  gallery: z
+    .array(z.instanceof(File))
+    .min(1, 'At least one image is required')
+    .max(3, 'You can upload up to 3 images'),
 });
 export type EditHospitalProcedureFormFields = z.infer<
   typeof editHospitalProcedureFormSchema
@@ -87,6 +94,7 @@ function EditHospitalProcedure({
 }: {
   params: { id: string; procedureId: string };
 }) {
+  const galleryRef = React.useRef<HTMLInputElement>(null);
   const editHospitalProcedure = useEditHospitalProcedure();
   const hospitalProcedureDetails = useGetHospitalProcedureById({
     id: params.procedureId,
@@ -102,6 +110,8 @@ function EditHospitalProcedure({
     register,
     handleSubmit,
     setValue,
+    control,
+    watch,
     formState: { errors },
   } = useForm<EditHospitalProcedureFormFields>({
     resolver: zodResolver(editHospitalProcedureFormSchema),
@@ -217,6 +227,7 @@ function EditHospitalProcedure({
   //   // updateHospitalLogo,
   //   // updateHospitalGallery,
   // ]);
+  const gallery = watch('gallery');
   return (
     <div>
       <Header />
@@ -454,44 +465,141 @@ function EditHospitalProcedure({
             </div>
           </div>
 
-          {/* <h3 className={addHospitalStyle.subTitleHospitalGallery}>
+          <h3 className={addHospitalStyle.subTitleHospitalGallery}>
             Procedure related images
           </h3>
-          {reqdHospital.data &&
-          reqdHospital.data.data &&
-          typeof reqdHospital.data.data.gallery === 'string' ? (
-            <Image
-              src={reqdHospital.data.data.gallery}
-              width={64}
-              height={64}
-              alt="hospital-gallery"
-              className="h-[250px] w-[264px] rounded-lg"
-            />
+          {hospitalProcedureDetails.data &&
+          hospitalProcedureDetails.data.data &&
+          hospitalProcedureDetails.data.data.hospitalProcedureImages &&
+          hospitalProcedureDetails.data.data.hospitalProcedureImages.length >
+            0 ? (
+            <div className="flex w-full flex-wrap items-center gap-4">
+              {hospitalProcedureDetails.data.data.hospitalProcedureImages.map(
+                (file) => {
+                  return (
+                    <Image
+                      key={file.id}
+                      src={file.imageUrl}
+                      width={64}
+                      height={64}
+                      alt="hospital-gallery"
+                      className="h-[250px] w-[264px] rounded-lg"
+                    />
+                  );
+                },
+              )}
+            </div>
           ) : (
             <>
               <p className={addHospitalStyle.hospitalGalleryDesc}>
                 Upload a minimum of 3 media items and maximum 10 media items
               </p>
-              <Controller
-                name="gallery"
-                control={control}
-                render={({ field: { ref, name, onBlur, onChange } }) => (
-                  <input
-                    type="file"
-                    ref={ref}
-                    name={name}
-                    onBlur={onBlur}
-                    onChange={(e) => onChange(e.target.files?.[0])}
-                  />
+              <div className="flex w-full flex-wrap items-center gap-x-6 gap-y-2">
+                {gallery && gallery.length > 0 && (
+                  <div className="flex w-full flex-wrap items-center gap-x-4 gap-y-2">
+                    {gallery.map((file) => (
+                      <div
+                        className="relative size-[220px] rounded-lg border border-neutral-4"
+                        key={file.size}
+                      >
+                        <Image
+                          src={`${URL.createObjectURL(file)}`}
+                          alt={`hospitalGallery-${file.size}`}
+                          key={`hospitalGallery-${file.size}`}
+                          fill
+                          priority
+                          unoptimized
+                          // className="inline-block"
+                        />
+                      </div>
+                    ))}
+                  </div>
                 )}
-              />
+                {gallery ? (
+                  <button
+                    className="mt-6 flex cursor-pointer gap-x-4 border-b-2 border-darkteal pb-1"
+                    type="button"
+                    onClick={() => galleryRef.current?.click()}
+                  >
+                    <PlusIcon stroke="rgba(9, 111, 144, 1)" />
+                    <span className="font-poppins text-base font-medium text-darkteal">
+                      Add media
+                    </span>
+                    <Controller
+                      name="gallery"
+                      control={control}
+                      render={({ field: { name, onBlur, onChange } }) => (
+                        <input
+                          type="file"
+                          ref={galleryRef}
+                          accept="image/*"
+                          multiple
+                          name={name}
+                          onBlur={onBlur}
+                          onChange={(e) => {
+                            if (e.target.files) {
+                              const files = Array.from(e.target.files);
+                              onChange(files);
+                            }
+                          }}
+                          className="invisible absolute"
+                        />
+                      )}
+                    />
+                  </button>
+                ) : (
+                  <button
+                    type="button"
+                    className="flex size-[220px] flex-col items-center justify-center rounded-lg border border-neutral-4"
+                    onClick={() => galleryRef.current?.click()}
+                  >
+                    {!gallery && (
+                      <div className="flex size-10 items-center justify-center rounded-full border border-darkgray p-2">
+                        <FileUploadIcon />
+                      </div>
+                    )}
+                    <Controller
+                      name="gallery"
+                      control={control}
+                      render={({ field: { name, onBlur, onChange } }) => (
+                        <input
+                          type="file"
+                          ref={galleryRef}
+                          accept="image/*"
+                          multiple
+                          name={name}
+                          onBlur={onBlur}
+                          onChange={(e) => {
+                            if (e.target.files) {
+                              const files = Array.from(e.target.files);
+                              onChange(files);
+                            }
+                          }}
+                          className="invisible absolute"
+                        />
+                      )}
+                    />
+                    <p className="mt-3 font-poppins text-sm font-medium text-darkgray">
+                      Click to upload a image
+                    </p>
+                    <p className="font-lexend text-sm font-normal text-neutral-3">
+                      PNG, JPG (max. 10 MB)
+                    </p>
+                    {errors.gallery && (
+                      <small className="mt-1 text-start font-lexend text-base font-normal text-error">
+                        {errors.gallery.message}
+                      </small>
+                    )}
+                  </button>
+                )}
+              </div>
             </>
           )}
           {errors.gallery && (
             <small className="mt-1 text-start font-lexend text-base font-normal text-error">
               {errors.gallery.message}
             </small>
-          )} */}
+          )}
           <div className={addHospitalStyle.footerBtnContainer}>
             <button
               className={addHospitalStyle.cancelBtn}

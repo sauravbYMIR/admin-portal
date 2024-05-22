@@ -14,6 +14,7 @@ function TeamMemberCard({
   qualification,
   isEdit,
   onOpen,
+  profile,
 }: {
   teamMemberId: string;
   name: string;
@@ -21,6 +22,7 @@ function TeamMemberCard({
   qualification: string;
   isEdit: boolean;
   onOpen: () => void;
+  profile: string | false;
 }) {
   const deleteTeamMember = useDeleteTeamMember();
   React.useEffect(() => {
@@ -32,7 +34,19 @@ function TeamMemberCard({
   return (
     <div className={style.cardContainer}>
       <div className={style.cardHeader}>
-        <Image src={sampleProfile} alt="sample profile image" />
+        {profile && typeof profile === 'string' ? (
+          <Image
+            src={profile}
+            width={30}
+            height={30}
+            className="rounded-full"
+            alt="sample profile image"
+            priority
+            unoptimized
+          />
+        ) : (
+          <Image src={sampleProfile} alt="sample profile image" />
+        )}
         <p>{name}</p>
       </div>
 

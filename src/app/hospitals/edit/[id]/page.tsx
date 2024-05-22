@@ -12,10 +12,19 @@ import { Controller, useForm } from 'react-hook-form';
 import { ClipLoader } from 'react-spinners';
 import { z } from 'zod';
 
-import { BackArrowIcon, CancelModal, Header, WithAuth } from '@/components';
+import {
+  BackArrowIcon,
+  CancelModal,
+  CloseIcon,
+  FileUploadIcon,
+  Header,
+  PlusIcon,
+  WithAuth,
+} from '@/components';
 import {
   useEditHospital,
   useGetHospitalById,
+  useRemoveGallery,
   useUpdateHospitalGallery,
   useUpdateHospitalLogo,
 } from '@/hooks';
@@ -53,19 +62,19 @@ const editHospitalFormSchema = z.object({
   zipCode: z.string().refine((val) => !Number.isNaN(parseInt(val, 10)), {
     message: 'Zipcode is required',
   }),
-  logo: z
-    .custom<File>((v) => v instanceof File, {
-      // message: 'Image is required',
-    })
-    .optional(),
+  logo: z.instanceof(File, { message: 'A file is required' }).optional(),
   gallery: z
-    .custom<File>((v) => v instanceof File, {
-      // message: 'Image is required',
-    })
+    .array(z.instanceof(File))
+    .min(1, 'At least one image is required')
+    .max(3, 'You can upload up to 3 images')
     .optional(),
 });
 export type EditHospitalFormFields = z.infer<typeof editHospitalFormSchema>;
 function EditHospital({ params: { id } }: { params: { id: string } }) {
+  const [showLogoOverlay, setShowLogoOverlay] = React.useState<boolean>(false);
+  const logoRef = React.useRef<HTMLInputElement>(null);
+  const logoRefImgInput = React.useRef<HTMLInputElement>(null);
+  const galleryRef = React.useRef<HTMLInputElement>(null);
   const editHospital = useEditHospital();
   const reqdHospital = useGetHospitalById({ id });
   const updateHospitalLogo = useUpdateHospitalLogo();
@@ -82,10 +91,13 @@ function EditHospital({ params: { id } }: { params: { id: string } }) {
     setValue,
     getValues,
     reset,
+    watch,
     formState: { errors },
   } = useForm<EditHospitalFormFields>({
     resolver: zodResolver(editHospitalFormSchema),
   });
+  const logo = watch('logo');
+  const gallery = watch('gallery');
   const hospitalObj = {
     English: 'hospitalDescEn',
     Norwegian: 'hospitalDescNb',
@@ -136,19 +148,21 @@ function EditHospital({ params: { id } }: { params: { id: string } }) {
   }, [reqdHospital.data, reqdHospital.isSuccess, setValue, id]);
   React.useEffect(() => {
     if (editHospital.isSuccess && editHospital.data && editHospital.data.data) {
-      const logo = getValues('logo');
-      if (logo) {
+      const logoVal = getValues('logo');
+      if (logoVal) {
         const formData = new FormData();
-        formData.append('logo', logo as Blob);
+        formData.append('logo', logoVal as Blob);
         updateHospitalLogo.mutate({
           hospitalId: `${editHospital.data.data}`,
           formData,
         });
       }
-      const gallery = getValues('gallery');
-      if (gallery) {
+      const galleryVal = getValues('gallery');
+      if (galleryVal) {
         const formData = new FormData();
-        formData.append('gallery', gallery as Blob);
+        galleryVal.forEach((file) => {
+          formData.append(`gallery`, file);
+        });
         updateHospitalGallery.mutate({
           hospitalId: `${editHospital.data.data}`,
           formData,
@@ -157,17 +171,12 @@ function EditHospital({ params: { id } }: { params: { id: string } }) {
       router.push(`/hospitals/add/${editHospital.data.data}`);
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [
-    editHospital.data,
-    editHospital.isSuccess,
-    // getValues,
-    // updateHospitalLogo,
-    // updateHospitalGallery,
-  ]);
+  }, [editHospital.data, editHospital.isSuccess]);
   const handleCancelBtn = () => {
     reset();
     router.back();
   };
+  const removeGallery = useRemoveGallery({ id });
   return (
     <div>
       <Header />
@@ -187,36 +196,151 @@ function EditHospital({ params: { id } }: { params: { id: string } }) {
           onSubmit={handleSubmit(onFormSubmit)}
         >
           <label
-            style={{ marginBottom: '6px' }}
+            style={{ marginBottom: '8px' }}
             className={addHospitalStyle.label}
           >
             Hospital logo
           </label>
-          {reqdHospital.data &&
-          reqdHospital.data.data.logo &&
-          typeof reqdHospital.data.data.logo === 'string' ? (
-            <Image
-              src={reqdHospital.data.data.logo}
-              width={64}
-              height={64}
-              alt="hospital-logo"
-              className="rounded-full"
-            />
-          ) : (
+
+          {!(
+            reqdHospital.data &&
+            reqdHospital.data.data.logo &&
+            typeof reqdHospital.data.data.logo === 'string'
+          ) && (
             <Controller
               name="logo"
               control={control}
-              render={({ field: { ref, name, onBlur, onChange } }) => (
-                <input
-                  type="file"
-                  ref={ref}
-                  name={name}
-                  onBlur={onBlur}
-                  onChange={(e) => onChange(e.target.files?.[0])}
-                />
+              render={({ field: { name, onBlur, onChange } }) => (
+                <button
+                  type="button"
+                  className="relative flex size-[220px] flex-col items-center justify-center rounded-full border border-neutral-4"
+                  style={{ marginLeft: '-40px' }}
+                  onClick={() => logoRef.current?.click()}
+                  onMouseEnter={() => setShowLogoOverlay(true)}
+                  onMouseLeave={() => setShowLogoOverlay(false)}
+                >
+                  {showLogoOverlay && logo && (
+                    <div
+                      className="absolute left-0 top-0 z-10 flex size-[220px] flex-col items-center justify-center rounded-full"
+                      style={{
+                        backgroundColor: 'rgba(0, 0, 0, 0.4)',
+                      }}
+                    >
+                      <div className="flex size-10 items-center justify-center rounded-full border border-white p-2">
+                        <FileUploadIcon stroke="#fff" />
+                      </div>
+                      <p className="mt-3 font-poppins text-sm font-medium text-white">
+                        Replace image
+                      </p>
+                      <p className="font-lexend text-sm font-normal text-white">
+                        PNG, JPG (max. 10 MB)
+                      </p>
+                    </div>
+                  )}
+                  {!getValues('logo') && (
+                    <div className="flex size-10 items-center justify-center rounded-full border border-darkgray p-2">
+                      <FileUploadIcon />
+                    </div>
+                  )}
+                  <input
+                    type="file"
+                    ref={logoRef}
+                    name={name}
+                    onBlur={onBlur}
+                    accept="image/*"
+                    // onChange={(e) => onChange(e.target.files?.[0])}
+                    onChange={(e) => {
+                      const file = e.target.files?.[0];
+                      onChange(file);
+                    }}
+                    className="invisible absolute"
+                  />
+                  {logo ? (
+                    <Image
+                      src={`${URL.createObjectURL(logo)}`}
+                      alt="hospitalLogo"
+                      key={`${logo}`}
+                      fill
+                      priority
+                      unoptimized
+                      style={{ backgroundImage: 'contain' }}
+                      className="inline-block rounded-full"
+                    />
+                  ) : (
+                    <>
+                      <p className="mt-3 font-poppins text-sm font-medium text-darkgray">
+                        Click to upload a image
+                      </p>
+                      <p className="font-lexend text-sm font-normal text-neutral-3">
+                        PNG, JPG (max. 10 MB)
+                      </p>
+                    </>
+                  )}
+                </button>
               )}
             />
           )}
+
+          {!logo &&
+            reqdHospital.data &&
+            reqdHospital.data.data.logo &&
+            typeof reqdHospital.data.data.logo === 'string' && (
+              <div className="relative size-[220px] rounded-full">
+                <Image
+                  src={reqdHospital.data.data.logo}
+                  fill
+                  priority
+                  unoptimized
+                  alt="hospital-logo"
+                  className="ml-[-30px] rounded-full"
+                />
+                <div className="absolute left-2 top-0">
+                  <Controller
+                    name="logo"
+                    control={control}
+                    render={({ field: { name, onBlur, onChange } }) => (
+                      <button
+                        type="button"
+                        className="relative flex size-[220px] flex-col items-center justify-center rounded-full border border-neutral-4"
+                        style={{
+                          marginLeft: '-40px',
+                          backgroundColor: 'rgba(0, 0, 0, 0.3)',
+                        }}
+                        onClick={() => logoRefImgInput.current?.click()}
+                      >
+                        {!getValues('logo') && (
+                          <div className="flex size-10 items-center justify-center rounded-full border border-white p-2">
+                            <FileUploadIcon stroke="#fff" />
+                          </div>
+                        )}
+                        <input
+                          type="file"
+                          ref={logoRefImgInput}
+                          name={name}
+                          onBlur={onBlur}
+                          accept="image/*"
+                          onChange={(e) => {
+                            const file = e.target.files?.[0];
+                            onChange(file);
+                          }}
+                          className="invisible absolute"
+                        />
+                        {!logo && (
+                          <>
+                            <p className="mt-3 font-poppins text-sm font-medium text-white">
+                              Click to upload a image
+                            </p>
+                            <p className="font-lexend text-sm font-normal text-white">
+                              PNG, JPG (max. 10 MB)
+                            </p>
+                          </>
+                        )}
+                      </button>
+                    )}
+                  />
+                </div>
+              </div>
+            )}
 
           {errors.logo && (
             <small className="mt-1 text-start font-lexend text-base font-normal text-error">
@@ -407,36 +531,80 @@ function EditHospital({ params: { id } }: { params: { id: string } }) {
           <h3 className={addHospitalStyle.subTitleHospitalGallery}>
             Hospital gallery
           </h3>
-          {reqdHospital.data &&
-          reqdHospital.data.data &&
-          typeof reqdHospital.data.data.gallery === 'string' ? (
-            <Image
-              src={reqdHospital.data.data.gallery}
-              width={64}
-              height={64}
-              alt="hospital-gallery"
-              className="h-[250px] w-[264px] rounded-lg"
-            />
-          ) : (
-            <>
-              <p className={addHospitalStyle.hospitalGalleryDesc}>
-                Upload a minimum of 3 media items and maximum 10 media items
-              </p>
-              <Controller
-                name="gallery"
-                control={control}
-                render={({ field: { ref, name, onBlur, onChange } }) => (
-                  <input
-                    type="file"
-                    ref={ref}
-                    name={name}
-                    onBlur={onBlur}
-                    onChange={(e) => onChange(e.target.files?.[0])}
+          {gallery && gallery.length > 0 && (
+            <div className=" flex w-full flex-wrap items-center gap-4">
+              {gallery.map((image) => (
+                <div className="relative" key={image.size}>
+                  <Image
+                    key={image.size}
+                    src={`${URL.createObjectURL(image)}`}
+                    width={64}
+                    height={64}
+                    alt="hospital-gallery"
+                    className="h-[250px] w-[264px] rounded-lg"
                   />
-                )}
-              />
-            </>
+                </div>
+              ))}
+            </div>
           )}
+          {!gallery &&
+            reqdHospital.data &&
+            reqdHospital.data.data &&
+            Array.isArray(reqdHospital.data.data.hospitalImages) &&
+            reqdHospital.data.data.hospitalImages.length > 0 && (
+              <div className=" flex w-full flex-wrap items-center gap-4">
+                {reqdHospital.data.data.hospitalImages.map((image) => (
+                  <div className="relative" key={image.id}>
+                    <Image
+                      key={image.id}
+                      src={image.imageUrl}
+                      width={64}
+                      height={64}
+                      alt="hospital-gallery"
+                      className="h-[250px] w-[264px] rounded-lg"
+                    />
+                    <button
+                      type="button"
+                      className="absolute right-2 top-2"
+                      onClick={() => removeGallery.mutate({ id: image.id })}
+                    >
+                      <CloseIcon />
+                    </button>
+                  </div>
+                ))}
+              </div>
+            )}
+          <button
+            className="mt-6 flex cursor-pointer gap-x-4 border-b-2 border-darkteal pb-1"
+            type="button"
+            onClick={() => galleryRef.current?.click()}
+          >
+            <PlusIcon stroke="rgba(9, 111, 144, 1)" />
+            <span className="font-poppins text-base font-medium text-darkteal">
+              Add media
+            </span>
+            <Controller
+              name="gallery"
+              control={control}
+              render={({ field: { name, onBlur, onChange } }) => (
+                <input
+                  type="file"
+                  ref={galleryRef}
+                  accept="image/*"
+                  multiple
+                  name={name}
+                  onBlur={onBlur}
+                  onChange={(e) => {
+                    if (e.target.files) {
+                      const files = Array.from(e.target.files);
+                      onChange(files);
+                    }
+                  }}
+                  className="invisible absolute"
+                />
+              )}
+            />
+          </button>
           {errors.gallery && (
             <small className="mt-1 text-start font-lexend text-base font-normal text-error">
               {errors.gallery.message}

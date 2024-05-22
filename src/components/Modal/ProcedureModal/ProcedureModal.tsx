@@ -32,18 +32,17 @@ function ProcedureModal({
   editSubCategory,
   updateId,
 }: DepartmentModalProps) {
-  const [radioType, setRadioType] = useState<'SUBCAT' | 'PROC'>(SUBCAT);
+  const [radioType, setRadioType] = useState<'SUBCAT' | 'PROC' | ''>('');
 
   useEffect(() => {
     if (isEdit) {
       if (editSubCategory) {
         setRadioType(SUBCAT);
-      } else {
-        setRadioType(PROC);
+        return;
       }
+      setRadioType(PROC);
     }
   }, [isEdit, editSubCategory]);
-
   return (
     <div>
       {isOpen && (

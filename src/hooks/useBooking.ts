@@ -112,17 +112,14 @@ export const useGetBookingDetail = ({ bookingId }: { bookingId: string }) => {
 export const updateBookingStatus = async ({
   bookingId,
   status,
-  userId,
 }: {
   bookingId: string;
   status: boolean;
-  userId: string;
 }): Promise<any> => {
   await axiosInstance.patch<any>(
     `${process.env.BASE_URL}/bookings/update-status/${bookingId}`,
     {
       status,
-      userId,
     },
   );
   return {

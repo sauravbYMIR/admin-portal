@@ -56,16 +56,11 @@ const createHospitalFormSchema = z.object({
   zipCode: z.string().refine((val) => !Number.isNaN(parseInt(val, 10)), {
     message: 'Zipcode is required',
   }),
-  logo: z
-    .custom<File>((v) => v instanceof File, {
-      // message: 'Image is required',
-    })
-    .optional(),
+  logo: z.instanceof(File, { message: 'A file is required' }),
   gallery: z
-    .custom<File>((v) => v instanceof File, {
-      // message: 'Image is required',
-    })
-    .optional(),
+    .array(z.instanceof(File))
+    .min(1, 'At least one image is required')
+    .max(3, 'You can upload up to 3 images'),
 });
 export type CreateHospitalFormFields = z.infer<typeof createHospitalFormSchema>;
 function HospitalDetailsPage({
@@ -282,6 +277,11 @@ function HospitalDetailsPage({
                                     setTeamMemberId(member.id);
                                     setIsCreateHospitalTeamModal(true);
                                   }}
+                                  profile={
+                                    member.profilePictureUploaded
+                                      ? member.profile
+                                      : false
+                                  }
                                 />
                               );
                             })
@@ -299,6 +299,11 @@ function HospitalDetailsPage({
                                     setTeamMemberId(member.id);
                                     setIsCreateHospitalTeamModal(true);
                                   }}
+                                  profile={
+                                    member.profilePictureUploaded
+                                      ? member.profile
+                                      : false
+                                  }
                                 />
                               );
                             },

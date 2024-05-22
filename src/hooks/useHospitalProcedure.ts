@@ -49,6 +49,16 @@ export type HospitalProcedureByIdType = {
   stayInHospital: string;
   updatedAt: string | null;
   waitingTime: string;
+  hospitalProcedureImages: Array<{
+    id: string;
+    hospitalProcedureId: string;
+    fileName: string;
+    originalFileName: string;
+    createdAt: string;
+    updatedAt: string;
+    deletedAt: null | string;
+    imageUrl: string;
+  }>;
 };
 export type CreateHospitalProcedureType = {
   success: boolean;
@@ -182,7 +192,10 @@ export const createHospitalProcedure = async ({
   waitingTime: string;
   stayInHospital: string;
   stayInCity: string;
-  procedureMembers: Array<any>;
+  procedureMembers: Array<{
+    id: string;
+    role: NameJSONType;
+  }>;
 }): Promise<{
   success: boolean;
   status: number;

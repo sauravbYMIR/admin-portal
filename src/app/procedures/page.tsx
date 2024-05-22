@@ -20,14 +20,21 @@ import {
 import { useGetAllDepartmentWithProcedure } from '@/hooks/useDepartment';
 import editIcon from '@/public/assets/icons/edit.svg';
 import plusIcon from '@/public/assets/icons/plus.svg';
+import type { LangType } from '@/types/global';
 
 import proceduresStyle from './procedures.module.scss';
 
-function ReimbursementWrapper({ key, value }: { key: string; value: number }) {
+function ReimbursementWrapper({
+  name,
+  value,
+}: {
+  name: LangType;
+  value: number;
+}) {
   return (
-    <div key={key} className="w-1/2 p-3">
+    <div key={name} className="w-1/2 p-3">
       <p className="font-lexend text-xl font-normal text-neutral-2">
-        Reimbursement for {key}
+        Reimbursement for {name}
       </p>
       <p className="font-lexend text-base font-light">{value}</p>
     </div>
@@ -49,32 +56,40 @@ function ProceduresList() {
   const router = useRouter();
   return (
     <>
-      <DepartmentModal
-        isOpen={editDepartmentModalOpen}
-        onClose={() => setEditDepartmentModalOpen(false)}
-        isEdit={isEditData}
-        updateId={updateId}
-      />
-      <ProcedureModal
-        isOpen={
-          isEditSubCategory ? editSubCategoryModalOpen : editProcedureModalOpen
-        }
-        onClose={
-          isEditSubCategory
-            ? () => setEditSubCategoryModalOpen(false)
-            : () => setEditProcedureModalOpen(false)
-        }
-        isEdit={isEditData}
-        editSubCategory={isEditSubCategory}
-        updateId={updateId}
-      />
-      <ProcedureModal
-        isOpen={editProcedureModalOpen}
-        onClose={() => setEditProcedureModalOpen(false)}
-        isEdit={isEditData}
-        editSubCategory={false}
-        updateId={updateId}
-      />
+      {editDepartmentModalOpen && (
+        <DepartmentModal
+          isOpen={editDepartmentModalOpen}
+          onClose={() => setEditDepartmentModalOpen(false)}
+          isEdit={isEditData}
+          updateId={updateId}
+        />
+      )}
+      {isEditSubCategory ? (
+        <ProcedureModal
+          isOpen={editSubCategoryModalOpen}
+          onClose={() => setEditSubCategoryModalOpen(false)}
+          isEdit={isEditData}
+          editSubCategory={isEditSubCategory}
+          updateId={updateId}
+        />
+      ) : (
+        <ProcedureModal
+          isOpen={editProcedureModalOpen}
+          onClose={() => setEditProcedureModalOpen(false)}
+          isEdit={isEditData}
+          editSubCategory={isEditSubCategory}
+          updateId={updateId}
+        />
+      )}
+      {editProcedureModalOpen && (
+        <ProcedureModal
+          isOpen={editProcedureModalOpen}
+          onClose={() => setEditProcedureModalOpen(false)}
+          isEdit={isEditData}
+          editSubCategory={false}
+          updateId={updateId}
+        />
+      )}
       <CustomHomePage
         heading="Procedure List"
         subHeading="List of all Procedures listed on the platform"
@@ -162,6 +177,9 @@ function ProceduresList() {
                                     className={
                                       proceduresStyle.subCategoryAccordionContainer
                                     }
+                                    style={{
+                                      marginLeft: '1.5rem',
+                                    }}
                                   >
                                     {subCategoryData.procedures.map(
                                       (procedure) => {
@@ -176,13 +194,20 @@ function ProceduresList() {
                                             }}
                                           >
                                             <div className="flex flex-wrap items-center">
-                                              {Object.entries(
+                                              {Object.keys(
                                                 procedure.reimbursement,
-                                              ).map(([key, value]) => {
+                                              ).map((key) => {
+                                                const reimbursementKey =
+                                                  key as LangType;
                                                 return (
                                                   <ReimbursementWrapper
-                                                    key={key}
-                                                    value={value}
+                                                    key={reimbursementKey}
+                                                    name={reimbursementKey}
+                                                    value={
+                                                      procedure.reimbursement[
+                                                        reimbursementKey
+                                                      ]
+                                                    }
                                                   />
                                                 );
                                               })}
@@ -215,12 +240,18 @@ function ProceduresList() {
                                 title={procedure.name.en}
                               >
                                 <div className="flex flex-wrap items-center">
-                                  {Object.entries(procedure.reimbursement).map(
-                                    ([key, value]) => {
+                                  {Object.keys(procedure.reimbursement).map(
+                                    (key) => {
+                                      const reimbursementKey = key as LangType;
                                       return (
                                         <ReimbursementWrapper
-                                          key={key}
-                                          value={value}
+                                          key={reimbursementKey}
+                                          name={reimbursementKey}
+                                          value={
+                                            procedure.reimbursement[
+                                              reimbursementKey
+                                            ]
+                                          }
                                         />
                                       );
                                     },

@@ -82,11 +82,26 @@ function HospitalDetailsPage({ params: { id } }: { params: { id: string } }) {
 
           <div className={style.headerSection}>
             <div className={style.titleContainer}>
-              <Image
-                className={style.hospitalLogo}
-                src={hospitalLogo}
-                alt="hospital logo"
-              />
+              {hospitalById &&
+              hospitalById.data &&
+              hospitalById.data.data &&
+              typeof hospitalById.data.data.logo === 'string' ? (
+                <Image
+                  className={style.hospitalLogo}
+                  src={hospitalById.data.data.logo}
+                  alt="hospital logo"
+                  width={100}
+                  height={100}
+                  unoptimized
+                  priority
+                />
+              ) : (
+                <Image
+                  className={style.hospitalLogo}
+                  src={hospitalLogo}
+                  alt="hospital logo"
+                />
+              )}
 
               <div className={style.titleBreadCrumbContainer}>
                 {hospitalById.isSuccess && hospitalById.data.data && (
@@ -126,6 +141,30 @@ function HospitalDetailsPage({ params: { id } }: { params: { id: string } }) {
               {hospitalById.data.data.streetName}, {hospitalById.data.data.city}
               , {hospitalById.data.data.country}
             </p>
+          )}
+
+          <h3 className={style.subTitle}>Hospital gallery</h3>
+
+          {hospitalById.isSuccess &&
+          hospitalById.data.data &&
+          Array.isArray(hospitalById.data.data.hospitalImages) &&
+          hospitalById.data.data.hospitalImages.length > 0 ? (
+            <div className="mb-12 mt-7 flex w-full flex-wrap items-center gap-4">
+              {hospitalById.data.data.hospitalImages.map((file) => {
+                return (
+                  <Image
+                    key={file.id}
+                    src={file.imageUrl}
+                    width={64}
+                    height={64}
+                    alt="hospital-gallery"
+                    className="h-[250px] w-[264px] rounded-lg"
+                  />
+                );
+              })}
+            </div>
+          ) : (
+            <p className={`${style.title} mb-12`}>No images uploaded</p>
           )}
 
           <h3 className={style.subTitle}>Team members</h3>
@@ -190,6 +229,11 @@ function HospitalDetailsPage({ params: { id } }: { params: { id: string } }) {
                             setTeamMemberId(member.id);
                             setIsCreateHospitalTeamModal(true);
                           }}
+                          profile={
+                            member.profilePictureUploaded
+                              ? member.profile
+                              : false
+                          }
                         />
                       );
                     })}

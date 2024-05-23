@@ -26,7 +26,7 @@ function LandingPage() {
         <Image
           className={style.bannerImg}
           src={landingPageBanner}
-          alt="landing page banner imag"
+          alt="landing page banner image"
         />
       </div>
     </div>

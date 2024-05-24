@@ -88,10 +88,29 @@ const handleRemoveFromLocalStorage = ({ tokenKey }: { tokenKey: string }) => {
   }
 };
 
+const ACCEPT = 'ACCEPT';
+const REJECT = 'REJECT';
+const ACCEPTED = 'Accepted';
+const REJECTED = 'Rejected';
+const REQUESTED = 'Requested';
+
+const SERVER_ERROR_MESSAGE = {
+  'User-not-found': 'User not found',
+  'otp-verification-failed': 'Otp verification failed',
+  'resend-otp-successful': 'Resend otp successful',
+  'send-otp-successful': 'Send otp successful',
+};
+
 export {
+  ACCEPT,
+  ACCEPTED,
   countryData,
   handleGetLocalStorage,
   handleRemoveFromLocalStorage,
   handleSetLocalStorage,
   intialLanguagesData,
+  REJECT,
+  REJECTED,
+  REQUESTED,
+  SERVER_ERROR_MESSAGE,
 };

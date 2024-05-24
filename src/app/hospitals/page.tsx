@@ -6,13 +6,8 @@ import { useRouter } from 'next/navigation';
 import React from 'react';
 import { toast } from 'sonner';
 
-import {
-  CustomHomePage,
-  DataTable,
-  Header,
-  PatientsTable,
-  WithAuth,
-} from '@/components';
+import { CustomHomePage, DataTable, Header, WithAuth } from '@/components';
+import ShowDataTable from '@/components/Table/PatientsTable/PatientsTable';
 import { editHospital, useGetAllHospital } from '@/hooks';
 import infoLinkIcon from '@/public/assets/icons/linkArrow.svg';
 import plusIcon from '@/public/assets/icons/plus.svg';
@@ -93,7 +88,7 @@ function HospitalsPage() {
             {hospitals.isLoading ? (
               <DataTable />
             ) : (
-              <PatientsTable
+              <ShowDataTable
                 onCellClicked={onCellClicked}
                 rowData={hospitals.data.data.map((r) => ({
                   name: r.name,

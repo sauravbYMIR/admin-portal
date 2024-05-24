@@ -39,10 +39,10 @@ function Header() {
     router.push('/');
   };
   return (
-    <nav className={` h-24 w-full items-center ${headerStyle.headerContainer}`}>
-      <div>
+    <nav className={`h-24 w-full items-center ${headerStyle.headerContainer}`}>
+      <button type="button" onClick={() => router.push('/')}>
         <Image src={brandLogo} alt="branch icon" width={120} height={48} />
-      </div>
+      </button>
       <ul
         className={` flex list-none items-center gap-8 ${headerStyle.headerLinkContainer}`}
       >

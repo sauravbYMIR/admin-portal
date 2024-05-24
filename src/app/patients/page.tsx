@@ -7,9 +7,11 @@ import React from 'react';
 import { ClipLoader } from 'react-spinners';
 import { toast } from 'sonner';
 
-import { Header, PatientsTable, WithAuth } from '@/components';
+import { Header, WithAuth } from '@/components';
+import ShowDataTable from '@/components/Table/PatientsTable/PatientsTable';
 import { useGetAllBookings, useUpdateBookingStatus } from '@/hooks/useBooking';
 import infoLinkIcon from '@/public/assets/icons/linkArrow.svg';
+import { ACCEPT, ACCEPTED, REJECT, REJECTED, REQUESTED } from '@/utils/global';
 
 import patientsTableStyle from '../../components/Table/PatientsTable/patientsTable.module.scss';
 import patientsStyle from './patients.module.scss';
@@ -30,20 +32,20 @@ const CustomStatusEditComponent = (props: CustomCellRendererProps) => {
   }, [updateBookingStatus.isSuccess]);
   return (
     <div className={patientsTableStyle.patientsTableBtnContainer}>
-      {props.data.status === 'requested' && (
+      {props.data.status === REQUESTED && (
         <>
           <button
             type="button"
             className={patientsTableStyle.patientsTableAcceptBtn}
             onClick={() => {
-              setLoadingType('ACCEPT');
+              setLoadingType(ACCEPT);
               updateBookingStatus.mutate({
                 bookingId,
                 status: true,
               });
             }}
           >
-            {loadingType === 'ACCEPT' && updateBookingStatus.isPending ? (
+            {loadingType === ACCEPT && updateBookingStatus.isPending ? (
               <ClipLoader
                 loading={updateBookingStatus.isPending}
                 color="#fff"
@@ -59,14 +61,14 @@ const CustomStatusEditComponent = (props: CustomCellRendererProps) => {
             type="button"
             className={patientsTableStyle.patientsTableRejectBtn}
             onClick={() => {
-              setLoadingType('REJECT');
+              setLoadingType(REJECT);
               updateBookingStatus.mutate({
                 bookingId,
                 status: false,
               });
             }}
           >
-            {loadingType === 'REJECT' && updateBookingStatus.isPending ? (
+            {loadingType === REJECT && updateBookingStatus.isPending ? (
               <ClipLoader
                 loading={updateBookingStatus.isPending}
                 color="rgba(9, 111, 144, 1)"
@@ -132,12 +134,14 @@ function PatientsPage() {
         allBookings.data.data &&
         Array.isArray(allBookings.data.data) &&
         allBookings.data.data.length > 0 ? (
-          <PatientsTable
+          <ShowDataTable
             // onCellClicked={onCellClicked}
             rowData={allBookings.data.data.map((r) => ({
               procedure: r.procedureName.en,
               hospital: r.hospitalName,
-              status: r.applicationStatus,
+              status:
+                r.applicationStatus.charAt(0).toUpperCase() +
+                r.applicationStatus.slice(1),
               bookingId: r.id,
               userId: r.userId,
             }))}
@@ -165,6 +169,28 @@ function PatientsPage() {
                 floatingFilter: true,
                 flex: 1,
                 editable: true,
+                cellStyle: (params: { data: { status: string } }) => {
+                  switch (params.data.status) {
+                    case REQUESTED:
+                      return {
+                        color: 'rgba(220, 104, 3, 1)',
+                        backgroundColor: 'rgba(254, 240, 199, 1)',
+                      };
+                    case ACCEPTED:
+                      return {
+                        color: 'rgba(0, 59, 212, 1)',
+                        backgroundColor: 'rgba(230, 237, 255, 1)',
+                      };
+                    case REJECTED:
+                      return {
+                        color: 'rgba(144, 0, 18, 1)',
+                        backgroundColor: 'rgba(253, 237, 237, 1)',
+                      };
+                    default:
+                      break;
+                  }
+                  return null;
+                },
               },
               {
                 field: '',

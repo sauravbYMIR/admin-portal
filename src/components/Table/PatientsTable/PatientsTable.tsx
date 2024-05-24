@@ -8,7 +8,7 @@ import './table.css';
 
 import { AgGridReact } from 'ag-grid-react';
 
-function PatientsTable<T extends {}, U extends {}>({
+function ShowDataTable<T extends {}, U extends {}>({
   rowData,
   colDefs,
   onCellClicked,
@@ -31,4 +31,4 @@ function PatientsTable<T extends {}, U extends {}>({
   );
 }
 
-export default PatientsTable;
+export default ShowDataTable;

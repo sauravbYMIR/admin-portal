@@ -6,13 +6,8 @@ import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
 import { toast } from 'sonner';
 
-import {
-  CustomHomePage,
-  DataTable,
-  Header,
-  PatientsTable,
-  WithAuth,
-} from '@/components';
+import { CustomHomePage, DataTable, Header, WithAuth } from '@/components';
+import ShowDataTable from '@/components/Table/PatientsTable/PatientsTable';
 import {
   editHospitalProcedure,
   useGetAllHospitalProcedure,
@@ -121,7 +116,7 @@ function HospitalProcedureManagement() {
             {procedureByHospitalId.isLoading ? (
               <DataTable />
             ) : (
-              <PatientsTable
+              <ShowDataTable
                 onCellClicked={onCellClicked}
                 rowData={procedureByHospitalId.data.data.map((r) => ({
                   name: `${r.procedure.name.en}`,

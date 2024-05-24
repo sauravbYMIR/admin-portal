@@ -3,6 +3,7 @@ import axios from 'axios';
 
 export type ResendOtpResponse = {
   success: boolean;
+  message: string;
 };
 export type VerifyOtpResponse = {
   success: boolean;
@@ -35,6 +36,7 @@ export const resendOTP = async ({
     );
     return {
       success: response.data.success,
+      message: 'resend-otp-successful',
     };
   } catch (err) {
     if (axios.isAxiosError(err)) {
@@ -61,16 +63,19 @@ export const sendOTP = async ({
     );
     return {
       success: response.status === 201,
+      message: 'send-otp-successful',
     };
   } catch (err) {
     if (axios.isAxiosError(err)) {
       const serverError = err as AxiosError<ServerError>;
-
       if (serverError && serverError.response) {
-        throw new Error('otp-verify-failed');
+        const errMsg = serverError.response as unknown as {
+          data: { error: { message: string } };
+        };
+        return { success: false, message: errMsg.data.error.message };
       }
     }
-    throw new Error('otp-verify-failed');
+    return { success: false, message: 'otp-verification-failed' };
   }
 };
 export const verifyOTP = async ({

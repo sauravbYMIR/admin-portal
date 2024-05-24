@@ -11,8 +11,8 @@ import { toast } from 'sonner';
 import { z } from 'zod';
 
 import { resendOTP, sendOTP, verifyOTP } from '@/hooks';
-import arrowIcon from '@/public/assets/icons/whiteArrow.svg';
-import { handleSetLocalStorage } from '@/utils/global';
+import brandLogo from '@/public/assets/images/brandLogo.svg';
+import { handleSetLocalStorage, SERVER_ERROR_MESSAGE } from '@/utils/global';
 
 import style from '../../app/page.module.scss';
 import OTPInputWrapper from '../OtpInput/OtpInput';
@@ -55,8 +55,11 @@ function Timer({
   }, [reqTime, setIsTimeElapsed]);
 
   return (
-    <p className={style.resendOtpText}>
-      {msg} <span>00 : {reqTime === 0 ? '00' : reqTime}</span>
+    <p className="mb-9 mt-11 font-poppins text-sm font-normal text-darkgray">
+      {msg}{' '}
+      <span className="text-darkteal">
+        00 : {reqTime === 0 ? '00' : reqTime}
+      </span>
     </p>
   );
 }
@@ -72,12 +75,21 @@ function LoginWithMail({
     handleSubmit,
     formState: { errors, isSubmitting },
     getValues,
+    watch,
   } = useForm<EmailFormFields>({
     resolver: zodResolver(emailFormSchema),
   });
   const onFormSubmit: SubmitHandler<EmailFormFields> = async () => {
     try {
       const response = await sendOTP({ email: getValues('email') });
+      if (!response.success) {
+        toast.error(
+          SERVER_ERROR_MESSAGE[
+            response.message as keyof typeof SERVER_ERROR_MESSAGE
+          ],
+        );
+        return;
+      }
       if (response.success) {
         setStep((prevState) => ({ ...prevState, otp: true, email: false }));
         router.push(`?email=${getValues('email')}`, { scroll: false });
@@ -86,15 +98,21 @@ function LoginWithMail({
       toast.error('Email verification failed');
     }
   };
+  const email = watch('email');
   return (
-    <div className={style.contentContainer}>
-      <h2 className={style.headingText}>Log in</h2>
-      <form onSubmit={handleSubmit(onFormSubmit)}>
-        <label className={style.emailLabel} htmlFor="email">
-          Email
+    <div className="flex flex-col items-center justify-center">
+      <h2 className="mb-[60px] mt-12 font-poppins text-[22px] font-medium text-neutral-2">
+        Welcome, log in with your email address
+      </h2>
+      <form
+        onSubmit={handleSubmit(onFormSubmit)}
+        className="flex w-full flex-col"
+      >
+        <label className="flex flex-col items-center" htmlFor="email">
           <input
             placeholder="Enter your email"
-            className={style.emailInput}
+            className="w-full rounded-lg px-4 py-[19px] placeholder:font-poppins placeholder:text-sm placeholder:font-normal placeholder:text-placeholdertextcolor"
+            style={{ border: '1px solid rgba(17, 17, 17, 0.2)' }}
             id="email"
             type="text"
             {...register('email')}
@@ -108,22 +126,21 @@ function LoginWithMail({
 
         <button
           type="submit"
-          className={style.landingPageCtaBtn}
+          className={`${!email || errors.email?.message ? 'cursor-not-allowed bg-darkteal/60' : 'cursor-pointer bg-darkteal'} mt-8 flex items-center justify-center rounded-lg  py-[15px]`}
           disabled={isSubmitting}
         >
           {isSubmitting ? (
             <ClipLoader
               loading={isSubmitting}
               color="#fff"
-              size={30}
+              size={20}
               aria-label="Loading Spinner"
               data-testid="loader"
             />
           ) : (
-            <>
-              <p className={style.ctaBtnText}>Verify email</p>
-              <Image src={arrowIcon} alt="arrow icon cta button" />
-            </>
+            <p className="font-poppins text-sm font-bold text-white">
+              Verify email
+            </p>
           )}
         </button>
       </form>
@@ -188,7 +205,7 @@ function LoginWithOtp() {
     try {
       const r = await resendOTP({ email });
       if (r.success) {
-        toast.success('Otp send successfully');
+        toast.success('Otp sent successfully');
       }
     } catch (error) {
       toast.error('Resend otp failed, please try again');
@@ -198,45 +215,51 @@ function LoginWithOtp() {
     }
   };
   return (
-    <form className={style.contentContainer}>
-      <h2 className={style.otpHeadingText}>Verify with OTP</h2>
-      <p className={style.otpDesc}>You will receive the OTP on your email</p>
+    <form className="mt-10 flex w-full flex-col items-center">
+      <h2 className="font-poppins text-[22px] font-semibold text-neutral-1">
+        Verify email with OTP
+      </h2>
+      <p className="mb-11 mt-3 font-poppins text-sm font-normal text-neutral-3">
+        Kindly enter the 4 digits OTP sent to {email}
+      </p>
       <div className={style.otpInputContainer}>
-        <p className="font-lexend text-xl font-light">OTP</p>
         <OTPInputWrapper otp={otp} setOtp={setOtp} />
       </div>
-      {isTimeElapsed ? (
+      {!isTimeElapsed ? (
         <Timer
-          msg="Resend otp in"
+          msg="Resend OTP in"
           time={60}
           setIsTimeElapsed={setIsTimeElapsed}
         />
       ) : (
         <button
-          className={`mb-12 mt-[55px] font-poppins text-xl font-normal text-darkgray ${isDisableResendBtn ? 'cursor-not-allowed' : 'cursor-pointer'}`}
+          className={` mb-9 mt-11 font-poppins text-sm font-normal text-darkgray ${isDisableResendBtn ? 'cursor-not-allowed' : 'cursor-pointer'}`}
           type="button"
           onClick={() => handleResendOtp()}
           disabled={isDisableResendBtn}
         >
-          Didn&apos;t receive OTP?
-          {isOtpResendLoading ? (
-            <ClipLoader
-              className="ml-4"
-              loading={isOtpResendLoading}
-              color="#096f90"
-              size={20}
-              aria-label="Loading Spinner"
-              data-testid="loader"
-            />
-          ) : (
-            <span className="ml-1 border-none text-darkteal underline underline-offset-4">
-              Resend
-            </span>
-          )}
+          <div className="flex ">
+            <span>Didn&apos;t receive OTP?</span>
+            {isOtpResendLoading ? (
+              <div className="ml-4">
+                <ClipLoader
+                  loading={isOtpResendLoading}
+                  color="#096f90"
+                  size={20}
+                  aria-label="Loading Spinner"
+                  data-testid="loader"
+                />
+              </div>
+            ) : (
+              <span className="ml-1 border-none text-darkteal underline underline-offset-4">
+                Resend
+              </span>
+            )}
+          </div>
         </button>
       )}
       <button
-        className={`${style.landingPageCtaBtn} ${otp.length < 4 ? 'cursor-not-allowed' : ''}`}
+        className={`${otp.length < 4 ? 'cursor-not-allowed bg-darkteal/60' : 'cursor-pointer bg-darkteal'} mt-8 flex w-full items-center justify-center rounded-lg  py-[15px]`}
         onClick={(e) => handleOtpLogin(e)}
         type="submit"
         disabled={otp.length < 4}
@@ -245,15 +268,12 @@ function LoginWithOtp() {
           <ClipLoader
             loading={isLoading}
             color="#fff"
-            size={30}
+            size={20}
             aria-label="Loading Spinner"
             data-testid="loader"
           />
         ) : (
-          <>
-            <p className={style.ctaBtnText}>Log in</p>
-            <Image src={arrowIcon} alt="arrow icon cta button" />
-          </>
+          <p className="font-poppins text-sm font-bold text-white">Log in</p>
         )}
       </button>
     </form>
@@ -266,10 +286,11 @@ function Login() {
     otp: false,
   });
   return (
-    <>
+    <div className="flex flex-col items-center justify-center">
+      <Image src={brandLogo} alt="brand logo" />
       {step.email && <LoginWithMail setStep={setStep} />}
       {step.otp && <LoginWithOtp />}
-    </>
+    </div>
   );
 }
 

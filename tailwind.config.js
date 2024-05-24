@@ -45,6 +45,7 @@ module.exports = {
           800: '#2c5282',
           900: '#2a4365',
         },
+        placeholdertextcolor: 'rgba(26, 26, 30, 0.6)',
         darkteal: 'rgba(9, 111, 144, 1)',
         darkgray: 'rgba(59, 71, 94, 1)',
         error: 'rgba(203, 0, 25, 1)',

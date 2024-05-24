@@ -7,22 +7,17 @@ import Image from 'next/image';
 import React from 'react';
 
 import { Login } from '@/components';
-import brandLogo from '@/public/assets/images/brandLogo.svg';
 import landingPageBanner from '@/public/assets/images/landingPageBanner.png';
 
 import style from './page.module.scss';
 
 function LandingPage() {
   return (
-    <div className={style.landingPageContainer}>
-      <div className={style.landingPageLeftSection}>
-        <div className={style.brandLogoImg}>
-          <Image src={brandLogo} alt="brand logo" />
-        </div>
+    <div className="flex w-screen justify-between">
+      <div className="flex flex-1 items-center justify-center">
         <Login />
       </div>
-
-      <div className={style.landingPageRightSection}>
+      <div className="flex-1">
         <Image
           className={style.bannerImg}
           src={landingPageBanner}

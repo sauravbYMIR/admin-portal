@@ -9,6 +9,7 @@ import Select from 'react-select';
 import { ClipLoader } from 'react-spinners';
 import { z } from 'zod';
 
+import departmentModalStyle from '@/components/Modal/DepartmentModal/departmentModal.module.scss';
 import procedureModalStyle from '@/components/Modal/ProcedureModal/procedureModal.module.scss';
 import { useGetAllDepartment } from '@/hooks/useDepartment';
 import {
@@ -22,6 +23,7 @@ import { countryData } from '@/utils/global';
 interface CreateProcedureFormPropType {
   isEdit: boolean;
   updateId: string;
+  onClose: () => void;
 }
 
 export type ProcedureFormSchemaType =
@@ -84,6 +86,7 @@ export type DepartmentType = {
 function CreateProcedureForm({
   isEdit,
   updateId,
+  onClose,
 }: CreateProcedureFormPropType) {
   const [selectedOption, setSelectedOption] = React.useState<{
     label: string;
@@ -107,14 +110,29 @@ function CreateProcedureForm({
       allDepartment.data.data.length > 0
     ) {
       setDepartmentList(() =>
-        allDepartment.data.data.map((department) => ({
-          value: department.id,
-          label:
-            department.name.en ||
-            department.name.nb ||
-            department.name.sv ||
-            department.name.da,
-        })),
+        allDepartment.data.data.map((department) => {
+          if (department.parentCategoryId) {
+            const parentCategory = allDepartment.data.data.find(
+              (dept) => dept.id === department.parentCategoryId,
+            );
+            return {
+              value: department.id,
+              label:
+                `${parentCategory?.name.en} ${department.name.en}` ||
+                `${parentCategory?.name.nb} ${department.name.nb}` ||
+                `${parentCategory?.name.sv} ${department.name.sv}` ||
+                `${parentCategory?.name.da} ${department.name.da}`,
+            };
+          }
+          return {
+            value: department.id,
+            label:
+              department.name.en ||
+              department.name.nb ||
+              department.name.sv ||
+              department.name.da,
+          };
+        }),
       );
     }
   }, [allDepartment.data, allDepartment.isSuccess]);
@@ -163,6 +181,7 @@ function CreateProcedureForm({
     handleSubmit,
     setValue,
     formState: { errors },
+    reset,
   } = useForm<ProcedureFormFields>({
     resolver: zodResolver(procedureFormSchema),
   });
@@ -242,6 +261,29 @@ function CreateProcedureForm({
     return errors[lang] && errors[lang]?.message;
   });
 
+  React.useEffect(() => {
+    if (
+      createAnotherProcedure &&
+      (createProcedure.isSuccess || editProcedure.isSuccess)
+    ) {
+      reset();
+      return;
+    }
+    if (
+      !createAnotherProcedure &&
+      (createProcedure.isSuccess || editProcedure.isSuccess)
+    ) {
+      onClose();
+      reset();
+    }
+  }, [
+    createProcedure.isSuccess,
+    editProcedure.isSuccess,
+    createAnotherProcedure,
+    reset,
+    onClose,
+  ]);
+
   return (
     <form
       className={procedureModalStyle.createProcedureFormContainer}
@@ -249,7 +291,7 @@ function CreateProcedureForm({
     >
       <p
         style={{ marginBottom: '8px', display: 'block' }}
-        className={procedureModalStyle.departmentInputLabel}
+        className="font-poppins text-base font-normal text-neutral-2"
       >
         Department name/ Sub-category
       </p>
@@ -277,7 +319,7 @@ function CreateProcedureForm({
       )}
       <p
         style={{ marginTop: '24px', display: 'block' }}
-        className={procedureModalStyle.subCategoryInputLabel}
+        className="font-poppins text-base font-normal text-neutral-2"
       >
         Procedure name
       </p>
@@ -288,9 +330,18 @@ function CreateProcedureForm({
             <button
               key={data.locale}
               onClick={() => setActiveLanguageTab(data.language)}
+              style={
+                data.language === activeLanguageTab
+                  ? {
+                      border: '2px solid rgba(9, 111, 144, 1)',
+                      color: 'rgba(9, 111, 144, 1)',
+                      backgroundColor: 'rgba(242, 250, 252, 1)',
+                    }
+                  : {}
+              }
               className={`${
                 activeLanguageTab === data.language
-                  ? `${procedureModalStyle.activeLanguageTab} ${errors[lang] && errors[lang]?.message ? '!border !border-error !text-error' : ''}`
+                  ? `px-3 py-2 ${procedureModalStyle.activeLanguageTab} ${errors[lang] && errors[lang]?.message ? '!border !border-error !text-error' : ''}`
                   : ''
               }`}
               type="button"
@@ -306,7 +357,7 @@ function CreateProcedureForm({
           <div key={c.countryCode}>
             {c.language === activeLanguageTab && (
               <input
-                className={procedureModalStyle.procedureInput}
+                className="w-full rounded-lg border-2 border-lightsilver px-4 py-3"
                 style={{ marginBottom: '4px' }}
                 type="text"
                 placeholder="Enter procedure"
@@ -322,24 +373,19 @@ function CreateProcedureForm({
         </div>
       )}
       <div
-        className={`${procedureModalStyle.procedureReimbursementInputContainer} mb-4`}
+        className={`${procedureModalStyle.procedureReimbursementInputContainer} mb-4 mt-7`}
       >
+        <p className="font-poppins text-base font-normal text-neutral-2">
+          Reimbursements
+        </p>
         {countryData.map((data) => {
           const lang = reimburismentObj[
             data.language
           ] as ProcedureFormSchemaType;
 
           return (
-            <div key={data.locale} className="mb-5 mt-6">
+            <div key={data.locale} className="mb-3 mt-[10px]">
               <div className={procedureModalStyle.procedureReimbursementInput}>
-                <label
-                  htmlFor="reimbursement"
-                  className={
-                    errors[lang] && errors[lang]?.message ? '!text-error' : ''
-                  }
-                >
-                  Reimbursement for {data.name}
-                </label>
                 <div className={procedureModalStyle.inputWrapper}>
                   <div
                     className={`${procedureModalStyle.countryCodeWrapper} ${
@@ -348,18 +394,21 @@ function CreateProcedureForm({
                         : 'rounded-lg border border-primary-6'
                     }`}
                   >
-                    <Image src={data.flagIcon} alt="reimbursement input flag" />
-                    <span>{data.currency}</span>
+                    <Image
+                      src={data.flagIcon}
+                      alt="reimbursement input flag"
+                      height={20}
+                      width={20}
+                    />
+                    <span className="!font-poppins !text-sm !font-normal !text-neutral-2">
+                      {data.currency}
+                    </span>
                   </div>
                   <input
                     type="text"
                     {...register(lang)}
                     id="reimbursement"
-                    className={
-                      errors[lang] && errors[lang]?.message
-                        ? '!border-2 !border-error'
-                        : ''
-                    }
+                    className={`${errors[lang] && errors[lang]?.message ? 'border-2 border-error' : ''} w-full rounded-lg border-2 border-lightsilver px-4 py-3`}
                   />
                 </div>
                 {errors[lang] && (
@@ -374,27 +423,29 @@ function CreateProcedureForm({
       </div>
       {!isEdit && (
         <div
-          className={procedureModalStyle.procedureCheckboxContainer}
-          style={{ marginTop: '64px' }}
+          // className={procedureModalStyle.procedureCheckboxContainer}
+          style={{ marginTop: '64px', marginBottom: '28px' }}
         >
-          <input
-            onChange={() => setCreateAnotherProcedure(!createAnotherProcedure)}
-            checked={createAnotherProcedure}
-            className={procedureModalStyle.checkbox}
-            id="another-procedure"
-            type="checkbox"
-          />
-          <label
-            className={procedureModalStyle.checkboxLabel}
-            htmlFor="another-procedure"
-          >
-            Create another procedure
+          <label className={departmentModalStyle.checkboxLabel}>
+            <span className="absolute top-[-2px]">
+              Create another sub category
+            </span>
+            <input
+              className={departmentModalStyle.checkboxStyle}
+              type="checkbox"
+              checked={createAnotherProcedure}
+              id="another-procedure"
+              onChange={() =>
+                setCreateAnotherProcedure((prevState) => !prevState)
+              }
+            />
+            <span className={departmentModalStyle.checkmark} />
           </label>
         </div>
       )}
       {isEdit ? (
         <button
-          className="flex w-[357px] items-center justify-center rounded-lg bg-darkteal px-6 py-3 font-poppins text-2xl font-normal text-white"
+          className={`${editProcedure.isPending ? 'cursor-not-allowed bg-darkteal/60' : 'cursor-pointer bg-darkteal'} flex w-[280px] items-center justify-center rounded-lg px-4 py-[15px]`}
           style={{ marginTop: '64px' }}
           type="submit"
         >
@@ -402,29 +453,33 @@ function CreateProcedureForm({
             <ClipLoader
               loading={editProcedure.isPending}
               color="#fff"
-              size={30}
+              size={20}
               aria-label="Loading Spinner"
               data-testid="loader"
             />
           ) : (
-            <span>Save changes</span>
+            <span className="font-poppins text-sm font-bold text-white">
+              Save changes
+            </span>
           )}
         </button>
       ) : (
         <button
-          className="flex w-[357px] items-center justify-center rounded-lg bg-darkteal px-6 py-3 font-poppins text-2xl font-normal text-white"
+          className={`${createProcedure.isPending ? 'cursor-not-allowed bg-darkteal/60' : 'cursor-pointer bg-darkteal'} flex w-[280px] items-center justify-center rounded-lg px-4 py-[15px]`}
           type="submit"
         >
           {createProcedure.isPending ? (
             <ClipLoader
               loading={createProcedure.isPending}
               color="#fff"
-              size={30}
+              size={20}
               aria-label="Loading Spinner"
               data-testid="loader"
             />
           ) : (
-            <span>Create procedure</span>
+            <span className="font-poppins text-sm font-bold text-white">
+              Create procedure
+            </span>
           )}
         </button>
       )}

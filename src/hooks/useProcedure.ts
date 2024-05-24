@@ -120,8 +120,9 @@ export const useCreateProcedure = () => {
     mutationFn: createProcedure,
     onSuccess: () => {
       queryClient.invalidateQueries({
-        queryKey: [`procedure`],
+        queryKey: [`department-with-procedure`],
       });
+      toast.success('Procedure created successfully');
     },
     onError: (error) => {
       toast(`Something went wrong: ${error.message}`);
@@ -158,6 +159,7 @@ export const useEditProcedure = () => {
       queryClient.invalidateQueries({
         queryKey: [`procedure`],
       });
+      toast.success('Procedure edited successfully');
     },
     onError: (error) => {
       toast(`Something went wrong: ${error.message}`);

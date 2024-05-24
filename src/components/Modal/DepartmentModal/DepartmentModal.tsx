@@ -144,7 +144,7 @@ function DepartmentModal({
         <div className={departmentModalStyle.modalOverlay}>
           <div className={departmentModalStyle.modal}>
             <div className={departmentModalStyle.modalHeader}>
-              <h2 className={departmentModalStyle.title}>
+              <h2 className="font-poppins text-lg font-semibold text-neutral-1">
                 {isEdit ? 'Edit department' : 'Create a department'}
               </h2>
 
@@ -164,7 +164,7 @@ function DepartmentModal({
               onSubmit={handleSubmit(onFormSubmit)}
               className={departmentModalStyle.modalBody}
             >
-              <label className={departmentModalStyle.departmentInputLabel}>
+              <label className="font-poppins text-base font-normal text-neutral-2">
                 Department name
               </label>
 
@@ -178,16 +178,18 @@ function DepartmentModal({
                       style={
                         data.language === activeLanguageTab
                           ? {
-                              border: '1px solid rgba(9, 111, 144, 1)',
+                              border: '2px solid rgba(9, 111, 144, 1)',
                               color: 'rgba(9, 111, 144, 1)',
                               backgroundColor: 'rgba(242, 250, 252, 1)',
                             }
                           : {}
                       }
                       type="button"
-                      className={`${errors[lang] && errors[lang]?.message ? '!border !border-error !text-error' : ''}`}
+                      className={`px-3 py-2 ${errors[lang] && errors[lang]?.message ? '!border !border-error !text-error' : ''}`}
                     >
-                      {data.language}
+                      <span className="font-poppins text-sm font-medium text-darkteal">
+                        {data.language}
+                      </span>
                     </button>
                   );
                 })}
@@ -201,7 +203,7 @@ function DepartmentModal({
                     <div key={c.countryCode} className="w-full">
                       {c.language === activeLanguageTab && (
                         <input
-                          className="w-full rounded-lg border-2 border-lightsilver p-4"
+                          className="w-full rounded-lg border-2 border-lightsilver px-4 py-3"
                           type="text"
                           placeholder="Enter department name"
                           {...register(lang)}
@@ -219,9 +221,11 @@ function DepartmentModal({
               </div>
 
               {!isEdit && (
-                <div className="mb-7 flex items-center">
+                <div className="relative mb-7 flex items-center">
                   <label className={departmentModalStyle.checkboxLabel}>
-                    Create another department
+                    <span className="absolute top-[-2px]">
+                      Create another department
+                    </span>
                     <input
                       className={departmentModalStyle.checkboxStyle}
                       type="checkbox"

@@ -8,6 +8,7 @@ import Select from 'react-select';
 import { ClipLoader } from 'react-spinners';
 import { z } from 'zod';
 
+import departmentModalStyle from '@/components/Modal/DepartmentModal/departmentModal.module.scss';
 import procedureModalStyle from '@/components/Modal/ProcedureModal/procedureModal.module.scss';
 import {
   useCreateDepartment,
@@ -24,6 +25,7 @@ import { departmentTypeSchema } from './CreateProcedureForm';
 interface CreateSubCategoryFormPropType {
   isEdit: boolean;
   updateId: string;
+  onClose: () => void;
 }
 
 export type SubCategoryFormSchemaType =
@@ -53,6 +55,7 @@ export type SubCategoryFormFields = z.infer<typeof subCategoryFormSchema>;
 function CreateSubCategoryForm({
   isEdit,
   updateId,
+  onClose,
 }: CreateSubCategoryFormPropType) {
   const [selectedOption, setSelectedOption] = React.useState<{
     label: string;
@@ -73,14 +76,16 @@ function CreateSubCategoryForm({
       allDepartment.data.data.length > 0
     ) {
       setDepartmentList(() =>
-        allDepartment.data.data.map((department) => ({
-          value: department.id,
-          label:
-            department.name.en ||
-            department.name.nb ||
-            department.name.sv ||
-            department.name.da,
-        })),
+        allDepartment.data.data
+          .filter((department) => !department.parentCategoryId)
+          .map((department) => ({
+            value: department.id,
+            label:
+              department.name.en ||
+              department.name.nb ||
+              department.name.sv ||
+              department.name.da,
+          })),
       );
     }
   }, [allDepartment.data, allDepartment.isSuccess]);
@@ -100,7 +105,6 @@ function CreateSubCategoryForm({
       },
       parentCategoryId: data.department.value,
     });
-    setCreateAnotherSubCategory(false);
     setActiveLanguageTab('English');
   };
   const handleEditSubCategory = (data: SubCategoryFormFields) => {
@@ -123,6 +127,7 @@ function CreateSubCategoryForm({
     handleSubmit,
     setValue,
     formState: { errors },
+    reset,
   } = useForm<SubCategoryFormFields>({
     resolver: zodResolver(subCategoryFormSchema),
   });
@@ -180,6 +185,29 @@ function CreateSubCategoryForm({
     return errors[lang] && errors[lang]?.message;
   });
 
+  React.useEffect(() => {
+    if (
+      createAnotherSubCategory &&
+      (createDepartment.isSuccess || editDepartment.isSuccess)
+    ) {
+      reset();
+      return;
+    }
+    if (
+      !createAnotherSubCategory &&
+      (createDepartment.isSuccess || editDepartment.isSuccess)
+    ) {
+      onClose();
+      reset();
+    }
+  }, [
+    createDepartment.isSuccess,
+    editDepartment.isSuccess,
+    createAnotherSubCategory,
+    reset,
+    onClose,
+  ]);
+
   return (
     <form
       onSubmit={handleSubmit(onFormSubmit)}
@@ -187,9 +215,9 @@ function CreateSubCategoryForm({
     >
       <label
         style={{ display: 'block', marginBottom: '8px' }}
-        className={procedureModalStyle.departmentInputLabel}
+        className="font-poppins text-base font-normal text-neutral-2"
       >
-        Department name
+        Choose Department name
       </label>
 
       <Controller
@@ -222,7 +250,7 @@ function CreateSubCategoryForm({
       )}
       <p
         style={{ display: 'block', marginTop: '24px' }}
-        className={procedureModalStyle.subCategoryInputLabel}
+        className="font-poppins text-base font-normal text-neutral-2"
       >
         Sub-category
       </p>
@@ -236,14 +264,25 @@ function CreateSubCategoryForm({
             <button
               key={data.locale}
               onClick={() => setActiveLanguageTab(data.language)}
+              style={
+                data.language === activeLanguageTab
+                  ? {
+                      border: '2px solid rgba(9, 111, 144, 1)',
+                      color: 'rgba(9, 111, 144, 1)',
+                      backgroundColor: 'rgba(242, 250, 252, 1)',
+                    }
+                  : {}
+              }
               className={
                 activeLanguageTab === data.language
-                  ? `${procedureModalStyle.activeLanguageTab}  ${errors[lang] && errors[lang]?.message ? '!border !border-error !text-error' : ''}`
+                  ? `px-3 py-2 ${procedureModalStyle.activeLanguageTab}  ${errors[lang] && errors[lang]?.message ? '!border-2 !border-error !text-error' : ''}`
                   : ''
               }
               type="button"
             >
-              {data.language}
+              <span className="font-poppins text-sm font-medium text-darkteal">
+                {data.language}
+              </span>
             </button>
           );
         })}
@@ -255,7 +294,7 @@ function CreateSubCategoryForm({
           <div key={c.countryCode}>
             {c.language === activeLanguageTab && (
               <input
-                className={procedureModalStyle.procedureInput}
+                className="w-full rounded-lg border-2 border-lightsilver px-4 py-3"
                 type="text"
                 placeholder="Enter sub-category"
                 {...register(lang)}
@@ -271,59 +310,61 @@ function CreateSubCategoryForm({
       )}
 
       {!isEdit && (
-        <div
-          className={`${procedureModalStyle.procedureCheckboxContainer} mt-16`}
-        >
-          <input
-            onChange={() =>
-              setCreateAnotherSubCategory(!createAnotherSubCategory)
-            }
-            checked={createAnotherSubCategory}
-            className={procedureModalStyle.checkbox}
-            type="checkbox"
-            id="sub-cat-radio"
-          />
-          <label
-            className={procedureModalStyle.checkboxLabel}
-            htmlFor="sub-cat-radio"
-          >
-            Create another sub category
+        <div className="mb-7 mt-16">
+          <label className={departmentModalStyle.checkboxLabel}>
+            <span className="absolute top-[-2px]">
+              Create another sub category
+            </span>
+            <input
+              className={departmentModalStyle.checkboxStyle}
+              type="checkbox"
+              checked={createAnotherSubCategory}
+              id="sub-cat-radio"
+              onChange={() =>
+                setCreateAnotherSubCategory((prevState) => !prevState)
+              }
+            />
+            <span className={departmentModalStyle.checkmark} />
           </label>
         </div>
       )}
 
       {isEdit ? (
         <button
-          className="mt-5 flex w-[357px] items-center justify-center rounded-lg bg-darkteal px-6 py-3 font-poppins text-2xl font-normal text-white"
+          className={`${editDepartment.isPending ? 'cursor-not-allowed bg-darkteal/60' : 'cursor-pointer bg-darkteal'} flex w-[280px] items-center justify-center rounded-lg px-4 py-[15px]`}
           type="submit"
         >
           {editDepartment.isPending ? (
             <ClipLoader
               loading={editDepartment.isPending}
               color="#fff"
-              size={30}
+              size={20}
               aria-label="Loading Spinner"
               data-testid="loader"
             />
           ) : (
-            <span>Save changes</span>
+            <span className="font-poppins text-sm font-bold text-white">
+              Save changes
+            </span>
           )}
         </button>
       ) : (
         <button
-          className="mb-5 flex w-[357px] items-center justify-center rounded-lg bg-darkteal px-6 py-3 font-poppins text-2xl font-normal text-white"
+          className={`${createDepartment.isPending ? 'cursor-not-allowed bg-darkteal/60' : 'cursor-pointer bg-darkteal'} flex w-[280px] items-center justify-center rounded-lg px-4 py-[15px]`}
           type="submit"
         >
           {createDepartment.isPending ? (
             <ClipLoader
               loading={createDepartment.isPending}
               color="#fff"
-              size={30}
+              size={20}
               aria-label="Loading Spinner"
               data-testid="loader"
             />
           ) : (
-            <span>Create sub category</span>
+            <span className="font-poppins text-sm font-bold text-white">
+              Create sub category
+            </span>
           )}
         </button>
       )}

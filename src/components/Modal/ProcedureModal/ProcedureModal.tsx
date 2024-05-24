@@ -1,3 +1,4 @@
+/* eslint-disable jsx-a11y/control-has-associated-label */
 /* eslint-disable import/no-cycle */
 
 'use client';
@@ -5,12 +6,11 @@
 /* eslint-disable jsx-a11y/label-has-associated-control */
 /* eslint-disable no-nested-ternary */
 
-import Image from 'next/image';
 import { useEffect, useState } from 'react';
 
 import CreateProcedureForm from '@/app/procedures/CreateProcedureForm/CreateProcedureForm';
 import CreateSubCategoryForm from '@/app/procedures/CreateProcedureForm/CreateSubCategoryForm';
-import closeIcon from '@/public/assets/icons/close.svg';
+import { CloseIcon } from '@/components/Icons/Icons';
 
 import procedureModalStyle from './procedureModal.module.scss';
 
@@ -32,7 +32,7 @@ function ProcedureModal({
   editSubCategory,
   updateId,
 }: DepartmentModalProps) {
-  const [radioType, setRadioType] = useState<'SUBCAT' | 'PROC' | ''>('SUBCAT');
+  const [radioType, setRadioType] = useState<'SUBCAT' | 'PROC' | ''>(SUBCAT);
 
   useEffect(() => {
     if (isEdit) {
@@ -43,13 +43,14 @@ function ProcedureModal({
       setRadioType(PROC);
     }
   }, [isEdit, editSubCategory]);
+
   return (
     <div>
       {isOpen && (
         <div className={procedureModalStyle.modalOverlay}>
           <div className={procedureModalStyle.modal}>
             <div className={procedureModalStyle.modalHeader}>
-              <h2 className={procedureModalStyle.title}>
+              <h2 className="font-poppins text-lg font-semibold text-neutral-1">
                 {!isEdit
                   ? radioType === PROC
                     ? 'Create a procedure'
@@ -60,69 +61,27 @@ function ProcedureModal({
               </h2>
 
               <button
-                onClick={onClose}
                 type="button"
                 className="cursor-pointer"
+                onClick={onClose}
               >
-                <Image
-                  src={closeIcon}
-                  alt="modal close icon"
-                  width={24}
-                  height={24}
-                />
+                <CloseIcon className="mb-2 size-6" strokeWidth={1.7} />
               </button>
             </div>
 
             <div className={procedureModalStyle.modalBody}>
               {!isEdit && (
-                // <FbtRadioGroup
-                //   defaultValue={radioType}
-                //   className="!mb-6 !flex !items-center"
-                // >
-                //   <div className="mr-14 flex items-center space-x-2">
-                //     <FbtRadioGroupItem
-                //       value={radioType}
-                //       className={procedureModalStyle.radio}
-                //       onChange={() => setRadioType(PROC)}
-                //       id={radioType}
-                //     />
-                //     <FbtLabel
-                //       className={procedureModalStyle.radioLabel}
-                //       htmlFor={radioType}
-                //     >
-                //       Create procedure
-                //     </FbtLabel>
-                //   </div>
-                //   <div className="flex items-center space-x-2">
-                //     <FbtRadioGroupItem
-                //       value={radioType}
-                //       className={procedureModalStyle.radio}
-                //       onChange={() => setRadioType(SUBCAT)}
-                //       id={radioType}
-                //     />
-                //     <FbtLabel
-                //       className={procedureModalStyle.radioLabel}
-                //       htmlFor={radioType}
-                //     >
-                //       Create sub category
-                //     </FbtLabel>
-                //   </div>
-                // </FbtRadioGroup>
                 <div className={procedureModalStyle.radioSelectContainer}>
                   <div className={procedureModalStyle.radioWrapper}>
                     <input
                       checked={radioType === PROC}
-                      className={procedureModalStyle.radio}
+                      className="size-5"
                       type="radio"
                       onChange={() => setRadioType(PROC)}
-                      id={PROC}
-                      name={PROC}
+                      id="PROC"
                       value={radioType}
                     />
-                    <label
-                      className={procedureModalStyle.radioLabel}
-                      htmlFor={PROC}
-                    >
+                    <label className="font-poppins text-base font-medium text-neutral-2">
                       Create procedure
                     </label>
                   </div>
@@ -130,27 +89,32 @@ function ProcedureModal({
                   <div className={procedureModalStyle.radioWrapper}>
                     <input
                       checked={radioType === SUBCAT}
-                      className={procedureModalStyle.radio}
+                      className="size-5"
                       type="radio"
                       onChange={() => setRadioType(SUBCAT)}
-                      id={SUBCAT}
-                      name={SUBCAT}
+                      id="SUBCAT"
                       value={radioType}
                     />
-                    <label
-                      className={procedureModalStyle.radioLabel}
-                      htmlFor={SUBCAT}
-                    >
+
+                    <label className="font-poppins text-base font-medium text-neutral-2">
                       Create sub category
                     </label>
                   </div>
                 </div>
               )}
               {radioType === SUBCAT && (
-                <CreateSubCategoryForm isEdit={isEdit} updateId={updateId} />
+                <CreateSubCategoryForm
+                  isEdit={isEdit}
+                  updateId={updateId}
+                  onClose={onClose}
+                />
               )}
               {radioType === PROC && (
-                <CreateProcedureForm isEdit={isEdit} updateId={updateId} />
+                <CreateProcedureForm
+                  isEdit={isEdit}
+                  updateId={updateId}
+                  onClose={onClose}
+                />
               )}
             </div>
           </div>

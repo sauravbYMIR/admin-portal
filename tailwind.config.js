@@ -60,6 +60,7 @@ module.exports = {
         lightskyblue: 'rgba(61, 161, 194, 1)',
         'primary-6': 'rgba(242, 250, 252, 1)',
         lightsilver: 'rgba(217, 222, 231, 1)',
+        checkboxborder: 'rgba(100, 100, 106, 1)',
         black18: 'rgba(18, 15, 28, 1)',
       },
       fontFamily: {

@@ -171,7 +171,11 @@ function LoginWithOtp() {
     try {
       const response = await verifyOTP({ otp, email });
       if (!response.success) {
-        toast.error('Incorrect otp');
+        toast.error(
+          SERVER_ERROR_MESSAGE[
+            response.message as keyof typeof SERVER_ERROR_MESSAGE
+          ],
+        );
         return;
       }
       if (response.success) {
@@ -182,10 +186,6 @@ function LoginWithOtp() {
         handleSetLocalStorage({
           tokenKey: 'refresh_token',
           tokenValue: response.refreshToken,
-        });
-        handleSetLocalStorage({
-          tokenKey: 'user_id',
-          tokenValue: response.userId,
         });
         router.push('/patients');
       }
@@ -202,6 +202,7 @@ function LoginWithOtp() {
     }
     setIsDisableResendBtn(true);
     setIsOtpResendLoading(true);
+    setIsTimeElapsed(false);
     try {
       const r = await resendOTP({ email });
       if (r.success) {

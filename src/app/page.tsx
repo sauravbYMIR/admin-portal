@@ -13,7 +13,7 @@ import style from './page.module.scss';
 
 function LandingPage() {
   return (
-    <div className="flex w-screen justify-between">
+    <div className="flex h-screen w-screen justify-between overflow-y-hidden">
       <div className="flex flex-1 items-center justify-center">
         <Login />
       </div>

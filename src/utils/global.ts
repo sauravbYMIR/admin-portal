@@ -99,6 +99,8 @@ const SERVER_ERROR_MESSAGE = {
   'otp-verification-failed': 'Otp verification failed',
   'resend-otp-successful': 'Resend otp successful',
   'send-otp-successful': 'Send otp successful',
+  'otp-verify-failed': 'otp verify failed',
+  'Incorrect-otp': 'Incorrect otp',
 };
 
 export {

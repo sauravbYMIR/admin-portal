@@ -1,19 +1,21 @@
+/* eslint-disable @typescript-eslint/no-unused-expressions */
+/* eslint-disable jsx-a11y/control-has-associated-label */
+
 'use client';
 
 /* eslint-disable jsx-a11y/label-has-associated-control */
 import { zodResolver } from '@hookform/resolvers/zod';
-import Image from 'next/image';
 import React, { useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { ClipLoader } from 'react-spinners';
 import { z } from 'zod';
 
+import { CloseIcon } from '@/components/Icons/Icons';
 import {
   useCreateDepartment,
   useEditDepartment,
   useGetDepartmentById,
 } from '@/hooks/useDepartment';
-import closeIcon from '@/public/assets/icons/close.svg';
 import type { LanguagesType } from '@/types/components';
 import { countryData } from '@/utils/global';
 
@@ -48,6 +50,7 @@ const DepartmentFormSchema = z.object({
 });
 export type DepartmentFormFields = z.infer<typeof DepartmentFormSchema>;
 
+export type DeptNameFormSchemaType = 'nameEn' | 'nameDa' | 'nameSv' | 'nameNb';
 interface DepartmentModalProps {
   isOpen: boolean;
   onClose: () => void;
@@ -61,11 +64,18 @@ function DepartmentModal({
   isEdit,
   updateId,
 }: DepartmentModalProps) {
+  const deptObj = {
+    English: 'nameEn',
+    Norwegian: 'nameNb',
+    Danish: 'nameDa',
+    Swedish: 'nameSv',
+  };
   const {
     register,
     handleSubmit,
     setValue,
     formState: { errors },
+    reset,
   } = useForm<DepartmentFormFields>({
     resolver: zodResolver(DepartmentFormSchema),
   });
@@ -74,6 +84,7 @@ function DepartmentModal({
   const reqdDept = useGetDepartmentById({ id: updateId });
   const [activeLanguageTab, setActiveLanguageTab] =
     useState<LanguagesType>('English');
+  const [isChecked, setIsChecked] = useState<boolean>(false);
 
   const shouldRenderProcedureError = countryData.some((c) => {
     const lang = departmentObj[c.language] as DepartmentFormSchemaType;
@@ -84,7 +95,7 @@ function DepartmentModal({
     if (isEdit) {
       editDept.mutate({
         name: {
-          en: data.nameDa,
+          en: data.nameEn,
           nb: data.nameNb,
           sv: data.nameSv,
           da: data.nameDa,
@@ -94,7 +105,7 @@ function DepartmentModal({
     } else {
       createDept.mutate({
         name: {
-          en: data.nameDa,
+          en: data.nameEn,
           nb: data.nameNb,
           sv: data.nameSv,
           da: data.nameDa,
@@ -116,6 +127,16 @@ function DepartmentModal({
       setValue('nameNb', reqdDept.data.data.name.nb);
     }
   }, [reqdDept.data, reqdDept.isSuccess, setValue, updateId]);
+  React.useEffect(() => {
+    if (isChecked && (createDept.isSuccess || editDept.isSuccess)) {
+      reset();
+      return;
+    }
+    if (!isChecked && (createDept.isSuccess || editDept.isSuccess)) {
+      reset();
+      onClose();
+    }
+  }, [createDept.isSuccess, editDept.isSuccess, isChecked, onClose, reset]);
 
   return (
     <div>
@@ -127,14 +148,16 @@ function DepartmentModal({
                 {isEdit ? 'Edit department' : 'Create a department'}
               </h2>
 
-              <Image
-                className={departmentModalStyle.closeButton}
-                src={closeIcon}
-                alt="modal close icon"
-                width={24}
-                height={24}
-                onClick={onClose}
-              />
+              <button
+                type="button"
+                className="cursor-pointer"
+                onClick={() => {
+                  reset();
+                  onClose();
+                }}
+              >
+                <CloseIcon className="mb-2 size-6" strokeWidth={1.7} />
+              </button>
             </div>
 
             <form
@@ -147,91 +170,103 @@ function DepartmentModal({
 
               <div className={departmentModalStyle.languageTabContainer}>
                 {countryData.map((data) => {
+                  const lang = deptObj[data.language] as DeptNameFormSchemaType;
                   return (
                     <button
                       key={data.locale}
                       onClick={() => setActiveLanguageTab(data.language)}
-                      className={
-                        activeLanguageTab === data.language
-                          ? departmentModalStyle.activeLanguageTab
-                          : ''
+                      style={
+                        data.language === activeLanguageTab
+                          ? {
+                              border: '1px solid rgba(9, 111, 144, 1)',
+                              color: 'rgba(9, 111, 144, 1)',
+                              backgroundColor: 'rgba(242, 250, 252, 1)',
+                            }
+                          : {}
                       }
                       type="button"
+                      className={`${errors[lang] && errors[lang]?.message ? '!border !border-error !text-error' : ''}`}
                     >
                       {data.language}
                     </button>
                   );
                 })}
               </div>
-              {countryData.map((c) => {
-                const lang = departmentObj[
-                  c.language
-                ] as DepartmentFormSchemaType;
-                return (
-                  <div key={c.countryCode}>
-                    {c.language === activeLanguageTab && (
-                      <input
-                        className={departmentModalStyle.departmentInput}
-                        type="text"
-                        placeholder="Enter department"
-                        {...register(lang)}
-                      />
-                    )}
+              <div className="mb-10 flex w-full flex-col items-start">
+                {countryData.map((c) => {
+                  const lang = departmentObj[
+                    c.language
+                  ] as DepartmentFormSchemaType;
+                  return (
+                    <div key={c.countryCode} className="w-full">
+                      {c.language === activeLanguageTab && (
+                        <input
+                          className="w-full rounded-lg border-2 border-lightsilver p-4"
+                          type="text"
+                          placeholder="Enter department name"
+                          {...register(lang)}
+                        />
+                      )}
+                    </div>
+                  );
+                })}
+                {shouldRenderProcedureError && (
+                  <div className="mb-5 mt-1 text-start font-lexend text-base font-normal text-error">
+                    Fill in details in all the languages for in all the
+                    departments
                   </div>
-                );
-              })}
-              {shouldRenderProcedureError && (
-                <div className="mb-5 mt-1 text-start font-lexend text-base font-normal text-error">
-                  Fill in details in all the languages
-                </div>
-              )}
+                )}
+              </div>
 
               {!isEdit && (
-                <div
-                  className={departmentModalStyle.departmentCheckboxContainer}
-                >
-                  <input
-                    className={departmentModalStyle.checkbox}
-                    type="checkbox"
-                  />
+                <div className="mb-7 flex items-center">
                   <label className={departmentModalStyle.checkboxLabel}>
                     Create another department
+                    <input
+                      className={departmentModalStyle.checkboxStyle}
+                      type="checkbox"
+                      checked={isChecked}
+                      onChange={() => setIsChecked((prevState) => !prevState)}
+                    />
+                    <span className={departmentModalStyle.checkmark} />
                   </label>
                 </div>
               )}
 
               {isEdit ? (
                 <button
-                  className={departmentModalStyle.createDepartmentBtn}
+                  className={`${editDept.isPending ? 'cursor-not-allowed bg-darkteal/60' : 'cursor-pointer bg-darkteal'} flex w-[280px] items-center justify-center rounded-lg px-4 py-[15px]`}
                   type="submit"
                 >
                   {editDept.isPending ? (
                     <ClipLoader
                       loading={editDept.isPending}
                       color="#fff"
-                      size={30}
+                      size={20}
                       aria-label="Loading Spinner"
                       data-testid="loader"
                     />
                   ) : (
-                    <p className={departmentModalStyle.btnText}>Save changes</p>
+                    <p className="font-poppins text-sm font-bold text-white">
+                      Save changes
+                    </p>
                   )}
                 </button>
               ) : (
                 <button
-                  className={departmentModalStyle.createDepartmentBtn}
+                  className={`${createDept.isPending ? 'cursor-not-allowed bg-darkteal/60' : 'cursor-pointer bg-darkteal'} flex w-[280px] items-center justify-center rounded-lg px-4 py-[15px]`}
                   type="submit"
                 >
                   {createDept.isPending ? (
                     <ClipLoader
                       loading={createDept.isPending}
                       color="#fff"
-                      size={30}
+                      size={20}
                       aria-label="Loading Spinner"
                       data-testid="loader"
                     />
                   ) : (
-                    <p className={departmentModalStyle.btnText}>
+                    <p className="font-poppins text-sm font-bold text-white">
                       Create department
                     </p>
                   )}

@@ -206,6 +206,7 @@ function AddProcedure() {
               editClickHandler={() => setEditDepartmentModalOpen(true)}
               key={procedureData.id}
               title={procedureData.name.en}
+              type="DEPARTMENT"
             >
               {procedureData.procedures.length > 0 && (
                 <div className={proceduresStyle.proceduresAccordionContainer}>
@@ -217,6 +218,7 @@ function AddProcedure() {
                         }}
                         key={procedure.id}
                         title={procedure.name.en}
+                        type="PROCEDURE"
                       >
                         <div>
                           {Object.entries(procedure.reimbursement).map(
@@ -265,6 +267,7 @@ function AddProcedure() {
                                 <Accordion
                                   key={procedure.id}
                                   title={procedure.name.en}
+                                  type="SUB-CATEGORY"
                                 >
                                   <div>
                                     {Object.entries(

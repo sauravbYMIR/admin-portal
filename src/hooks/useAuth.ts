@@ -9,7 +9,7 @@ export type VerifyOtpResponse = {
   success: boolean;
   accessToken: string;
   refreshToken: string;
-  userId: string;
+  message: string;
 };
 export type ServerError = {
   response: {
@@ -97,14 +97,21 @@ export const verifyOTP = async ({
       success: response.data.success,
       accessToken: response.data.accessToken,
       refreshToken: response.data.refreshToken,
-      userId: response.data.userId,
+      message: 'user-verify-successful',
     };
   } catch (err) {
     if (axios.isAxiosError(err)) {
       const serverError = err as AxiosError<ServerError>;
-
       if (serverError && serverError.response) {
-        throw new Error('otp-verify-failed');
+        const errMsg = serverError.response as unknown as {
+          data: { error: { message: string } };
+        };
+        return {
+          success: false,
+          message: errMsg.data.error.message,
+          accessToken: '',
+          refreshToken: '',
+        };
       }
     }
     throw new Error('otp-verify-failed');

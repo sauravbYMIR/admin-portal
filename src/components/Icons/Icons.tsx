@@ -1,13 +1,21 @@
 import React from 'react';
 
-function CloseIcon({ className }: { className?: string }) {
+function CloseIcon({
+  className,
+  stroke,
+  strokeWidth,
+}: {
+  className?: string;
+  stroke?: string;
+  strokeWidth?: number;
+}) {
   return (
     <svg
       xmlns="http://www.w3.org/2000/svg"
       fill="none"
       viewBox="0 0 24 24"
-      strokeWidth={1.5}
-      stroke="currentColor"
+      strokeWidth={strokeWidth ?? 1.5}
+      stroke={stroke ?? 'currentColor'}
       className={className ?? 'size-6'}
     >
       <path
@@ -39,16 +47,18 @@ function BackArrowIcon({ className }: { className?: string }) {
 function PlusIcon({
   className,
   stroke,
+  strokeWidth,
 }: {
   className?: string;
   stroke?: string;
+  strokeWidth?: number;
 }) {
   return (
     <svg
       xmlns="http://www.w3.org/2000/svg"
       fill="none"
       viewBox="0 0 24 24"
-      strokeWidth={1.5}
+      strokeWidth={strokeWidth ?? 2}
       stroke={stroke ?? 'currentColor'}
       className={className ?? 'size-6'}
     >
@@ -60,14 +70,22 @@ function PlusIcon({
     </svg>
   );
 }
-function MinusIcon({ className }: { className?: string }) {
+function MinusIcon({
+  className,
+  stroke,
+  strokeWidth,
+}: {
+  className?: string;
+  stroke?: string;
+  strokeWidth?: number;
+}) {
   return (
     <svg
       xmlns="http://www.w3.org/2000/svg"
       fill="none"
       viewBox="0 0 24 24"
-      strokeWidth={1.5}
-      stroke="currentColor"
+      strokeWidth={strokeWidth ?? 2}
+      stroke={stroke ?? 'currentColor'}
       className={className ?? 'size-6'}
     >
       <path strokeLinecap="round" strokeLinejoin="round" d="M5 12h14" />

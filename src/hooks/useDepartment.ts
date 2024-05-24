@@ -129,6 +129,7 @@ export const useCreateDepartment = () => {
       queryClient.invalidateQueries({
         queryKey: [`department-with-procedure`],
       });
+      toast.success('Department created successfully');
     },
     onError: (error) => {
       toast(`Something went wrong: ${error.message}`);
@@ -179,8 +180,9 @@ export const useEditDepartment = () => {
     mutationFn: editDepartment,
     onSuccess: () => {
       queryClient.invalidateQueries({
-        queryKey: [`department-with-procedure`, `department`],
+        queryKey: [`department-with-procedure`],
       });
+      toast.success('Department edited successfully');
     },
     onError: (error) => {
       toast(`Something went wrong: ${error.message}`);

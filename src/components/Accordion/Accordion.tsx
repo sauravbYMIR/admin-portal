@@ -7,20 +7,21 @@ import collapseIcon from '@/public/assets/icons/collapseCircle.svg';
 import editIcon from '@/public/assets/icons/edit.svg';
 import expandIcon from '@/public/assets/icons/expandCircle.svg';
 
+import { MinusIcon, PlusIcon } from '../Icons/Icons';
 import accordionStyles from './accordion.module.scss';
 
 interface AccordionProps {
   children: ReactNode;
   title: string;
   editClickHandler?: () => void;
-  // type: 'DEPARTMENT' | 'PROCEDURE' | 'SUB-CATEGORY';
+  type: 'DEPARTMENT' | 'PROCEDURE' | 'SUB-CATEGORY';
 }
 
 function Accordion({
   children,
   title,
   editClickHandler,
-  // type,
+  type,
 }: AccordionProps) {
   const [isOpen, setIsOpen] = useState(false);
 
@@ -31,31 +32,51 @@ function Accordion({
   return (
     <div className={accordionStyles.accordionContainer}>
       <div className={accordionStyles.headerContainer}>
-        <div className={accordionStyles.headerContentWrapper}>
-          <button
-            onClick={toggleAccordion}
-            className="cursor-pointer"
-            type="button"
-          >
+        <button
+          type="button"
+          onClick={toggleAccordion}
+          className={accordionStyles.headerContentWrapper}
+        >
+          <div className="cursor-pointer">
             {isOpen ? (
-              <Image
-                src={collapseIcon}
-                alt="collapse accordion icon"
-                width={13.34}
-                height={13.34}
-              />
+              <div>
+                {type === 'PROCEDURE' ? (
+                  <MinusIcon
+                    className="size-[11.67px]"
+                    stroke="rgba(9, 111, 144, 1)"
+                    strokeWidth={4}
+                  />
+                ) : (
+                  <Image
+                    src={collapseIcon}
+                    alt="collapse accordion icon"
+                    width={13.34}
+                    height={13.34}
+                  />
+                )}
+              </div>
             ) : (
-              <Image
-                onClick={toggleAccordion}
-                src={expandIcon}
-                alt="expand accordion icon"
-                width={13.34}
-                height={13.34}
-              />
+              <div>
+                {type === 'PROCEDURE' ? (
+                  <PlusIcon
+                    className="size-[11.67px]"
+                    stroke="rgba(9, 111, 144, 1)"
+                    strokeWidth={4}
+                  />
+                ) : (
+                  <Image
+                    onClick={toggleAccordion}
+                    src={expandIcon}
+                    alt="expand accordion icon"
+                    width={13.34}
+                    height={13.34}
+                  />
+                )}
+              </div>
             )}
-          </button>
+          </div>
           <p className="font-poppins text-base text-black18">{title}</p>
-        </div>
+        </button>
         <button type="button" className="cursor-pointer">
           <Image
             width={16}

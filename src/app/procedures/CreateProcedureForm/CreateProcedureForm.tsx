@@ -152,7 +152,6 @@ function CreateProcedureForm({
         sv: Number(data.reimbursementSv),
       },
     });
-    setCreateAnotherProcedure(false);
     setActiveLanguageTab('English');
   };
   const handleEditProcedure = (data: ProcedureFormFields) => {
@@ -293,7 +292,7 @@ function CreateProcedureForm({
         style={{ marginBottom: '8px', display: 'block' }}
         className="font-poppins text-base font-normal text-neutral-2"
       >
-        Department name/ Sub-category
+        Choose Department name/ Sub-category
       </p>
       <Controller
         name="department"
@@ -360,7 +359,9 @@ function CreateProcedureForm({
                 className="w-full rounded-lg border-2 border-lightsilver px-4 py-3"
                 style={{ marginBottom: '4px' }}
                 type="text"
-                placeholder="Enter procedure"
+                // eslint-disable-next-line jsx-a11y/no-autofocus
+                autoFocus
+                placeholder="Enter procedure name"
                 {...register(lang)}
               />
             )}
@@ -382,15 +383,21 @@ function CreateProcedureForm({
           const lang = reimburismentObj[
             data.language
           ] as ProcedureFormSchemaType;
-
           return (
             <div key={data.locale} className="mb-3 mt-[10px]">
               <div className={procedureModalStyle.procedureReimbursementInput}>
-                <div className={procedureModalStyle.inputWrapper}>
+                <div
+                  className={procedureModalStyle.inputWrapper}
+                  style={
+                    errors[lang] && errors[lang]?.message
+                      ? { border: '1.5px solid rgba(203, 0, 25, 1)' }
+                      : { border: '1.5px solid rgba(217, 222, 231, 1)' }
+                  }
+                >
                   <div
                     className={`${procedureModalStyle.countryCodeWrapper} ${
                       errors[lang] && errors[lang]?.message
-                        ? 'rounded-s-lg border-y-2 border-s-2 border-error'
+                        ? 'rounded-s-lg border-y-[1.48px] border-s-[0.5px] border-error'
                         : 'rounded-lg border border-primary-6'
                     }`}
                   >
@@ -408,7 +415,8 @@ function CreateProcedureForm({
                     type="text"
                     {...register(lang)}
                     id="reimbursement"
-                    className={`${errors[lang] && errors[lang]?.message ? 'border-2 border-error' : ''} w-full rounded-lg border-2 border-lightsilver px-4 py-3`}
+                    placeholder={`Reimbursement for ${data.name}`}
+                    className={`${errors[lang] && errors[lang]?.message ? '!border-2 !border-error' : '!border-2 !border-lightsilver'} w-full rounded-lg px-4 py-3 placeholder:font-lexend placeholder:text-sm placeholder:font-light placeholder:text-neutral-4`}
                   />
                 </div>
                 {errors[lang] && (
@@ -422,13 +430,10 @@ function CreateProcedureForm({
         })}
       </div>
       {!isEdit && (
-        <div
-          // className={procedureModalStyle.procedureCheckboxContainer}
-          style={{ marginTop: '64px', marginBottom: '28px' }}
-        >
+        <div style={{ marginTop: '64px', marginBottom: '28px' }}>
           <label className={departmentModalStyle.checkboxLabel}>
             <span className="absolute top-[-2px]">
-              Create another sub category
+              Create another procedure
             </span>
             <input
               className={departmentModalStyle.checkboxStyle}

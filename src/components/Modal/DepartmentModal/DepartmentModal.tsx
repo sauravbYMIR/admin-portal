@@ -79,7 +79,7 @@ function DepartmentModal({
   } = useForm<DepartmentFormFields>({
     resolver: zodResolver(DepartmentFormSchema),
   });
-  const createDept = useCreateDepartment();
+  const createDept = useCreateDepartment({ isCreateSubCategory: false });
   const editDept = useEditDepartment();
   const reqdDept = useGetDepartmentById({ id: updateId });
   const [activeLanguageTab, setActiveLanguageTab] =
@@ -205,6 +205,8 @@ function DepartmentModal({
                         <input
                           className="w-full rounded-lg border-2 border-lightsilver px-4 py-3"
                           type="text"
+                          // eslint-disable-next-line jsx-a11y/no-autofocus
+                          autoFocus
                           placeholder="Enter department name"
                           {...register(lang)}
                         />
@@ -214,8 +216,7 @@ function DepartmentModal({
                 })}
                 {shouldRenderProcedureError && (
                   <div className="mb-5 mt-1 text-start font-lexend text-base font-normal text-error">
-                    Fill in details in all the languages for in all the
-                    departments
+                    Fill in details in all the languages
                   </div>
                 )}
               </div>

@@ -31,7 +31,17 @@ function Accordion({
 
   return (
     <div className={accordionStyles.accordionContainer}>
-      <div className={accordionStyles.headerContainer}>
+      <div
+        className={accordionStyles.headerContainer}
+        style={
+          type === 'PROCEDURE' && isOpen
+            ? {
+                backgroundColor: 'rgba(225, 247, 254, 1)',
+                border: '1px solid rgba(225, 247, 254, 1)',
+              }
+            : {}
+        }
+      >
         <button
           type="button"
           onClick={toggleAccordion}

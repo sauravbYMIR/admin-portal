@@ -73,31 +73,30 @@ function ProcedureModal({
               {!isEdit && (
                 <div className={procedureModalStyle.radioSelectContainer}>
                   <div className={procedureModalStyle.radioWrapper}>
-                    <input
-                      checked={radioType === PROC}
-                      className="size-5"
-                      type="radio"
-                      onChange={() => setRadioType(PROC)}
-                      id="PROC"
-                      value={radioType}
-                    />
-                    <label className="font-poppins text-base font-medium text-neutral-2">
-                      Create procedure
+                    <label className="flex items-center gap-x-2 font-poppins text-base font-medium text-neutral-2">
+                      <input
+                        checked={radioType === PROC}
+                        className="size-5"
+                        type="radio"
+                        onChange={() => setRadioType(PROC)}
+                        id="PROC"
+                        value={radioType}
+                      />
+                      <p>Create procedure</p>
                     </label>
                   </div>
 
                   <div className={procedureModalStyle.radioWrapper}>
-                    <input
-                      checked={radioType === SUBCAT}
-                      className="size-5"
-                      type="radio"
-                      onChange={() => setRadioType(SUBCAT)}
-                      id="SUBCAT"
-                      value={radioType}
-                    />
-
-                    <label className="font-poppins text-base font-medium text-neutral-2">
-                      Create sub category
+                    <label className="flex items-center gap-x-2 font-poppins text-base font-medium text-neutral-2">
+                      <input
+                        checked={radioType === SUBCAT}
+                        className="size-5"
+                        type="radio"
+                        onChange={() => setRadioType(SUBCAT)}
+                        id="SUBCAT"
+                        value={radioType}
+                      />
+                      <p>Create sub category</p>
                     </label>
                   </div>
                 </div>

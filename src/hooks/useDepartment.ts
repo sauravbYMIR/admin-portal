@@ -121,7 +121,11 @@ export const createDepartment = async ({
   };
 };
 
-export const useCreateDepartment = () => {
+export const useCreateDepartment = ({
+  isCreateSubCategory,
+}: {
+  isCreateSubCategory: boolean;
+}) => {
   const queryClient = useQueryClient();
   return useMutation({
     mutationFn: createDepartment,
@@ -129,7 +133,11 @@ export const useCreateDepartment = () => {
       queryClient.invalidateQueries({
         queryKey: [`department-with-procedure`],
       });
-      toast.success('Department created successfully');
+      if (isCreateSubCategory) {
+        toast.success('Sub-category created successfully!');
+      } else {
+        toast.success('Department created successfully!');
+      }
     },
     onError: (error) => {
       toast(`Something went wrong: ${error.message}`);

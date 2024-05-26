@@ -63,7 +63,7 @@ function CreateSubCategoryForm({
   } | null>(null);
   const reqdDept = useGetDepartmentById({ id: updateId });
   const editDepartment = useEditDepartment();
-  const createDepartment = useCreateDepartment();
+  const createDepartment = useCreateDepartment({ isCreateSubCategory: true });
   const allDepartment = useGetAllDepartment();
   const [departmentList, setDepartmentList] = useState<Array<DepartmentType>>(
     [],
@@ -296,7 +296,7 @@ function CreateSubCategoryForm({
               <input
                 className="w-full rounded-lg border-2 border-lightsilver px-4 py-3"
                 type="text"
-                placeholder="Enter sub-category"
+                placeholder="Enter sub-category name"
                 {...register(lang)}
               />
             )}

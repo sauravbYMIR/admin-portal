@@ -317,9 +317,9 @@ function AddHospitalProcedure({ params }: { params: { id: string } }) {
         <button
           type="button"
           onClick={() => router.push('/hospitals')}
-          className="cursor-pointer border-none"
+          className="flex size-10 cursor-pointer items-center justify-center rounded-full border-none bg-rgba244"
         >
-          <BackArrowIcon />
+          <BackArrowIcon strokeWidth="2" stroke="rgba(17, 17, 17, 0.8)" />
         </button>
         <h2 className={addHospitalStyle.title}>Add procedure</h2>
 

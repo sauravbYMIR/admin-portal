@@ -290,7 +290,7 @@ function CreateProcedureForm({
     >
       <p
         style={{ marginBottom: '8px', display: 'block' }}
-        className="font-poppins text-base font-normal text-neutral-2"
+        // className="font-poppins text-base font-normal text-neutral-2"
       >
         Choose Department name/ Sub-category
       </p>

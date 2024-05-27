@@ -67,8 +67,8 @@ const DataTable = (props: any) => (
 );
 
 DataTable.metadata = {
-  name: 'Mohd Arif Un',
-  github: 'arif-un',
+  name: 'Saurav biswas',
+  github: 'saurav49',
   description: 'Data Table skeleton',
   filename: 'DataTable',
 };

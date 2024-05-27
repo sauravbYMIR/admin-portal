@@ -4,15 +4,48 @@ import type { CustomCellRendererProps } from 'ag-grid-react';
 import Image from 'next/image';
 import { useRouter } from 'next/navigation';
 import React from 'react';
-import { toast } from 'sonner';
 
-import { CustomHomePage, DataTable, Header, WithAuth } from '@/components';
+import {
+  CustomHomePage,
+  DataTable,
+  Header,
+  PlusIcon,
+  WithAuth,
+} from '@/components';
 import ShowDataTable from '@/components/Table/PatientsTable/PatientsTable';
-import { editHospital, useGetAllHospital } from '@/hooks';
+import { useGetAllHospital } from '@/hooks';
 import infoLinkIcon from '@/public/assets/icons/linkArrow.svg';
 import plusIcon from '@/public/assets/icons/plus.svg';
+import emptyHospital from '@/public/assets/images/emptyHospital.svg';
 
 import patientsTableStyle from '../../components/Table/PatientsTable/patientsTable.module.scss';
+
+const EmptyHospitalPage = () => {
+  const router = useRouter();
+  return (
+    <div className="mt-[100px] flex w-screen flex-col items-center justify-center">
+      <Image
+        src={emptyHospital}
+        alt="empty-hospital-list"
+        width={160}
+        height={160}
+      />
+      <p className="mb-7 mt-3 font-poppins text-base font-normal text-neutral-2">
+        No hospitals have been added yet!
+      </p>
+      <button
+        type="button"
+        className="flex cursor-pointer items-center gap-3 rounded-lg bg-darkteal px-6 py-[14px]"
+        onClick={() => router.push('/hospitals/add')}
+      >
+        <PlusIcon className="size-5" stroke="#fff" />
+        <p className="font-poppins text-base font-semibold text-primary-6">
+          Add a hospital
+        </p>
+      </button>
+    </div>
+  );
+};
 
 const CustomStatusEditComponent = (props: CustomCellRendererProps) => {
   const router = useRouter();
@@ -36,32 +69,32 @@ const CustomStatusEditComponent = (props: CustomCellRendererProps) => {
 function HospitalsPage() {
   const router = useRouter();
   const hospitals = useGetAllHospital();
-  const onCellClicked = async (params: any) => {
-    if (params.type === 'cellEditingStopped') {
-      try {
-        const r = await editHospital({
-          name: params.data.hospital_name,
-          description: {
-            en: params.data.description.en,
-            sv: params.data.description.sv,
-            da: params.data.description.da,
-            nb: params.data.description.nb,
-          },
-          streetName: params.data.streetName,
-          streetNumber: params.data.streetNumber,
-          city: params.data.city,
-          country: params.data.location,
-          zipcode: params.data.zipCode,
-          hospitalId: params.data.hospital_id,
-        });
-        if (r.success) {
-          toast.success('Changes updated successfully');
-        }
-      } catch (e) {
-        toast.error('error while updated hospital procedure');
-      }
-    }
-  };
+  // const onCellClicked = async (params: any) => {
+  //   if (params.type === 'cellEditingStopped') {
+  //     try {
+  //       const r = await editHospital({
+  //         name: params.data.hospital_name,
+  //         description: {
+  //           en: params.data.description.en,
+  //           sv: params.data.description.sv,
+  //           da: params.data.description.da,
+  //           nb: params.data.description.nb,
+  //         },
+  //         streetName: params.data.streetName,
+  //         streetNumber: params.data.streetNumber,
+  //         city: params.data.city,
+  //         country: params.data.location,
+  //         zipcode: params.data.zipCode,
+  //         hospitalId: params.data.hospital_id,
+  //       });
+  //       if (r.success) {
+  //         toast.success('Changes updated successfully');
+  //       }
+  //     } catch (e) {
+  //       toast.error('error while updated hospital procedure');
+  //     }
+  //   }
+  // };
   return (
     <div>
       <Header />
@@ -89,7 +122,7 @@ function HospitalsPage() {
               <DataTable />
             ) : (
               <ShowDataTable
-                onCellClicked={onCellClicked}
+                // onCellClicked={onCellClicked}
                 rowData={hospitals.data.data.map((r) => ({
                   name: r.name,
                   description: r.description,
@@ -137,33 +170,7 @@ function HospitalsPage() {
           </div>
         ) : (
           <div>
-            {hospitals.isLoading ? (
-              <DataTable />
-            ) : (
-              <div
-                style={{ boxShadow: '2px 2px 4px 1px rgba(9, 111, 144, 0.1)' }}
-                className="box-border flex w-full flex-col items-center gap-12 rounded-xl border border-lightskyblue bg-neutral-7 px-[178px] py-12"
-              >
-                <h2 className="text-center font-poppins text-4xl font-medium text-neutral-1">
-                  No hospitals have been add yet!
-                </h2>
-                <button
-                  type="button"
-                  className="flex h-16 items-center gap-3 rounded-lg bg-darkteal px-6 py-[14px]"
-                  onClick={() => router.push('/hospitals/add')}
-                >
-                  <Image
-                    src={plusIcon}
-                    alt="cta btn text"
-                    width={25}
-                    height={25}
-                  />
-                  <p className="font-poppins text-2xl font-normal text-primary-6">
-                    Add a hospital
-                  </p>
-                </button>
-              </div>
-            )}
+            {hospitals.isLoading ? <DataTable /> : <EmptyHospitalPage />}
           </div>
         )}
       </CustomHomePage>

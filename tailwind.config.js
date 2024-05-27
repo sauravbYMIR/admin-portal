@@ -62,6 +62,9 @@ module.exports = {
         lightsilver: 'rgba(217, 222, 231, 1)',
         checkboxborder: 'rgba(100, 100, 106, 1)',
         black18: 'rgba(18, 15, 28, 1)',
+        gray1: 'rgba(36, 38, 40, 1)',
+        gray2: 'rgba(114, 119, 123, 1)',
+        rgba244: 'rgba(244, 244, 244, 1)',
       },
       fontFamily: {
         poppins: ['Poppins', 'sans-serif'],

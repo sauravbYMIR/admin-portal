@@ -1,3 +1,4 @@
+/* eslint-disable jsx-a11y/control-has-associated-label */
 /* eslint-disable react/button-has-type */
 
 'use client';
@@ -9,6 +10,7 @@ import { useState } from 'react';
 import { z } from 'zod';
 
 import {
+  BackArrowIcon,
   CreateHospitalTeamMemberModal,
   FacebookStyleLoader,
   Header,
@@ -17,7 +19,6 @@ import {
 } from '@/components';
 import { useGetHospitalById } from '@/hooks';
 import arrowForward from '@/public/assets/icons/arrowForward.svg';
-import backArrow from '@/public/assets/icons/backArrow.svg';
 import editIcon from '@/public/assets/icons/edit.svg';
 import plusIcon from '@/public/assets/icons/plus.svg';
 import hospitalLogo from '@/public/assets/icons/sampleLogo.svg';
@@ -74,10 +75,10 @@ function HospitalDetailsPage({ params: { id } }: { params: { id: string } }) {
         <div className={style.hospitalDetailPageContainer}>
           <button
             type="button"
-            className="cursor-pointer"
             onClick={() => router.push('/hospitals')}
+            className="flex size-10 cursor-pointer items-center justify-center rounded-full border-none bg-rgba244"
           >
-            <Image src={backArrow} alt="back arrow icon" />
+            <BackArrowIcon strokeWidth="2" stroke="rgba(17, 17, 17, 0.8)" />
           </button>
 
           <div className={style.headerSection}>
@@ -117,12 +118,19 @@ function HospitalDetailsPage({ params: { id } }: { params: { id: string } }) {
             </div>
 
             <button
-              className={style.editHospitalBtn}
+              className="mt-6 flex cursor-pointer items-center gap-x-[10px] rounded-lg border-2 border-darkteal p-3"
               type="button"
               onClick={() => router.push(`/hospitals/edit/${id}`)}
             >
-              <Image width={24} height={24} src={editIcon} alt="edit icon" />
-              <p>Edit Details</p>
+              <Image
+                width={16.25}
+                height={16.25}
+                src={editIcon}
+                alt="edit icon"
+              />
+              <p className="font-poppins text-sm font-semibold text-darkteal">
+                Edit Details
+              </p>
             </button>
           </div>
 

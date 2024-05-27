@@ -12,33 +12,37 @@
   }
 
   .hospitalProfileForm {
-    .label {
-      color: #000;
-      font-family: Poppins;
-      font-size: 20px;
-      font-style: normal;
-      font-weight: 400;
-      line-height: 100%;
-      display: block;
-    }
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    // .label {
+    //   color: #000;
+    //   font-family: Poppins;
+    //   font-size: 20px;
+    //   font-style: normal;
+    //   font-weight: 400;
+    //   line-height: 100%;
+    //   display: block;
+    // }
 
-    .input {
-      width: 100%;
-      height: 64px;
-      border-radius: 10.667px;
-      border: 2px solid #d9dee7;
-      background: #fff;
-      padding: 0px 12px;
-      box-sizing: border-box;
-      overflow: hidden;
-      color: var(--Colour-Neutral-3, #757f95);
-      text-overflow: ellipsis;
-      font-family: Poppins;
-      font-size: 20px;
-      font-style: normal;
-      font-weight: 400;
-      line-height: 100%;
-    }
+    // .input {
+    //   width: 100%;
+    //   height: 64px;
+    //   border-radius: 10.667px;
+    //   border: 2px solid #d9dee7;
+    //   background: #fff;
+    //   padding: 0px 12px;
+    //   box-sizing: border-box;
+    //   overflow: hidden;
+    //   color: var(--Colour-Neutral-3, #757f95);
+    //   text-overflow: ellipsis;
+    //   font-family: Poppins;
+    //   font-size: 20px;
+    //   font-style: normal;
+    //   font-weight: 400;
+    //   line-height: 100%;
+    // }
 
     .langTabContainer {
       display: flex;
@@ -63,23 +67,23 @@
       }
     }
 
-    .textarea {
-      border-radius: 10.667px;
-      border: 2px solid #d9dee7;
-      background: #fff;
-      width: 100%;
-      height: 147px;
-      padding: 12px;
-      overflow: hidden;
-      color: var(--Colour-Neutral-3, #757f95);
-      text-overflow: ellipsis;
-      font-family: Poppins;
-      font-size: 20px;
-      font-style: normal;
-      font-weight: 400;
-      line-height: 100%;
-      box-sizing: border-box;
-    }
+    // .textarea {
+    //   border-radius: 10.667px;
+    //   border: 2px solid #d9dee7;
+    //   background: #fff;
+    //   width: 100%;
+    //   height: 147px;
+    //   padding: 12px;
+    //   overflow: hidden;
+    //   color: var(--Colour-Neutral-3, #757f95);
+    //   text-overflow: ellipsis;
+    //   font-family: Poppins;
+    //   font-size: 20px;
+    //   font-style: normal;
+    //   font-weight: 400;
+    //   line-height: 100%;
+    //   box-sizing: border-box;
+    // }
 
     .subTitleAddress {
       color: #4d4d4d;

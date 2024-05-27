@@ -123,8 +123,10 @@ export const createDepartment = async ({
 
 export const useCreateDepartment = ({
   isCreateSubCategory,
+  closeModal,
 }: {
   isCreateSubCategory: boolean;
+  closeModal: (() => void) | null;
 }) => {
   const queryClient = useQueryClient();
   return useMutation({
@@ -137,6 +139,9 @@ export const useCreateDepartment = ({
         toast.success('Sub-category created successfully!');
       } else {
         toast.success('Department created successfully!');
+      }
+      if (closeModal) {
+        closeModal();
       }
     },
     onError: (error) => {

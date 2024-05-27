@@ -4,6 +4,7 @@
 
 /* eslint-disable jsx-a11y/label-has-associated-control */
 import { zodResolver } from '@hookform/resolvers/zod';
+import Image from 'next/image';
 import { useRouter } from 'next/navigation';
 import React from 'react';
 import type { SubmitHandler } from 'react-hook-form';
@@ -18,6 +19,8 @@ import { departmentTypeSchema } from '@/app/procedures/CreateProcedureForm/Creat
 import {
   AddTeamMemberToHospitalProcedure,
   BackArrowIcon,
+  CloseIcon,
+  FileUploadIcon,
   Header,
   PlusIcon,
   RemoveIcon,
@@ -25,8 +28,12 @@ import {
 } from '@/components';
 import type { NameJSONType } from '@/hooks/useDepartment';
 import { useGetAllDepartment } from '@/hooks/useDepartment';
-import { useCreateHospitalProcedure } from '@/hooks/useHospitalProcedure';
+import {
+  useCreateHospitalProcedure,
+  useUpdateHospitalProcedureGallery,
+} from '@/hooks/useHospitalProcedure';
 import { useGetAllProcedureByDeptId } from '@/hooks/useProcedure';
+import emptyTeamMember from '@/public/assets/images/emptyTeamMember.svg';
 import type { LanguagesType } from '@/types/components';
 import { countryData } from '@/utils/global';
 
@@ -73,6 +80,7 @@ const createHospitalProcedureFormSchema = z.object({
     .string()
     .min(1, { message: 'Stay in hospital is required' }),
   stayInCity: z.string().min(1, { message: 'Stay in city is required' }),
+  gallery: z.array(z.instanceof(File)).optional(),
 });
 export type CreateHospitalProcedureFormFields = z.infer<
   typeof createHospitalProcedureFormSchema
@@ -136,6 +144,12 @@ const costObj = {
   Swedish: 'costSv',
 };
 function AddHospitalProcedure({ params }: { params: { id: string } }) {
+  const updateHospitalProcedureGallery = useUpdateHospitalProcedureGallery();
+  const galleryRef = React.useRef<HTMLInputElement>(null);
+  const [isShowRemoveImgBtn, setIsShowRemoveImgBtn] = React.useState<{
+    lastModified: number;
+    isShow: boolean;
+  }>({ lastModified: 0, isShow: false });
   const [isCreateHospitalTeamModal, setIsCreateHospitalTeamModal] =
     React.useState<boolean>(false);
   const createHospitalProcedure = useCreateHospitalProcedure();
@@ -177,6 +191,9 @@ function AddHospitalProcedure({ params }: { params: { id: string } }) {
     reset,
     handleSubmit,
     formState: { errors },
+    watch,
+    setValue,
+    getValues,
   } = useForm<CreateHospitalProcedureFormFields>({
     resolver: zodResolver(createHospitalProcedureFormSchema),
   });
@@ -229,24 +246,18 @@ function AddHospitalProcedure({ params }: { params: { id: string } }) {
       createHospitalProcedure.data.data
     ) {
       reset();
-      // const logo = getValues('logo');
-      // if (logo) {
-      //   const formData = new FormData();
-      //   formData.append('logo', logo as Blob);
-      //   updateHospitalLogo.mutate({
-      //     hospitalId: `${createHospital.data.data.id}`,
-      //     formData,
-      //   });
-      // }
-      // const gallery = getValues('gallery');
-      // if (gallery) {
-      //   const formData = new FormData();
-      //   formData.append('gallery', gallery as Blob);
-      //   updateHospitalGallery.mutate({
-      //     hospitalId: `${createHospital.data.data.id}`,
-      //     formData,
-      //   });
-      // }
+      const gallery = getValues('gallery');
+      if (gallery) {
+        const formData = new FormData();
+        gallery.forEach((file) => {
+          formData.append(`procedurePicture`, file);
+        });
+        updateHospitalProcedureGallery.mutate({
+          hospitalProcedureId: `${createHospitalProcedure.data.data}`,
+          formData,
+        });
+        reset();
+      }
       router.push(`/hospitals/edit/${createHospitalProcedure.data.data}`);
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -259,14 +270,29 @@ function AddHospitalProcedure({ params }: { params: { id: string } }) {
       allDepartment.data.data.length > 0
     ) {
       setDepartmentList(() =>
-        allDepartment.data.data.map((department) => ({
-          value: department.id,
-          label:
-            department.name.en ||
-            department.name.nb ||
-            department.name.sv ||
-            department.name.da,
-        })),
+        allDepartment.data.data.map((department) => {
+          if (department.parentCategoryId) {
+            const parentCategory = allDepartment.data.data.find(
+              (dept) => dept.id === department.parentCategoryId,
+            );
+            return {
+              value: department.id,
+              label:
+                `${parentCategory?.name.en} -- ${department.name.en}` ||
+                `${parentCategory?.name.nb} -- ${department.name.nb}` ||
+                `${parentCategory?.name.sv} -- ${department.name.sv}` ||
+                `${parentCategory?.name.da} -- ${department.name.da}`,
+            };
+          }
+          return {
+            value: department.id,
+            label:
+              department.name.en ||
+              department.name.nb ||
+              department.name.sv ||
+              department.name.da,
+          };
+        }),
       );
     }
   }, [allDepartment.data, allDepartment.isSuccess]);
@@ -290,9 +316,6 @@ function AddHospitalProcedure({ params }: { params: { id: string } }) {
       );
     }
   }, [allProcedureByDeptId.data, allProcedureByDeptId.isSuccess]);
-  const handleCancelBtn = () => {
-    router.push('/hospitals');
-  };
   React.useEffect(() => {
     if (createHospitalProcedure.isSuccess) {
       toast('Procedure added successfully');
@@ -309,19 +332,24 @@ function AddHospitalProcedure({ params }: { params: { id: string } }) {
     createHospitalProcedure.isSuccess,
     router,
   ]);
+  const gallery = watch('gallery');
   return (
     <div>
       <Header />
 
       <div className={addHospitalStyle.hospitalFormContainer}>
-        <button
-          type="button"
-          onClick={() => router.push('/hospitals')}
-          className="flex size-10 cursor-pointer items-center justify-center rounded-full border-none bg-rgba244"
-        >
-          <BackArrowIcon strokeWidth="2" stroke="rgba(17, 17, 17, 0.8)" />
-        </button>
-        <h2 className={addHospitalStyle.title}>Add procedure</h2>
+        <div className="flex items-center gap-x-14">
+          <button
+            type="button"
+            onClick={() => router.push('/hospitals')}
+            className="flex size-10 cursor-pointer items-center justify-center rounded-full border-none bg-rgba244"
+          >
+            <BackArrowIcon strokeWidth="2" stroke="rgba(17, 17, 17, 0.8)" />
+          </button>
+          <h2 className="font-poppins text-3xl font-medium text-darkslategray">
+            Add procedure
+          </h2>
+        </div>
 
         <form
           className={`${addHospitalStyle.hospitalProfileForm} mt-20 gap-y-8`}
@@ -573,9 +601,147 @@ function AddHospitalProcedure({ params }: { params: { id: string } }) {
               )}
             </div>
           </div>
+
+          <div className="flex w-full flex-col items-start">
+            <h3 className="mb-7 font-poppins text-lg font-normal text-neutral-1">
+              Procedure related images (Optional)
+            </h3>
+            <div className="flex w-full flex-wrap items-center gap-x-6 gap-y-2">
+              {gallery && gallery.length > 0 && (
+                <div className="flex w-full flex-wrap items-center gap-x-4 gap-y-2">
+                  {gallery.map((file) => (
+                    <div
+                      onMouseEnter={() =>
+                        setIsShowRemoveImgBtn(() => ({
+                          lastModified: file.lastModified,
+                          isShow: true,
+                        }))
+                      }
+                      onMouseLeave={() =>
+                        setIsShowRemoveImgBtn(() => ({
+                          lastModified: file.lastModified,
+                          isShow: false,
+                        }))
+                      }
+                      className="relative size-[180px] cursor-pointer rounded-lg border border-neutral-4"
+                      key={file.size}
+                    >
+                      {isShowRemoveImgBtn.lastModified === file.lastModified &&
+                        isShowRemoveImgBtn.isShow && (
+                          <button
+                            type="button"
+                            className="absolute right-4 top-4 z-10"
+                            onClick={() => {
+                              const updatedGallery = gallery.filter(
+                                (f) =>
+                                  f.lastModified !==
+                                  isShowRemoveImgBtn.lastModified,
+                              );
+                              setValue('gallery', updatedGallery);
+                            }}
+                          >
+                            <CloseIcon
+                              className="mb-2 size-6"
+                              strokeWidth={1.7}
+                            />
+                          </button>
+                        )}
+                      <Image
+                        src={`${URL.createObjectURL(file)}`}
+                        alt={`hospitalGallery-${file.size}`}
+                        key={`hospitalGallery-${file.size}`}
+                        fill
+                        priority
+                        unoptimized
+                      />
+                    </div>
+                  ))}
+                </div>
+              )}
+              {gallery ? (
+                <button
+                  className="mt-6 flex cursor-pointer gap-x-4 border-b-2 border-darkteal pb-1"
+                  type="button"
+                  onClick={() => galleryRef.current?.click()}
+                >
+                  <PlusIcon stroke="rgba(9, 111, 144, 1)" />
+                  <span className="font-poppins text-base font-medium text-darkteal">
+                    Add media
+                  </span>
+                  <Controller
+                    name="gallery"
+                    control={control}
+                    render={({ field: { name, onBlur, onChange } }) => (
+                      <input
+                        type="file"
+                        ref={galleryRef}
+                        accept="image/*"
+                        multiple
+                        name={name}
+                        onBlur={onBlur}
+                        onChange={(e) => {
+                          if (e.target.files) {
+                            const files = Array.from(e.target.files);
+                            onChange(files);
+                          }
+                        }}
+                        className="invisible absolute"
+                      />
+                    )}
+                  />
+                </button>
+              ) : (
+                <button
+                  type="button"
+                  className={`flex size-[220px] flex-col items-center justify-center rounded-lg ${errors.gallery?.message ? 'border-[1.5px] border-error' : 'border border-neutral-4'}`}
+                  onClick={() => galleryRef.current?.click()}
+                >
+                  {!gallery && (
+                    <div className="flex size-10 items-center justify-center rounded-full border border-darkgray p-2">
+                      <FileUploadIcon />
+                    </div>
+                  )}
+                  <Controller
+                    name="gallery"
+                    control={control}
+                    render={({ field: { name, onBlur, onChange } }) => (
+                      <input
+                        type="file"
+                        ref={galleryRef}
+                        accept="image/*"
+                        multiple
+                        name={name}
+                        onBlur={onBlur}
+                        onChange={(e) => {
+                          if (e.target.files) {
+                            const files = Array.from(e.target.files);
+                            onChange(files);
+                          }
+                        }}
+                        className="invisible absolute"
+                      />
+                    )}
+                  />
+
+                  <p className="mt-3 font-poppins text-xs font-semibold text-gray1">
+                    Click to upload a image
+                  </p>
+                  <p className="font-lexend text-xs font-medium text-gray2">
+                    PNG, JPG (max. 10 MB)
+                  </p>
+                  {/* {errors.gallery && (
+                    <small className="mt-1 text-start font-lexend text-sm font-normal text-error">
+                      {errors.gallery.message}
+                    </small>
+                  )} */}
+                </button>
+              )}
+            </div>
+          </div>
+
           {teamMembers.length > 0 ? (
             <div className={style.teamMemberCardsContainer}>
-              <h3 className="my-8 font-poppins text-2xl font-medium text-black">
+              <h3 className="my-8 font-poppins text-lg font-normal text-neutral-1">
                 Team members
               </h3>
               <div className="flex flex-wrap items-center gap-6">
@@ -605,32 +771,43 @@ function AddHospitalProcedure({ params }: { params: { id: string } }) {
               </button>
             </div>
           ) : (
-            <div className="flex w-full flex-col items-center  justify-center rounded-xl bg-neutral-7 py-12">
-              <p className="mb-7 text-center font-poppins text-4xl font-medium">
-                No team members have been created yet!
-              </p>
-
-              <button
-                onClick={() => setIsCreateHospitalTeamModal(true)}
-                className="flex items-center justify-center rounded-[6.4px] bg-darkteal px-6 py-[14px] text-white"
-                type="button"
+            <div className="flex w-full flex-col items-start">
+              <h3 className="my-8 font-poppins text-lg font-normal text-neutral-1">
+                Team members
+              </h3>
+              <div
+                className="flex w-full flex-col items-center  justify-center rounded-xl border py-12"
+                style={{
+                  borderColor: 'rgba(186, 191, 199, 1)',
+                }}
               >
-                <p className="font-poppins text-2xl font-normal">
-                  Create team members
+                <Image
+                  src={emptyTeamMember}
+                  alt="empty-team-member-list"
+                  width={160}
+                  height={160}
+                />
+                <p className="mb-7 mt-3 font-poppins text-base font-normal text-neutral-2">
+                  No procedures have been added yet!
                 </p>
-              </button>
+                <button
+                  type="button"
+                  className="flex cursor-pointer items-center gap-3 rounded-lg bg-darkteal px-6 py-[14px]"
+                  onClick={() => setIsCreateHospitalTeamModal(true)}
+                >
+                  <PlusIcon className="size-5" stroke="#fff" />
+                  <p className="font-poppins text-base font-semibold text-primary-6">
+                    Create team members
+                  </p>
+                </button>
+              </div>
             </div>
           )}
-          <div className={addHospitalStyle.footerBtnContainer}>
+          <div className="mt-16 w-full">
             <button
-              className={addHospitalStyle.cancelBtn}
-              type="button"
-              onClick={handleCancelBtn}
+              className={`${createHospitalProcedure.isPending ? 'cursor-not-allowed bg-darkteal/60' : 'cursor-pointer bg-darkteal'} flex w-[280px] items-center justify-center rounded-lg px-4 py-[15px]`}
+              type="submit"
             >
-              <p>Cancel</p>
-            </button>
-
-            <button className={addHospitalStyle.publishBtn} type="submit">
               {createHospitalProcedure.isPending ? (
                 <ClipLoader
                   loading={createHospitalProcedure.isPending}
@@ -640,7 +817,9 @@ function AddHospitalProcedure({ params }: { params: { id: string } }) {
                   data-testid="loader"
                 />
               ) : (
-                <p>Publish</p>
+                <span className="font-poppins text-sm font-bold text-white">
+                  Publish
+                </span>
               )}
             </button>
           </div>

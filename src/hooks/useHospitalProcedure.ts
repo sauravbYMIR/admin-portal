@@ -3,7 +3,6 @@ import { toast } from 'sonner';
 
 import { axiosInstance } from '@/utils/axiosInstance';
 
-import type { EditHospitalAxios, EditHospitalResponse } from '.';
 import type { NameJSONType, ReimbursementJSONType } from './useDepartment';
 import type { HospitalMember } from './useMember';
 
@@ -117,8 +116,16 @@ export const editHospitalProcedure = async ({
   description: NameJSONType;
   cost: ReimbursementJSONType;
   hospitalProcedureId: string;
-}): Promise<EditHospitalResponse> => {
-  const response = await axiosInstance.patch<EditHospitalAxios>(
+}): Promise<{
+  success: boolean;
+  status: number;
+  data: string;
+}> => {
+  const response = await axiosInstance.patch<{
+    success: boolean;
+    status: number;
+    data: string;
+  }>(
     `${process.env.BASE_URL}/hospital-procedure/update/${hospitalProcedureId}`,
     {
       waitingTime,
@@ -131,7 +138,7 @@ export const editHospitalProcedure = async ({
   return {
     success: response.data.success,
     status: response.data.status,
-    data: response.data.data.id,
+    data: response.data.data,
   };
 };
 export const useEditHospitalProcedure = () => {
@@ -228,6 +235,73 @@ export const useCreateHospitalProcedure = () => {
     onSuccess: () => {
       queryClient.invalidateQueries({
         queryKey: [`hospital-procedure`],
+      });
+    },
+    onError: (error) => {
+      toast(`Something went wrong: ${error.message}`);
+    },
+  });
+};
+
+export const updateHospitalProcedureGallery = async ({
+  formData,
+  hospitalProcedureId,
+}: {
+  formData: FormData;
+  hospitalProcedureId: string;
+}): Promise<{
+  success: boolean;
+}> => {
+  await axiosInstance.post<{
+    success: boolean;
+  }>(
+    `${process.env.BASE_URL}/hospital-procedure/upload-image/${hospitalProcedureId}`,
+    formData,
+  );
+  return {
+    success: true,
+  };
+};
+
+export const useUpdateHospitalProcedureGallery = () => {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: updateHospitalProcedureGallery,
+    onSuccess: () => {
+      return queryClient.invalidateQueries({
+        queryKey: ['hospital-procedure'],
+      });
+    },
+  });
+};
+
+export const removeHospitalProcedureGallery = async ({
+  id,
+}: {
+  id: string;
+}): Promise<{
+  success: boolean;
+  status: number;
+}> => {
+  const response = await axiosInstance.delete<{
+    success: boolean;
+    status: number;
+  }>(
+    `${process.env.BASE_URL}/hospital-procedure/remove-procedure-picture/${id}`,
+  );
+  return {
+    success: true,
+    status: response.data.status,
+  };
+};
+
+export const useRemoveHospitalProcedureGallery = ({ id }: { id: string }) => {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: removeHospitalProcedureGallery,
+    onSuccess: () => {
+      queryClient.invalidateQueries({
+        queryKey: [`hospital-procedure`, id],
       });
     },
     onError: (error) => {

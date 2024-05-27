@@ -79,13 +79,16 @@ function DepartmentModal({
   } = useForm<DepartmentFormFields>({
     resolver: zodResolver(DepartmentFormSchema),
   });
-  const createDept = useCreateDepartment({ isCreateSubCategory: false });
+
   const editDept = useEditDepartment();
   const reqdDept = useGetDepartmentById({ id: updateId });
   const [activeLanguageTab, setActiveLanguageTab] =
     useState<LanguagesType>('English');
   const [isChecked, setIsChecked] = useState<boolean>(false);
-
+  const createDept = useCreateDepartment({
+    isCreateSubCategory: false,
+    closeModal: isChecked ? onClose : null,
+  });
   const shouldRenderProcedureError = countryData.some((c) => {
     const lang = departmentObj[c.language] as DepartmentFormSchemaType;
     return errors[lang] && errors[lang]?.message;

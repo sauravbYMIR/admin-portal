@@ -10,6 +10,7 @@ import React, { useState } from 'react';
 import { z } from 'zod';
 
 import {
+  BackArrowIcon,
   CreateHospitalTeamMemberModal,
   FacebookStyleLoader,
   Header,
@@ -18,10 +19,8 @@ import {
   WithAuth,
 } from '@/components';
 import { useGetHospitalProcedureById } from '@/hooks/useHospitalProcedure';
-import backArrow from '@/public/assets/icons/backArrow.svg';
 import editIcon from '@/public/assets/icons/edit.svg';
 import plusIcon from '@/public/assets/icons/plus.svg';
-import hospitalLogo from '@/public/assets/icons/sampleLogo.svg';
 
 import style from '../../hospitalDetailPage.module.scss';
 
@@ -85,10 +84,10 @@ function HospitalDetailsPage({
       <div className={style.hospitalDetailPageContainer}>
         <button
           type="button"
-          className="cursor-pointer"
           onClick={() => router.back()}
+          className="flex size-10 cursor-pointer items-center justify-center rounded-full border-none bg-rgba244"
         >
-          <Image src={backArrow} alt="back arrow icon" />
+          <BackArrowIcon strokeWidth="2" stroke="rgba(17, 17, 17, 0.8)" />
         </button>
 
         {hospitalProcedureId.isLoading ? (
@@ -97,16 +96,12 @@ function HospitalDetailsPage({
           <>
             <div className={style.headerSection}>
               <div className={style.titleContainer}>
-                <Image
-                  className={style.hospitalLogo}
-                  src={hospitalLogo}
-                  alt="hospital logo"
-                />
-
                 <div className={style.titleBreadCrumbContainer}>
                   {hospitalProcedureId.isSuccess &&
                     hospitalProcedureId.data.data && (
-                      <h3>{hospitalProcedureId.data.data.procedure.name.en}</h3>
+                      <h3 className="font-poppins text-[28px] font-medium text-neutral-1">
+                        {hospitalProcedureId.data.data.procedure.name.en}
+                      </h3>
                     )}
 
                   {hospitalProcedureId.isSuccess &&
@@ -127,7 +122,7 @@ function HospitalDetailsPage({
               </div>
 
               <button
-                className={style.editHospitalBtn}
+                className="flex cursor-pointer items-center gap-x-[10px] rounded-lg border-2 border-darkteal p-3"
                 type="button"
                 onClick={() =>
                   router.push(
@@ -135,12 +130,21 @@ function HospitalDetailsPage({
                   )
                 }
               >
-                <Image width={24} height={24} src={editIcon} alt="edit icon" />
-                <p>Edit Details</p>
+                <Image
+                  width={16.25}
+                  height={16.25}
+                  src={editIcon}
+                  alt="edit icon"
+                />
+                <p className="font-poppins text-sm font-semibold text-darkteal">
+                  Edit Details
+                </p>
               </button>
             </div>
 
-            <h3 className={style.subTitle}>About the procedure</h3>
+            <h3 className="mb-7 font-poppins text-lg font-normal text-neutral-1">
+              About the procedure
+            </h3>
             {hospitalProcedureId.isSuccess && hospitalProcedureId.data.data && (
               <p className={style.hospitalDesc}>
                 {hospitalProcedureId.data.data.description.en}
@@ -181,6 +185,36 @@ function HospitalDetailsPage({
                     {hospitalProcedureId.data.data.stayInHospital}
                   </p>
                 </div>
+                {hospitalProcedureId.data &&
+                  hospitalProcedureId.data.data &&
+                  hospitalProcedureId.data.data.hospitalProcedureImages &&
+                  Array.isArray(
+                    hospitalProcedureId.data.data.hospitalProcedureImages,
+                  ) &&
+                  hospitalProcedureId.data.data.hospitalProcedureImages.length >
+                    0 && (
+                    <div className="flex w-full flex-col items-start">
+                      <h3 className="mb-7 font-poppins text-lg font-normal text-neutral-1">
+                        Procedure related images
+                      </h3>
+                      <div className="flex w-full flex-row flex-wrap items-center gap-8">
+                        {hospitalProcedureId.data.data.hospitalProcedureImages.map(
+                          (file) => {
+                            return (
+                              <Image
+                                key={file.id}
+                                src={file.imageUrl}
+                                width={220}
+                                height={220}
+                                alt="hospital-gallery"
+                                className="size-[220px] rounded-lg"
+                              />
+                            );
+                          },
+                        )}
+                      </div>
+                    </div>
+                  )}
               </div>
             )}
 

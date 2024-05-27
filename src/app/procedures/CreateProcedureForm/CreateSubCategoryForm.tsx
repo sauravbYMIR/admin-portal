@@ -63,7 +63,7 @@ function CreateSubCategoryForm({
   } | null>(null);
   const reqdDept = useGetDepartmentById({ id: updateId });
   const editDepartment = useEditDepartment();
-  const createDepartment = useCreateDepartment({ isCreateSubCategory: true });
+
   const allDepartment = useGetAllDepartment();
   const [departmentList, setDepartmentList] = useState<Array<DepartmentType>>(
     [],
@@ -91,6 +91,11 @@ function CreateSubCategoryForm({
   }, [allDepartment.data, allDepartment.isSuccess]);
   const [createAnotherSubCategory, setCreateAnotherSubCategory] =
     useState(false);
+
+  const createDepartment = useCreateDepartment({
+    isCreateSubCategory: true,
+    closeModal: createAnotherSubCategory ? onClose : null,
+  });
 
   const [activeLanguageTab, setActiveLanguageTab] =
     useState<LanguagesType>('English');
@@ -191,21 +196,12 @@ function CreateSubCategoryForm({
       (createDepartment.isSuccess || editDepartment.isSuccess)
     ) {
       reset();
-      return;
-    }
-    if (
-      !createAnotherSubCategory &&
-      (createDepartment.isSuccess || editDepartment.isSuccess)
-    ) {
-      onClose();
-      reset();
     }
   }, [
     createDepartment.isSuccess,
     editDepartment.isSuccess,
     createAnotherSubCategory,
     reset,
-    onClose,
   ]);
 
   return (

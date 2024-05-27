@@ -15,6 +15,7 @@ import { z } from 'zod';
 import {
   BackArrowIcon,
   CancelModal,
+  CloseIcon,
   FileUploadIcon,
   Header,
   PlusIcon,
@@ -23,6 +24,8 @@ import {
 import {
   useEditHospitalProcedure,
   useGetHospitalProcedureById,
+  useRemoveHospitalProcedureGallery,
+  useUpdateHospitalProcedureGallery,
 } from '@/hooks/useHospitalProcedure';
 import type { LanguagesType } from '@/types/components';
 import { countryData } from '@/utils/global';
@@ -81,10 +84,7 @@ const editHospitalProcedureFormSchema = z.object({
     .string()
     .min(1, { message: 'Stay in hospital is required' }),
   stayInCity: z.string().min(1, { message: 'Stay in city is required' }),
-  gallery: z
-    .array(z.instanceof(File))
-    .min(1, 'At least one image is required')
-    .max(3, 'You can upload up to 3 images'),
+  gallery: z.array(z.instanceof(File)).optional(),
 });
 export type EditHospitalProcedureFormFields = z.infer<
   typeof editHospitalProcedureFormSchema
@@ -112,6 +112,8 @@ function EditHospitalProcedure({
     setValue,
     control,
     watch,
+    getValues,
+    reset,
     formState: { errors },
   } = useForm<EditHospitalProcedureFormFields>({
     resolver: zodResolver(editHospitalProcedureFormSchema),
@@ -122,6 +124,7 @@ function EditHospitalProcedure({
     Danish: 'procedureDescDa',
     Swedish: 'procedureDescSv',
   };
+  const updateHospitalProcedureGallery = useUpdateHospitalProcedureGallery();
   const shouldRenderProcedureError = countryData.some((c) => {
     const lang = hospitalObj[c.language] as HospitalProcedureFormSchemaType;
     return errors[lang] && errors[lang]?.message;
@@ -197,37 +200,48 @@ function EditHospitalProcedure({
     setValue,
     params.procedureId,
   ]);
-  // React.useEffect(() => {
-  //   if (editHospital.isSuccess && editHospital.data && editHospital.data.data) {
-  //     const logo = getValues('logo');
-  //     if (logo) {
-  //       const formData = new FormData();
-  //       formData.append('logo', logo as Blob);
-  //       updateHospitalLogo.mutate({
-  //         hospitalId: `${editHospital.data.data}`,
-  //         formData,
-  //       });
-  //     }
-  //     const gallery = getValues('gallery');
-  //     if (gallery) {
-  //       const formData = new FormData();
-  //       formData.append('gallery', gallery as Blob);
-  //       updateHospitalGallery.mutate({
-  //         hospitalId: `${editHospital.data.data}`,
-  //         formData,
-  //       });
-  //     }
-  //     router.push(`/hospitals/add/${editHospital.data.data}`);
-  //   }
-  //   // eslint-disable-next-line react-hooks/exhaustive-deps
-  // }, [
-  //   editHospital.data,
-  //   editHospital.isSuccess,
-  //   // getValues,
-  //   // updateHospitalLogo,
-  //   // updateHospitalGallery,
-  // ]);
+  React.useEffect(() => {
+    if (
+      editHospitalProcedure.isSuccess &&
+      editHospitalProcedure.data &&
+      editHospitalProcedure.data.data
+    ) {
+      const gallery = getValues('gallery');
+      if (gallery) {
+        const formData = new FormData();
+        gallery.forEach((file) => {
+          formData.append(`procedurePicture`, file);
+        });
+        updateHospitalProcedureGallery.mutate({
+          hospitalProcedureId: `${editHospitalProcedure.data.data}`,
+          formData,
+        });
+        reset();
+      }
+      router.push(
+        `/hospitals/add/${params.id}/procedures/${editHospitalProcedure.data.data}`,
+      );
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [
+    editHospitalProcedure.data,
+    editHospitalProcedure.isSuccess,
+    // getValues,
+    // updateHospitalLogo,
+    // updateHospitalGallery,
+  ]);
+  const [isShowRemoveImgBtn, setIsShowRemoveImgBtn] = React.useState<{
+    id: string;
+    isShow: boolean;
+  }>({ id: '', isShow: false });
+  // const [isRemoveImgBtn, setIsRemoveImgBtn] = React.useState<{
+  //   id: string;
+  //   isShow: boolean;
+  // }>({ id: '', isShow: false });
   const gallery = watch('gallery');
+  const removeHospitalProcedureGallery = useRemoveHospitalProcedureGallery({
+    id: params.procedureId,
+  });
   return (
     <div>
       <Header />
@@ -243,126 +257,127 @@ function EditHospitalProcedure({
         <h2 className={addHospitalStyle.title}>Edit procedure</h2>
 
         <form
-          className={addHospitalStyle.hospitalProfileForm}
+          className={`${addHospitalStyle.hospitalProfileForm} mt-20 gap-y-8`}
           onSubmit={handleSubmit(onFormSubmit)}
         >
-          <label
-            style={{ margin: '24px 0 8px' }}
-            className={addHospitalStyle.label}
-            htmlFor="deparment-sub-category"
-          >
-            Department/Sub-category
-          </label>
-          <input
-            className={addHospitalStyle.input}
-            style={{ backgroundColor: 'rgba(224, 228, 235, 1)' }}
-            type="text"
-            placeholder="Type here"
-            id="deparment-sub-category"
-            disabled
-            {...register('departmentName')}
-          />
-          {errors.departmentName && (
-            <small className="mt-1 text-start font-lexend text-base font-normal text-error">
-              {errors.departmentName.message}
-            </small>
-          )}
-          <label
-            style={{ margin: '24px 0 8px' }}
-            className={addHospitalStyle.label}
-            htmlFor="procedure"
-          >
-            Procedure
-          </label>
-          <input
-            className={addHospitalStyle.input}
-            style={{ backgroundColor: 'rgba(224, 228, 235, 1)' }}
-            type="text"
-            placeholder="Type here"
-            id="procedure"
-            disabled
-            {...register('procedureName')}
-          />
-          {errors.procedureName && (
-            <small className="mt-1 text-start font-lexend text-base font-normal text-error">
-              {errors.procedureName.message}
-            </small>
-          )}
+          <div className="flex w-full flex-col items-start">
+            <label
+              className="mb-3 font-poppins text-base font-normal text-neutral-2"
+              htmlFor="deparment-sub-category"
+            >
+              Department/Sub-category
+            </label>
+            <input
+              className="w-full rounded-lg border-2 border-lightsilver px-4 py-2 placeholder:text-sm placeholder:font-normal placeholder:text-neutral-3"
+              type="text"
+              placeholder="Type here"
+              id="deparment-sub-category"
+              disabled
+              {...register('departmentName')}
+            />
+            {errors.departmentName && (
+              <small className="mt-1 text-start font-lexend text-base font-normal text-error">
+                {errors.departmentName.message}
+              </small>
+            )}
+          </div>
+          <div className="flex w-full flex-col items-start">
+            <label
+              className="mb-3 font-poppins text-base font-normal text-neutral-2"
+              htmlFor="procedure"
+            >
+              Procedure
+            </label>
+            <input
+              className="w-full rounded-lg border-2 border-lightsilver px-4 py-2 placeholder:text-sm placeholder:font-normal placeholder:text-neutral-3"
+              type="text"
+              placeholder="Type here"
+              id="procedure"
+              disabled
+              {...register('procedureName')}
+            />
+            {errors.procedureName && (
+              <small className="mt-1 text-start font-lexend text-base font-normal text-error">
+                {errors.procedureName.message}
+              </small>
+            )}
+          </div>
+          <div className="flex w-full flex-col items-start">
+            <label
+              className="mb-3 font-poppins text-base font-normal text-neutral-2"
+              htmlFor="hospital-procedure-description"
+            >
+              Procedure Description
+            </label>
 
-          <label
-            style={{ margin: '32px 0 0' }}
-            className={addHospitalStyle.label}
-            htmlFor="hospital-procedure-description"
-          >
-            Procedure Description
-          </label>
+            <div className={addHospitalStyle.langTabContainer}>
+              {countryData.map((data) => {
+                const lang = hospitalObj[
+                  data.language
+                ] as HospitalProcedureFormSchemaType;
+                return (
+                  <button
+                    key={data.locale}
+                    style={
+                      data.language === activeLanguageTab
+                        ? {
+                            border: '1px solid rgba(9, 111, 144, 1)',
+                            color: 'rgba(9, 111, 144, 1)',
+                            backgroundColor: 'rgba(242, 250, 252, 1)',
+                          }
+                        : {}
+                    }
+                    type="button"
+                    onClick={() => setActiveLanguageTab(data.language)}
+                    className={`${errors[lang] && errors[lang]?.message ? '!border !border-error !text-error' : ''}`}
+                  >
+                    {data.language}
+                  </button>
+                );
+              })}
+            </div>
 
-          <div className={addHospitalStyle.langTabContainer}>
-            {countryData.map((data) => {
+            {countryData.map((c) => {
               const lang = hospitalObj[
-                data.language
+                c.language
               ] as HospitalProcedureFormSchemaType;
               return (
-                <button
-                  key={data.locale}
-                  style={
-                    data.language === activeLanguageTab
-                      ? {
-                          border: '1px solid rgba(9, 111, 144, 1)',
-                          color: 'rgba(9, 111, 144, 1)',
-                          backgroundColor: 'rgba(242, 250, 252, 1)',
-                        }
-                      : {}
-                  }
-                  type="button"
-                  onClick={() => setActiveLanguageTab(data.language)}
-                  className={`${errors[lang] && errors[lang]?.message ? '!border !border-error !text-error' : ''}`}
-                >
-                  {data.language}
-                </button>
+                <div key={c.countryCode} className="w-full">
+                  {c.language === activeLanguageTab && (
+                    <textarea
+                      // eslint-disable-next-line jsx-a11y/no-autofocus
+                      autoFocus
+                      className={`${errors[lang]?.message ? 'outline-2 outline-error' : ''} h-[128px] w-full rounded-lg border-2 border-lightsilver px-4 py-2 placeholder:text-sm placeholder:font-normal placeholder:text-neutral-3`}
+                      placeholder="Type here"
+                      id="hospital-procedure-description"
+                      {...register(lang)}
+                    />
+                  )}
+                </div>
               );
             })}
+
+            {shouldRenderProcedureError && (
+              <small className="mb-5 mt-1 text-start font-lexend text-base font-normal text-error">
+                Fill in details in all the languages
+              </small>
+            )}
           </div>
 
-          {countryData.map((c) => {
-            const lang = hospitalObj[
-              c.language
-            ] as HospitalProcedureFormSchemaType;
-            return (
-              <div key={c.countryCode}>
-                {c.language === activeLanguageTab && (
-                  <textarea
-                    className={addHospitalStyle.textarea}
-                    placeholder="Type here"
-                    id="hospital-procedure-description"
-                    {...register(lang)}
-                  />
-                )}
-              </div>
-            );
-          })}
-
-          {shouldRenderProcedureError && (
-            <small className="mb-5 mt-1 text-start font-lexend text-base font-normal text-error">
-              Fill in details in all the languages
-            </small>
-          )}
-
-          <div className="grid grid-cols-2 gap-4">
+          <div className="grid w-full grid-cols-2 gap-x-10 gap-y-4">
             <div className="relative my-4 flex w-full flex-col items-start">
               <label
-                style={{ margin: '0 0 8px 0' }}
-                className={addHospitalStyle.label}
+                className="mb-3 font-poppins text-base font-normal text-neutral-2"
                 htmlFor="cost-of-procedure"
               >
                 Expected cost of procedure
               </label>
 
-              <div className="absolute top-[30px]">
+              <div className="absolute top-[38px]">
                 <select
                   name="cost-of-procedure"
                   id="cost-of-procedure"
-                  className="rounded-md border-2 border-neutral-4 bg-neutral-6 px-5 py-[18px]"
+                  className="rounded-md border-2 border-neutral-4 bg-neutral-6 px-5 py-[8px]"
                   onChange={(e) =>
                     setActiveCostTab(e.target.value as LanguagesType)
                   }
@@ -385,7 +400,8 @@ function EditHospitalProcedure({
                   <div key={c.countryCode} className="w-full">
                     {c.language === activeCostTab && (
                       <input
-                        className={addHospitalStyle.input}
+                        className="w-full rounded-lg border-2 border-lightsilver px-4 py-2 placeholder:text-sm placeholder:font-normal placeholder:text-neutral-3"
+                        style={{ paddingLeft: '110px' }}
                         id="cost-of-procedure"
                         {...register(costLang)}
                       />
@@ -402,15 +418,13 @@ function EditHospitalProcedure({
             </div>
             <div className="my-4 flex w-full flex-col items-start">
               <label
-                style={{ marginBottom: '8px' }}
-                className={addHospitalStyle.label}
+                className="mb-3 font-poppins text-base font-normal text-neutral-2"
                 htmlFor="waiting-time"
               >
                 Expected waiting time for the procedure in days
               </label>
               <input
-                style={{ marginBottom: '32px' }}
-                className={addHospitalStyle.input}
+                className="w-full rounded-lg border-2 border-lightsilver px-4 py-2 placeholder:text-sm placeholder:font-normal placeholder:text-neutral-3"
                 type="number"
                 id="waiting-time"
                 {...register('waitingTime')}
@@ -423,15 +437,13 @@ function EditHospitalProcedure({
             </div>
             <div className="my-4 flex w-full flex-col items-start">
               <label
-                style={{ marginBottom: '8px' }}
-                className={addHospitalStyle.label}
+                className="mb-3 font-poppins text-base font-normal text-neutral-2"
                 htmlFor="stay-in-hospital"
               >
                 Expected length of stay in the hospital in days
               </label>
               <input
-                style={{ marginBottom: '32px' }}
-                className={addHospitalStyle.input}
+                className="w-full rounded-lg border-2 border-lightsilver px-4 py-2 placeholder:text-sm placeholder:font-normal placeholder:text-neutral-3"
                 type="number"
                 id="stay-in-hospital"
                 {...register('stayInHospital')}
@@ -444,15 +456,13 @@ function EditHospitalProcedure({
             </div>
             <div className="my-4 flex w-full flex-col items-start">
               <label
-                style={{ marginBottom: '8px' }}
-                className={addHospitalStyle.label}
+                className="mb-3 font-poppins text-base font-normal text-neutral-2"
                 htmlFor="stay-in-city"
               >
                 Expected length of stay in the city in days
               </label>
               <input
-                style={{ marginBottom: '32px' }}
-                className={addHospitalStyle.input}
+                className="w-full rounded-lg border-2 border-lightsilver px-4 py-2 placeholder:text-sm placeholder:font-normal placeholder:text-neutral-3"
                 type="number"
                 id="stay-in-city"
                 {...register('stayInCity')}
@@ -465,42 +475,73 @@ function EditHospitalProcedure({
             </div>
           </div>
 
-          <h3 className={addHospitalStyle.subTitleHospitalGallery}>
-            Procedure related images
-          </h3>
-          {hospitalProcedureDetails.data &&
-          hospitalProcedureDetails.data.data &&
-          hospitalProcedureDetails.data.data.hospitalProcedureImages &&
-          hospitalProcedureDetails.data.data.hospitalProcedureImages.length >
-            0 ? (
-            <div className="flex w-full flex-wrap items-center gap-4">
-              {hospitalProcedureDetails.data.data.hospitalProcedureImages.map(
-                (file) => {
-                  return (
-                    <Image
-                      key={file.id}
-                      src={file.imageUrl}
-                      width={64}
-                      height={64}
-                      alt="hospital-gallery"
-                      className="h-[250px] w-[264px] rounded-lg"
-                    />
-                  );
-                },
-              )}
-            </div>
-          ) : (
-            <>
-              <p className={addHospitalStyle.hospitalGalleryDesc}>
-                Upload a minimum of 3 media items and maximum 10 media items
-              </p>
+          <div className="flex w-full flex-col items-start">
+            <h3 className="mb-7 font-poppins text-lg font-normal text-neutral-1">
+              Procedure related images
+            </h3>
+            {hospitalProcedureDetails.data &&
+            hospitalProcedureDetails.data.data &&
+            hospitalProcedureDetails.data.data.hospitalProcedureImages &&
+            hospitalProcedureDetails.data.data.hospitalProcedureImages.length >
+              0 ? (
+              <div className="flex w-full flex-wrap items-center gap-4">
+                {hospitalProcedureDetails.data.data.hospitalProcedureImages.map(
+                  (file) => {
+                    return (
+                      <div
+                        onMouseEnter={() =>
+                          setIsShowRemoveImgBtn(() => ({
+                            id: file.id,
+                            isShow: true,
+                          }))
+                        }
+                        onMouseLeave={() =>
+                          setIsShowRemoveImgBtn(() => ({
+                            id: file.id,
+                            isShow: false,
+                          }))
+                        }
+                        key={file.id}
+                        className="relative"
+                      >
+                        {isShowRemoveImgBtn.id === file.id &&
+                          isShowRemoveImgBtn.isShow && (
+                            <button
+                              type="button"
+                              className="absolute right-4 top-4 z-10"
+                              onClick={() => {
+                                removeHospitalProcedureGallery.mutate({
+                                  id: file.id,
+                                });
+                              }}
+                            >
+                              <CloseIcon
+                                className="mb-2 size-6"
+                                strokeWidth={1.7}
+                              />
+                            </button>
+                          )}
+                        <Image
+                          key={file.id}
+                          src={file.imageUrl}
+                          width={64}
+                          height={64}
+                          alt="hospital-gallery"
+                          className="h-[250px] w-[264px] rounded-lg"
+                        />
+                      </div>
+                    );
+                  },
+                )}
+              </div>
+            ) : (
               <div className="flex w-full flex-wrap items-center gap-x-6 gap-y-2">
                 {gallery && gallery.length > 0 && (
                   <div className="flex w-full flex-wrap items-center gap-x-4 gap-y-2">
                     {gallery.map((file) => (
                       <div
-                        className="relative size-[220px] rounded-lg border border-neutral-4"
                         key={file.size}
+                        className="relative size-[180px] cursor-pointer rounded-lg border border-neutral-4"
                       >
                         <Image
                           src={`${URL.createObjectURL(file)}`}
@@ -585,32 +626,21 @@ function EditHospitalProcedure({
                     <p className="font-lexend text-sm font-normal text-neutral-3">
                       PNG, JPG (max. 10 MB)
                     </p>
-                    {errors.gallery && (
-                      <small className="mt-1 text-start font-lexend text-base font-normal text-error">
-                        {errors.gallery.message}
-                      </small>
-                    )}
                   </button>
                 )}
               </div>
-            </>
-          )}
-          {errors.gallery && (
-            <small className="mt-1 text-start font-lexend text-base font-normal text-error">
-              {errors.gallery.message}
-            </small>
-          )}
-          <div className={addHospitalStyle.footerBtnContainer}>
+            )}
+            {errors.gallery && (
+              <small className="mt-1 text-start font-lexend text-base font-normal text-error">
+                {errors.gallery.message}
+              </small>
+            )}
+          </div>
+          <div className="mt-16 w-full">
             <button
-              className={addHospitalStyle.cancelBtn}
-              type="button"
-              onClick={() => {
-                router.push('/hospitals');
-              }}
+              className={`${editHospitalProcedure.isPending ? 'cursor-not-allowed bg-darkteal/60' : 'cursor-pointer bg-darkteal'} flex w-[280px] items-center justify-center rounded-lg px-4 py-[15px]`}
+              type="submit"
             >
-              <p>Cancel</p>
-            </button>
-            <button className={addHospitalStyle.publishBtn} type="submit">
               {editHospitalProcedure.isPending ? (
                 <ClipLoader
                   loading={editHospitalProcedure.isPending}
@@ -620,7 +650,9 @@ function EditHospitalProcedure({
                   data-testid="loader"
                 />
               ) : (
-                <p>Edit</p>
+                <p className="font-poppins text-sm font-bold text-white">
+                  Edit
+                </p>
               )}
             </button>
           </div>

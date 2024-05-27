@@ -114,7 +114,11 @@ export const createProcedure = async ({
   };
 };
 
-export const useCreateProcedure = () => {
+export const useCreateProcedure = ({
+  closeModal,
+}: {
+  closeModal: (() => void) | null;
+}) => {
   const queryClient = useQueryClient();
   return useMutation({
     mutationFn: createProcedure,
@@ -123,6 +127,9 @@ export const useCreateProcedure = () => {
         queryKey: [`department-with-procedure`],
       });
       toast.success('Procedure created successfully');
+      if (closeModal) {
+        closeModal();
+      }
     },
     onError: (error) => {
       toast(`Something went wrong: ${error.message}`);
@@ -157,7 +164,7 @@ export const useEditProcedure = () => {
     mutationFn: editProcedure,
     onSuccess: () => {
       queryClient.invalidateQueries({
-        queryKey: [`procedure`],
+        queryKey: [`department-with-procedure`],
       });
       toast.success('Procedure edited successfully');
     },

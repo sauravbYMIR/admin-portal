@@ -94,7 +94,6 @@ function CreateProcedureForm({
   } | null>(null);
   const reqProcedure = useGetProcedureById({ id: updateId });
   const editProcedure = useEditProcedure();
-  const createProcedure = useCreateProcedure();
   const allDepartment = useGetAllDepartment();
   const [activeLanguageTab, setActiveLanguageTab] =
     useState<LanguagesType>('English');
@@ -102,6 +101,9 @@ function CreateProcedureForm({
   const [departmentList, setDepartmentList] = useState<Array<DepartmentType>>(
     [],
   );
+  const createProcedure = useCreateProcedure({
+    closeModal: !createAnotherProcedure ? onClose : null,
+  });
   React.useEffect(() => {
     if (
       allDepartment.isSuccess &&
@@ -118,10 +120,10 @@ function CreateProcedureForm({
             return {
               value: department.id,
               label:
-                `${parentCategory?.name.en} ${department.name.en}` ||
-                `${parentCategory?.name.nb} ${department.name.nb}` ||
-                `${parentCategory?.name.sv} ${department.name.sv}` ||
-                `${parentCategory?.name.da} ${department.name.da}`,
+                `${parentCategory?.name.en} -- ${department.name.en}` ||
+                `${parentCategory?.name.nb} -- ${department.name.nb}` ||
+                `${parentCategory?.name.sv} -- ${department.name.sv}` ||
+                `${parentCategory?.name.da} -- ${department.name.da}`,
             };
           }
           return {
@@ -261,18 +263,7 @@ function CreateProcedureForm({
   });
 
   React.useEffect(() => {
-    if (
-      createAnotherProcedure &&
-      (createProcedure.isSuccess || editProcedure.isSuccess)
-    ) {
-      reset();
-      return;
-    }
-    if (
-      !createAnotherProcedure &&
-      (createProcedure.isSuccess || editProcedure.isSuccess)
-    ) {
-      onClose();
+    if (createProcedure.isSuccess || editProcedure.isSuccess) {
       reset();
     }
   }, [
@@ -280,7 +271,6 @@ function CreateProcedureForm({
     editProcedure.isSuccess,
     createAnotherProcedure,
     reset,
-    onClose,
   ]);
 
   return (

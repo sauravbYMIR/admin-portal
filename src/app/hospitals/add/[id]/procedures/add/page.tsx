@@ -324,42 +324,46 @@ function AddHospitalProcedure({ params }: { params: { id: string } }) {
         <h2 className={addHospitalStyle.title}>Add procedure</h2>
 
         <form
-          className={addHospitalStyle.hospitalProfileForm}
+          className={`${addHospitalStyle.hospitalProfileForm} mt-20 gap-y-8`}
           onSubmit={handleSubmit(onFormSubmit)}
         >
-          <label
-            style={{ marginBottom: '8px', display: 'block' }}
-            className={addHospitalStyle.label}
-            htmlFor="department"
-          >
-            Department name/ Sub-category
-          </label>
-          <Controller
-            name="department"
-            control={control}
-            defaultValue={
-              selectedOption?.label ? selectedOption : { label: '', value: '' }
-            }
-            render={({ field }) => (
-              <Select
-                {...field}
-                options={departmentList}
-                onChange={(value) => {
-                  setSelectedOption(value);
-                  field.onChange(value);
-                }}
-              />
-            )}
-          />
-          {errors.department && (
-            <div className="mt-1 text-start font-lexend text-base font-normal text-error">
-              {errors.department.message}
-            </div>
-          )}
-          <div className="mt-8">
+          <div className="flex w-full flex-col items-start">
             <label
-              style={{ marginBottom: '8px', display: 'block' }}
-              className={addHospitalStyle.label}
+              className="mb-3 font-poppins text-base font-normal text-neutral-2"
+              htmlFor="department"
+            >
+              Department name/ Sub-category
+            </label>
+            <Controller
+              name="department"
+              control={control}
+              defaultValue={
+                selectedOption?.label
+                  ? selectedOption
+                  : { label: '', value: '' }
+              }
+              render={({ field }) => (
+                <Select
+                  className="w-full"
+                  {...field}
+                  options={departmentList}
+                  onChange={(value) => {
+                    setSelectedOption(value);
+                    field.onChange(value);
+                  }}
+                />
+              )}
+            />
+            {errors.department && (
+              <div className="mt-1 text-start font-lexend text-base font-normal text-error">
+                {errors.department.message}
+              </div>
+            )}
+          </div>
+
+          <div className="flex w-full flex-col items-start">
+            <label
+              className="mb-3 font-poppins text-base font-normal text-neutral-2"
               htmlFor="procedure"
             >
               Procedure name
@@ -374,6 +378,7 @@ function AddHospitalProcedure({ params }: { params: { id: string } }) {
               }
               render={({ field }) => (
                 <Select
+                  className="w-full"
                   {...field}
                   options={procedureList}
                   onChange={(value) => {
@@ -389,79 +394,83 @@ function AddHospitalProcedure({ params }: { params: { id: string } }) {
               </div>
             )}
           </div>
-          <label
-            style={{ margin: '32px 0 0' }}
-            className={addHospitalStyle.label}
-            htmlFor="procedure-description"
-          >
-            Procedure Description
-          </label>
 
-          <div className={addHospitalStyle.langTabContainer}>
-            {countryData.map((data) => {
+          <div className="flex w-full flex-col items-start">
+            <label
+              className="mt-3 font-poppins text-base font-normal text-neutral-2"
+              htmlFor="procedure-description"
+            >
+              Procedure Description
+            </label>
+
+            <div className={addHospitalStyle.langTabContainer}>
+              {countryData.map((data) => {
+                const lang = hospitalProcedureObj[
+                  data.language
+                ] as HospitalProcedureFormSchemaType;
+                return (
+                  <button
+                    key={data.locale}
+                    type="button"
+                    onClick={() => setActiveLanguageTab(data.language)}
+                    style={
+                      data.language === activeLanguageTab
+                        ? {
+                            border: '2px solid rgba(9, 111, 144, 1)',
+                            color: 'rgba(9, 111, 144, 1)',
+                            backgroundColor: 'rgba(242, 250, 252, 1)',
+                          }
+                        : {}
+                    }
+                    className={`${errors[lang] && errors[lang]?.message ? '!border !border-error !text-error' : ''}`}
+                  >
+                    {data.language}
+                  </button>
+                );
+              })}
+            </div>
+
+            {countryData.map((c) => {
               const lang = hospitalProcedureObj[
-                data.language
+                c.language
               ] as HospitalProcedureFormSchemaType;
               return (
-                <button
-                  key={data.locale}
-                  type="button"
-                  onClick={() => setActiveLanguageTab(data.language)}
-                  style={
-                    data.language === activeLanguageTab
-                      ? {
-                          border: '1px solid rgba(9, 111, 144, 1)',
-                          color: 'rgba(9, 111, 144, 1)',
-                          backgroundColor: 'rgba(242, 250, 252, 1)',
-                        }
-                      : {}
-                  }
-                  className={`${errors[lang] && errors[lang]?.message ? '!border !border-error !text-error' : ''}`}
-                >
-                  {data.language}
-                </button>
+                <div key={c.countryCode} className="w-full">
+                  {c.language === activeLanguageTab && (
+                    <textarea
+                      // eslint-disable-next-line jsx-a11y/no-autofocus
+                      autoFocus
+                      className={`${errors[lang]?.message ? 'outline-2 outline-error' : ''} h-[128px] w-full rounded-lg border-2 border-lightsilver px-4 py-2 placeholder:text-sm placeholder:font-normal placeholder:text-neutral-3`}
+                      placeholder="Type here"
+                      id="procedure-description"
+                      {...register(lang)}
+                    />
+                  )}
+                </div>
               );
             })}
+
+            {shouldRenderProcedureError && (
+              <small className="mb-5 mt-1 text-start font-lexend text-base font-normal text-error">
+                Fill in details in all the languages
+              </small>
+            )}
           </div>
 
-          {countryData.map((c) => {
-            const lang = hospitalProcedureObj[
-              c.language
-            ] as HospitalProcedureFormSchemaType;
-            return (
-              <div key={c.countryCode}>
-                {c.language === activeLanguageTab && (
-                  <textarea
-                    className={addHospitalStyle.textarea}
-                    placeholder="Type here"
-                    id="procedure-description"
-                    {...register(lang)}
-                  />
-                )}
-              </div>
-            );
-          })}
-
-          {shouldRenderProcedureError && (
-            <small className="mb-5 mt-1 text-start font-lexend text-base font-normal text-error">
-              Fill in details in all the languages
-            </small>
-          )}
-          <div className="mt-8 grid grid-cols-2 gap-4">
+          <div className="grid w-full grid-cols-2 gap-4">
             <div className="relative my-4 flex w-full flex-col items-start">
               <label
-                style={{ margin: '0 0 8px 0' }}
-                className={addHospitalStyle.label}
+                className="mb-3 font-poppins text-base font-normal text-neutral-2"
                 htmlFor="cost-of-procedure"
               >
                 Expected cost of procedure
               </label>
 
-              <div className="absolute top-[30px]">
+              <div className="absolute top-[38px]">
                 <select
                   name="cost-of-procedure"
                   id="cost-of-procedure"
-                  className="rounded-md border-2 border-neutral-4 bg-neutral-6 px-5 py-[18px]"
+                  className="rounded-md border-2 border-neutral-4 bg-neutral-6 px-5 py-[8px]"
                   onChange={(e) =>
                     setActiveCostTab(e.target.value as LanguagesType)
                   }
@@ -484,7 +493,7 @@ function AddHospitalProcedure({ params }: { params: { id: string } }) {
                   <div key={c.countryCode} className="w-full">
                     {c.language === activeCostTab && (
                       <input
-                        className={addHospitalStyle.input}
+                        className="w-full rounded-lg border-2 border-lightsilver px-4 py-2 placeholder:text-sm placeholder:font-normal placeholder:text-neutral-3"
                         style={{ paddingLeft: '110px' }}
                         id="cost-of-procedure"
                         {...register(costLang, { valueAsNumber: true })}
@@ -502,14 +511,13 @@ function AddHospitalProcedure({ params }: { params: { id: string } }) {
             </div>
             <div className="my-4 flex w-full flex-col items-start">
               <label
-                style={{ marginBottom: '8px' }}
-                className={addHospitalStyle.label}
+                className="mb-3 font-poppins text-base font-normal text-neutral-2"
                 htmlFor="waiting-time"
               >
                 Expected waiting time for the procedure in days
               </label>
               <input
-                className={addHospitalStyle.input}
+                className="w-full rounded-lg border-2 border-lightsilver px-4 py-2 placeholder:text-sm placeholder:font-normal placeholder:text-neutral-3"
                 type="number"
                 id="waiting-time"
                 {...register('waitingTime')}
@@ -525,14 +533,13 @@ function AddHospitalProcedure({ params }: { params: { id: string } }) {
               style={{ marginBottom: '32px' }}
             >
               <label
-                style={{ marginBottom: '8px' }}
-                className={addHospitalStyle.label}
+                className="mb-3 font-poppins text-base font-normal text-neutral-2"
                 htmlFor="stay-in-hospital"
               >
                 Expected length of stay in the hospital in days
               </label>
               <input
-                className={addHospitalStyle.input}
+                className="w-full rounded-lg border-2 border-lightsilver px-4 py-2 placeholder:text-sm placeholder:font-normal placeholder:text-neutral-3"
                 type="number"
                 id="stay-in-hospital"
                 {...register('stayInHospital')}
@@ -548,14 +555,13 @@ function AddHospitalProcedure({ params }: { params: { id: string } }) {
               style={{ marginBottom: '32px' }}
             >
               <label
-                style={{ marginBottom: '8px' }}
-                className={addHospitalStyle.label}
+                className="mb-3 font-poppins text-base font-normal text-neutral-2"
                 htmlFor="stay-in-city"
               >
                 Expected length of stay in the city in days
               </label>
               <input
-                className={addHospitalStyle.input}
+                className="w-full rounded-lg border-2 border-lightsilver px-4 py-2 placeholder:text-sm placeholder:font-normal placeholder:text-neutral-3"
                 type="number"
                 id="stay-in-city"
                 {...register('stayInCity')}

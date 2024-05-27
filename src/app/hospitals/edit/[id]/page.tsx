@@ -171,10 +171,10 @@ function EditHospital({ params: { id } }: { params: { id: string } }) {
       reqdHospital.data.success
     ) {
       setValue('hospitalName', reqdHospital.data.data.name);
-      setValue('hospitalDescEn', reqdHospital.data.data.description.da);
-      setValue('hospitalDescNb', reqdHospital.data.data.description.sv);
-      setValue('hospitalDescDa', reqdHospital.data.data.description.nb);
-      setValue('hospitalDescSv', reqdHospital.data.data.description.nb);
+      setValue('hospitalDescEn', reqdHospital.data.data.description.en);
+      setValue('hospitalDescNb', reqdHospital.data.data.description.nb);
+      setValue('hospitalDescDa', reqdHospital.data.data.description.da);
+      setValue('hospitalDescSv', reqdHospital.data.data.description.sv);
       setValue('streetName', reqdHospital.data.data.streetName);
       setValue('city', reqdHospital.data.data.city);
       setValue('streetNumber', reqdHospital.data.data.streetNumber);
@@ -240,11 +240,7 @@ function EditHospital({ params: { id } }: { params: { id: string } }) {
           onSubmit={handleSubmit(onFormSubmit)}
         >
           <div className="flex flex-col items-center justify-center">
-            {!(
-              reqdHospital.data &&
-              reqdHospital.data.data.logo &&
-              typeof reqdHospital.data.data.logo === 'string'
-            ) && (
+            {logo && (
               <Controller
                 name="logo"
                 control={control}
@@ -252,7 +248,6 @@ function EditHospital({ params: { id } }: { params: { id: string } }) {
                   <button
                     type="button"
                     className="relative flex size-[220px] flex-col items-center justify-center rounded-full border border-neutral-4"
-                    style={{ marginLeft: '-40px' }}
                     onClick={() => logoRef.current?.click()}
                     onMouseEnter={() => setShowLogoOverlay(true)}
                     onMouseLeave={() => setShowLogoOverlay(false)}

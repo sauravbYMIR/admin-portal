@@ -4,16 +4,19 @@ import type { CustomCellRendererProps } from 'ag-grid-react';
 import Image from 'next/image';
 import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
-import { toast } from 'sonner';
 
-import { CustomHomePage, DataTable, Header, WithAuth } from '@/components';
-import ShowDataTable from '@/components/Table/PatientsTable/PatientsTable';
 import {
-  editHospitalProcedure,
-  useGetAllHospitalProcedure,
-} from '@/hooks/useHospitalProcedure';
+  CustomHomePage,
+  DataTable,
+  Header,
+  PlusIcon,
+  WithAuth,
+} from '@/components';
+import ShowDataTable from '@/components/Table/PatientsTable/PatientsTable';
+import { useGetAllHospitalProcedure } from '@/hooks/useHospitalProcedure';
 import infoLinkIcon from '@/public/assets/icons/linkArrow.svg';
 import plusIcon from '@/public/assets/icons/plus.svg';
+import emptyState from '@/public/assets/images/emptyState.svg';
 
 import patientsTableStyle from '../../../../../components/Table/PatientsTable/patientsTable.module.scss';
 
@@ -37,6 +40,39 @@ const CustomStatusEditComponent = (props: CustomCellRendererProps) => {
   );
 };
 
+const EmptyHospitalProcedurePage = ({
+  hospitalId,
+}: {
+  hospitalId?: string;
+}) => {
+  const router = useRouter();
+  return (
+    <div className="mt-[100px] flex w-screen flex-col items-center justify-center">
+      <Image
+        src={emptyState}
+        alt="empty-procedure-list"
+        width={160}
+        height={160}
+      />
+      <p className="mb-7 mt-3 font-poppins text-base font-normal text-neutral-2">
+        No procedures have been added yet!
+      </p>
+      <button
+        type="button"
+        className="flex cursor-pointer items-center gap-3 rounded-lg bg-darkteal px-6 py-[14px]"
+        onClick={() =>
+          router.push(`/hospitals/add/${hospitalId}/procedures/add`)
+        }
+      >
+        <PlusIcon className="size-5" stroke="#fff" />
+        <p className="font-poppins text-base font-semibold text-primary-6">
+          Add procedures
+        </p>
+      </button>
+    </div>
+  );
+};
+
 function HospitalProcedureManagement() {
   const pathname = usePathname();
   const hospitalId = pathname.split('/')[3];
@@ -44,28 +80,28 @@ function HospitalProcedureManagement() {
     id: hospitalId ?? '',
   });
   const router = useRouter();
-  const onCellClicked = async (params: any) => {
-    if (params.type === 'cellEditingStopped') {
-      try {
-        const r = await editHospitalProcedure({
-          waitingTime: params.data.waitTime,
-          stayInHospital: params.data.stayInHospital,
-          stayInCity: params.data.stayInCity,
-          description: params.data.desc,
-          cost: {
-            ...params.data.costObj,
-            en: params.data.cost,
-          },
-          hospitalProcedureId: params.data.id,
-        });
-        if (r.success) {
-          toast.success('Changes updated successfully');
-        }
-      } catch (e) {
-        toast.error('error while updated hospital procedure');
-      }
-    }
-  };
+  // const onCellClicked = async (params: any) => {
+  //   if (params.type === 'cellEditingStopped') {
+  //     try {
+  //       const r = await editHospitalProcedure({
+  //         waitingTime: params.data.waitTime,
+  //         stayInHospital: params.data.stayInHospital,
+  //         stayInCity: params.data.stayInCity,
+  //         description: params.data.desc,
+  //         cost: {
+  //           ...params.data.costObj,
+  //           en: params.data.cost,
+  //         },
+  //         hospitalProcedureId: params.data.id,
+  //       });
+  //       if (r.success) {
+  //         toast.success('Changes updated successfully');
+  //       }
+  //     } catch (e) {
+  //       toast.error('error while updated hospital procedure');
+  //     }
+  //   }
+  // };
   return (
     <div>
       <Header />
@@ -117,7 +153,7 @@ function HospitalProcedureManagement() {
               <DataTable />
             ) : (
               <ShowDataTable
-                onCellClicked={onCellClicked}
+                // onCellClicked={onCellClicked}
                 rowData={procedureByHospitalId.data.data.map((r) => ({
                   name: `${r.procedure.name.en}`,
                   department: r.procedure.category.name.en,
@@ -186,31 +222,7 @@ function HospitalProcedureManagement() {
             {procedureByHospitalId.isLoading ? (
               <DataTable />
             ) : (
-              <div
-                style={{ boxShadow: '2px 2px 4px 1px rgba(9, 111, 144, 0.1)' }}
-                className="box-border flex w-full flex-col items-center gap-12 rounded-xl border border-lightskyblue bg-neutral-7 px-[178px] py-12"
-              >
-                <h2 className="text-center font-poppins text-4xl font-medium text-neutral-1">
-                  No procedures have been added yet!
-                </h2>
-                <button
-                  type="button"
-                  className="flex h-16 items-center gap-3 rounded-lg bg-darkteal px-6 py-[14px]"
-                  onClick={() =>
-                    router.push(`/hospitals/add/${hospitalId}/procedures/add`)
-                  }
-                >
-                  <Image
-                    src={plusIcon}
-                    alt="cta btn text"
-                    width={25}
-                    height={25}
-                  />
-                  <p className="font-poppins text-2xl font-normal text-primary-6">
-                    Add procedures
-                  </p>
-                </button>
-              </div>
+              <EmptyHospitalProcedurePage hospitalId={hospitalId} />
             )}
           </div>
         )}

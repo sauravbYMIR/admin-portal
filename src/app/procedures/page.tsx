@@ -20,6 +20,7 @@ import { useGetAllDepartmentWithProcedure } from '@/hooks/useDepartment';
 import editIcon from '@/public/assets/icons/edit.svg';
 import emptyState from '@/public/assets/images/emptyState.svg';
 import type { LangType } from '@/types/global';
+import { countryData } from '@/utils/global';
 
 import proceduresStyle from './procedures.module.scss';
 
@@ -27,7 +28,7 @@ function ReimbursementWrapper({
   name,
   value,
 }: {
-  name: LangType;
+  name?: string;
   value: number;
 }) {
   return (
@@ -111,21 +112,27 @@ function ProceduresList() {
       ) : (
         <ProcedureModal
           isOpen={editProcedureModalOpen}
-          onClose={() => setEditProcedureModalOpen(false)}
+          onClose={() => {
+            setUpdateId('');
+            setEditProcedureModalOpen(false);
+          }}
           isEdit={isEditData}
           editSubCategory={isEditSubCategory}
           updateId={updateId}
         />
       )}
-      {editProcedureModalOpen && (
+      {/* {editProcedureModalOpen && (
         <ProcedureModal
           isOpen={editProcedureModalOpen}
-          onClose={() => setEditProcedureModalOpen(false)}
+          onClose={() => {
+            setUpdateId('');
+            setEditProcedureModalOpen(false);
+          }}
           isEdit={isEditData}
           editSubCategory={false}
           updateId={updateId}
         />
-      )}
+      )} */}
       <CustomHomePage
         heading="Procedure List"
         subHeading="List of all Procedures listed on the platform"
@@ -238,10 +245,14 @@ function ProceduresList() {
                                                 ).map((key) => {
                                                   const reimbursementKey =
                                                     key as LangType;
+                                                  const countryName =
+                                                    countryData.find(
+                                                      (c) => c.locale === key,
+                                                    )?.name;
                                                   return (
                                                     <ReimbursementWrapper
                                                       key={reimbursementKey}
-                                                      name={reimbursementKey}
+                                                      name={countryName}
                                                       value={
                                                         procedure.reimbursement[
                                                           reimbursementKey

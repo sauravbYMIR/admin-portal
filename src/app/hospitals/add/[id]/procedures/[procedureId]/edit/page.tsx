@@ -247,14 +247,18 @@ function EditHospitalProcedure({
       <Header />
 
       <div className={addHospitalStyle.hospitalFormContainer}>
-        <button
-          type="button"
-          onClick={() => router.push('/hospitals')}
-          className="flex size-10 cursor-pointer items-center justify-center rounded-full border-none bg-rgba244"
-        >
-          <BackArrowIcon strokeWidth="2" stroke="rgba(17, 17, 17, 0.8)" />
-        </button>
-        <h2 className={addHospitalStyle.title}>Edit procedure</h2>
+        <div className="flex items-center gap-x-14">
+          <button
+            type="button"
+            onClick={() => router.push('/hospitals')}
+            className="flex size-10 cursor-pointer items-center justify-center rounded-full border-none bg-rgba244"
+          >
+            <BackArrowIcon strokeWidth="2" stroke="rgba(17, 17, 17, 0.8)" />
+          </button>
+          <h2 className="font-poppins text-3xl font-medium text-darkslategray">
+            Edit procedure
+          </h2>
+        </div>
 
         <form
           className={`${addHospitalStyle.hospitalProfileForm} mt-20 gap-y-8`}

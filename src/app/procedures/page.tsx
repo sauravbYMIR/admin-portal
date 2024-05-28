@@ -173,6 +173,10 @@ function ProceduresList() {
                           setUpdateId(procedureData.id);
                           setIsEditData(true);
                           setEditDepartmentModalOpen(true);
+                          setIsEditData(true);
+                          setEditProcedureModalOpen(false);
+                          setIsEditSubCategory(false);
+                          setEditSubCategoryModalOpen(false);
                         }}
                         title={procedureData.name.en}
                         type="SUB-CATEGORY"
@@ -228,6 +232,13 @@ function ProceduresList() {
                                                 setUpdateId(procedure.id);
                                                 setIsEditData(true);
                                                 setEditProcedureModalOpen(true);
+                                                setIsEditSubCategory(false);
+                                                setEditSubCategoryModalOpen(
+                                                  false,
+                                                );
+                                                setEditDepartmentModalOpen(
+                                                  false,
+                                                );
                                               }}
                                               type="PROCEDURE"
                                             >
@@ -269,6 +280,7 @@ function ProceduresList() {
                             className={
                               proceduresStyle.proceduresAccordionContainer
                             }
+                            style={{ border: '1px solid red' }}
                           >
                             {procedureData.procedures.map((procedure) => {
                               return (
@@ -277,6 +289,8 @@ function ProceduresList() {
                                     setUpdateId(procedure.id);
                                     setIsEditData(true);
                                     setEditProcedureModalOpen(true);
+                                    setIsEditSubCategory(false);
+                                    setEditSubCategoryModalOpen(false);
                                   }}
                                   key={procedure.id}
                                   title={procedure.name.en}

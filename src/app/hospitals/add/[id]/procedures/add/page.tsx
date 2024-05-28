@@ -19,6 +19,7 @@ import { departmentTypeSchema } from '@/app/procedures/CreateProcedureForm/Creat
 import {
   AddTeamMemberToHospitalProcedure,
   BackArrowIcon,
+  CancelModal,
   CloseIcon,
   FileUploadIcon,
   Header,
@@ -38,11 +39,7 @@ import type { LanguagesType } from '@/types/components';
 import { countryData } from '@/utils/global';
 
 import addHospitalStyle from '../../../style.module.scss';
-import style from '../../hospitalDetailPage.module.scss';
-import type {
-  HospitalCostFormSchemaType,
-  HospitalProcedureFormSchemaType,
-} from '../[procedureId]/edit/page';
+import type { HospitalProcedureFormSchemaType } from '../[procedureId]/edit/page';
 
 const createHospitalProcedureFormSchema = z.object({
   department: departmentTypeSchema,
@@ -59,19 +56,7 @@ const createHospitalProcedureFormSchema = z.object({
   procedureDescSv: z
     .string()
     .min(1, { message: 'Fill in details in all the languages' }),
-  costEn: z.number({
-    required_error: 'Cost in all language is required',
-    invalid_type_error: 'Cost must be a number',
-  }),
-  costNb: z.number({
-    required_error: 'Cost in all language is required',
-    invalid_type_error: 'Cost must be a number',
-  }),
-  costDa: z.number({
-    required_error: 'Cost in all language is required',
-    invalid_type_error: 'Cost must be a number',
-  }),
-  costSv: z.number({
+  cost: z.number({
     required_error: 'Cost in all language is required',
     invalid_type_error: 'Cost must be a number',
   }),
@@ -115,18 +100,20 @@ const HospitalMemberCard = ({
       <div className="mt-6 flex items-center justify-between">
         <button
           type="button"
-          className="cursor-pointer"
+          className="flex cursor-pointer items-center"
           onClick={() => {
             setTeamMembers((prevState) =>
-              prevState.filter((member) => member.member.id !== memberId),
+              prevState.filter(
+                (teamMemberInfo) => teamMemberInfo.member.id !== memberId,
+              ),
             );
           }}
         >
           <RemoveIcon className="h-6 w-4" stroke="rgba(9, 111, 144, 1)" />
+          <span className="ml-3 font-poppins text-base font-medium text-darkteal">
+            Remove
+          </span>
         </button>
-        <span className="ml-3 font-poppins text-base font-medium text-darkteal">
-          Remove
-        </span>
       </div>
     </div>
   );
@@ -136,12 +123,6 @@ const hospitalProcedureObj = {
   Norwegian: 'procedureDescNb',
   Danish: 'procedureDescDa',
   Swedish: 'procedureDescSv',
-};
-const costObj = {
-  English: 'costEn',
-  Norwegian: 'costNb',
-  Danish: 'costDa',
-  Swedish: 'costSv',
 };
 function AddHospitalProcedure({ params }: { params: { id: string } }) {
   const updateHospitalProcedureGallery = useUpdateHospitalProcedureGallery();
@@ -182,8 +163,8 @@ function AddHospitalProcedure({ params }: { params: { id: string } }) {
   });
   const [activeLanguageTab, setActiveLanguageTab] =
     React.useState<LanguagesType>('English');
-  const [activeCostTab, setActiveCostTab] =
-    React.useState<LanguagesType>('English');
+  const [isActiveCancelModal, setIsActiveCancelModal] =
+    React.useState<boolean>(false);
   const router = useRouter();
   const {
     register,
@@ -203,10 +184,6 @@ function AddHospitalProcedure({ params }: { params: { id: string } }) {
     ] as HospitalProcedureFormSchemaType;
     return errors[lang] && errors[lang]?.message;
   });
-  const shouldRenderCostError = countryData.some((c) => {
-    const lang = costObj[c.language] as HospitalCostFormSchemaType;
-    return errors[lang] && errors[lang]?.message;
-  });
   const onFormSubmit: SubmitHandler<CreateHospitalProcedureFormFields> = (
     data: CreateHospitalProcedureFormFields,
   ) => {
@@ -223,11 +200,10 @@ function AddHospitalProcedure({ params }: { params: { id: string } }) {
         nb: data.procedureDescNb,
         sv: data.procedureDescSv,
       },
+      // TODO: Change currency
       cost: {
-        en: data.costEn,
-        da: data.costDa,
-        nb: data.costNb,
-        sv: data.costSv,
+        price: data.cost,
+        currency: 'EUR',
       },
       waitingTime: data.waitingTime,
       stayInCity: data.stayInCity,
@@ -317,9 +293,14 @@ function AddHospitalProcedure({ params }: { params: { id: string } }) {
     }
   }, [allProcedureByDeptId.data, allProcedureByDeptId.isSuccess]);
   React.useEffect(() => {
-    if (createHospitalProcedure.isSuccess) {
+    if (
+      createHospitalProcedure.isSuccess &&
+      createHospitalProcedure.data?.data
+    ) {
       toast('Procedure added successfully');
-      router.push('/procedures');
+      router.push(
+        `/hospitals/add/${params.id}/procedures/${createHospitalProcedure.data.data}`,
+      );
       return;
     }
     if (createHospitalProcedure.isError) {
@@ -331,6 +312,8 @@ function AddHospitalProcedure({ params }: { params: { id: string } }) {
     createHospitalProcedure.isError,
     createHospitalProcedure.isSuccess,
     router,
+    createHospitalProcedure.data?.data,
+    params.id,
   ]);
   const gallery = watch('gallery');
   return (
@@ -341,7 +324,7 @@ function AddHospitalProcedure({ params }: { params: { id: string } }) {
         <div className="flex items-center gap-x-14">
           <button
             type="button"
-            onClick={() => router.push('/hospitals')}
+            onClick={() => setIsActiveCancelModal(true)}
             className="flex size-10 cursor-pointer items-center justify-center rounded-full border-none bg-rgba244"
           >
             <BackArrowIcon strokeWidth="2" stroke="rgba(17, 17, 17, 0.8)" />
@@ -486,7 +469,7 @@ function AddHospitalProcedure({ params }: { params: { id: string } }) {
             )}
           </div>
 
-          <div className="grid w-full grid-cols-2 gap-4">
+          <div className="grid w-full grid-cols-2 gap-x-10 gap-y-4">
             <div className="relative my-4 flex w-full flex-col items-start">
               <label
                 className="mb-3 font-poppins text-base font-normal text-neutral-2"
@@ -495,46 +478,28 @@ function AddHospitalProcedure({ params }: { params: { id: string } }) {
                 Expected cost of procedure
               </label>
 
-              <div className="absolute top-[38px]">
-                <select
-                  name="cost-of-procedure"
-                  id="cost-of-procedure"
-                  className="rounded-md border-2 border-neutral-4 bg-neutral-6 px-5 py-[8px]"
-                  onChange={(e) =>
-                    setActiveCostTab(e.target.value as LanguagesType)
-                  }
-                >
-                  {countryData.map((country) => {
-                    return (
-                      <option value={country.language} key={country.language}>
-                        <span>{country.currency}</span>
-                      </option>
-                    );
-                  })}
-                </select>
+              <div className="absolute top-[37px]">
+                <div className="rounded-md border-2 border-neutral-4 bg-neutral-6 px-5 py-[7px]">
+                  <span className="font-poppins text-sm font-normal text-neutral-2">
+                    EUR
+                  </span>
+                </div>
               </div>
 
-              {countryData.map((c) => {
-                const costLang = costObj[
-                  c.language
-                ] as HospitalProcedureFormSchemaType;
-                return (
-                  <div key={c.countryCode} className="w-full">
-                    {c.language === activeCostTab && (
-                      <input
-                        className="w-full rounded-lg border-2 border-lightsilver px-4 py-2 placeholder:text-sm placeholder:font-normal placeholder:text-neutral-3"
-                        style={{ paddingLeft: '110px' }}
-                        id="cost-of-procedure"
-                        {...register(costLang, { valueAsNumber: true })}
-                      />
-                    )}
-                  </div>
-                );
-              })}
-
-              {shouldRenderCostError && (
-                <small className="mb-5 mt-1 text-start font-lexend text-base font-normal text-error">
-                  Fill in details in all the languages
+              <input
+                className="w-full rounded-lg border-2 border-lightsilver px-4 py-2 placeholder:text-sm placeholder:font-normal placeholder:text-neutral-3"
+                style={{ paddingLeft: '75px' }}
+                id="cost-of-procedure"
+                {...register('cost', { valueAsNumber: true })}
+                type="number"
+                onWheel={(e: React.WheelEvent<HTMLInputElement>) => {
+                  const target = e.target as HTMLElement;
+                  target.blur();
+                }}
+              />
+              {errors.cost && (
+                <small className="mt-1 text-start font-lexend text-base font-normal text-error">
+                  {errors.cost.message}
                 </small>
               )}
             </div>
@@ -548,6 +513,10 @@ function AddHospitalProcedure({ params }: { params: { id: string } }) {
               <input
                 className="w-full rounded-lg border-2 border-lightsilver px-4 py-2 placeholder:text-sm placeholder:font-normal placeholder:text-neutral-3"
                 type="number"
+                onWheel={(e: React.WheelEvent<HTMLInputElement>) => {
+                  const target = e.target as HTMLElement;
+                  target.blur();
+                }}
                 id="waiting-time"
                 {...register('waitingTime')}
               />
@@ -570,6 +539,10 @@ function AddHospitalProcedure({ params }: { params: { id: string } }) {
               <input
                 className="w-full rounded-lg border-2 border-lightsilver px-4 py-2 placeholder:text-sm placeholder:font-normal placeholder:text-neutral-3"
                 type="number"
+                onWheel={(e: React.WheelEvent<HTMLInputElement>) => {
+                  const target = e.target as HTMLElement;
+                  target.blur();
+                }}
                 id="stay-in-hospital"
                 {...register('stayInHospital')}
               />
@@ -592,6 +565,10 @@ function AddHospitalProcedure({ params }: { params: { id: string } }) {
               <input
                 className="w-full rounded-lg border-2 border-lightsilver px-4 py-2 placeholder:text-sm placeholder:font-normal placeholder:text-neutral-3"
                 type="number"
+                onWheel={(e: React.WheelEvent<HTMLInputElement>) => {
+                  const target = e.target as HTMLElement;
+                  target.blur();
+                }}
                 id="stay-in-city"
                 {...register('stayInCity')}
               />
@@ -730,18 +707,13 @@ function AddHospitalProcedure({ params }: { params: { id: string } }) {
                   <p className="font-lexend text-xs font-medium text-gray2">
                     PNG, JPG (max. 10 MB)
                   </p>
-                  {/* {errors.gallery && (
-                    <small className="mt-1 text-start font-lexend text-sm font-normal text-error">
-                      {errors.gallery.message}
-                    </small>
-                  )} */}
                 </button>
               )}
             </div>
           </div>
 
           {teamMembers.length > 0 ? (
-            <div className={style.teamMemberCardsContainer}>
+            <div className="flex w-full flex-col items-start">
               <h3 className="my-8 font-poppins text-lg font-normal text-neutral-1">
                 Team members
               </h3>
@@ -833,6 +805,20 @@ function AddHospitalProcedure({ params }: { params: { id: string } }) {
           teamMembers={teamMembers}
         />
       </div>
+      {isActiveCancelModal && (
+        <CancelModal
+          heading="Are you sure you want to cancel creating hospital procedure?"
+          msg={`You'll lose all responses collected. We can't recover them once you go back.`}
+          onCancelHandler={() => {
+            setIsActiveCancelModal(false);
+          }}
+          onAcceptHandler={() => {
+            setIsActiveCancelModal(false);
+            router.back();
+          }}
+          cancelMsg="No, Continue editing"
+        />
+      )}
     </div>
   );
 }

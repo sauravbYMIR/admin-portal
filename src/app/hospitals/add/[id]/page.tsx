@@ -183,6 +183,8 @@ function HospitalDetailsPage({ params: { id } }: { params: { id: string } }) {
                     height={250}
                     alt="hospital-gallery"
                     objectFit="contain"
+                    unoptimized
+                    priority
                     className="h-[250px] w-[260px] rounded-lg"
                   />
                 );
@@ -265,6 +267,7 @@ function HospitalDetailsPage({ params: { id } }: { params: { id: string } }) {
                     {hospitalById.data.data.members.map((member) => {
                       return (
                         <TeamMemberCard
+                          hospitalId={id}
                           teamMemberId={member.id}
                           name={member.name}
                           qualification={member.qualification}
@@ -301,7 +304,7 @@ function HospitalDetailsPage({ params: { id } }: { params: { id: string } }) {
               onClick={() =>
                 router.push(`/hospitals/add/${hospitalId}/procedures`)
               }
-              className="flex items-center gap-x-2 border-b border-darkteal pb-2"
+              className="flex items-center gap-x-2 border-b-2 border-darkteal pb-1"
               type="button"
             >
               <p className="font-poppins text-base font-semibold text-darkteal">

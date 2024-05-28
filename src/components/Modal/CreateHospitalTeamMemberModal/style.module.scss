@@ -12,7 +12,7 @@
 
   .modal {
     width: 740px;
-    height: 700px;
+    // height: 700px;
     overflow: scroll;
     padding: 32px 48px 48px;
     display: flex;
@@ -48,7 +48,7 @@
         display: flex;
         gap: 8px;
         align-items: center;
-        margin: 20px 0;
+        margin: 12px 0 20px 0;
 
         button {
           border-radius: 8px;

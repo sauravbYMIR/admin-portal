@@ -11,15 +11,16 @@ import { z } from 'zod';
 
 import {
   BackArrowIcon,
-  CreateHospitalTeamMemberModal,
   EditIcon,
   FacebookStyleLoader,
   Header,
   PlusIcon,
   SearchIcon,
-  TeamMemberCard,
   WithAuth,
 } from '@/components';
+import HospitalTeamMemberCard from '@/components/Card/HospitalTeamMemberCard/HospitalTeamMemberCard';
+import { AddTeamMemberAPI } from '@/components/Modal/AddTeamMemberAPI/AddTeamMemberAPI';
+import type { NameJSONType } from '@/hooks/useDepartment';
 import { useGetHospitalProcedureById } from '@/hooks/useHospitalProcedure';
 
 import style from '../../hospitalDetailPage.module.scss';
@@ -73,8 +74,20 @@ function HospitalDetailsPage({
   const [isCreateHospitalTeamModal, setIsCreateHospitalTeamModal] =
     useState<boolean>(false);
   const [isEditTeamMember, setIsEditTeamMember] = useState<boolean>(false);
-  const [teamMemberId, setTeamMemberId] = useState<string>('');
   const [searchMemberQuery, setSearchMemberQuery] = useState<string>('');
+  const [selectedTeamMemberDetails, setSelectedTeamMemberDetails] = useState<{
+    role: NameJSONType | null;
+    id: string;
+    position: NameJSONType;
+    name: string;
+    qualification: string;
+  }>({
+    role: { en: '', nb: '', da: '', sv: '' },
+    position: { en: '', nb: '', da: '', sv: '' },
+    id: '',
+    name: '',
+    qualification: '',
+  });
 
   const router = useRouter();
   return (
@@ -222,7 +235,7 @@ function HospitalDetailsPage({
                 {hospitalProcedureId.data.data.hospitalMembers.length === 0 ? (
                   <div className={style.createTeamMemberContainer}>
                     <p className={style.title}>
-                      No team members have been created yet!
+                      No team members have been added yet!
                     </p>
 
                     <button
@@ -230,7 +243,7 @@ function HospitalDetailsPage({
                       className={style.btn}
                       type="button"
                     >
-                      <p>Create team members</p>
+                      <p>Add team members</p>
                     </button>
                   </div>
                 ) : (
@@ -294,7 +307,7 @@ function HospitalDetailsPage({
 
                     <div className="mb-16 flex flex-wrap items-center gap-8">
                       {searchMemberQuery
-                        ? hospitalProcedureId.data.data.hospitalMembers
+                        ? hospitalProcedureId.data.data.procedureMembers
                             .filter((member) =>
                               member.name
                                 .toLowerCase()
@@ -302,16 +315,24 @@ function HospitalDetailsPage({
                             )
                             .map((member) => {
                               return (
-                                <TeamMemberCard
+                                <HospitalTeamMemberCard
+                                  hospitalProcedureId={params.procedureId}
                                   teamMemberId={member.id}
                                   name={member.name}
                                   qualification={member.qualification}
-                                  role={member.position.en}
+                                  role={member.role ? member.role.en : '---'}
                                   key={member.id}
                                   isEdit={isEditTeamMember}
                                   onOpen={() => {
-                                    setTeamMemberId(member.id);
+                                    // setTeamMemberId(member.id);
                                     setIsCreateHospitalTeamModal(true);
+                                    setSelectedTeamMemberDetails({
+                                      role: member.role,
+                                      position: member.position,
+                                      id: member.id,
+                                      name: member.name,
+                                      qualification: member.qualification,
+                                    });
                                   }}
                                   profile={
                                     member.profilePictureUploaded
@@ -321,19 +342,27 @@ function HospitalDetailsPage({
                                 />
                               );
                             })
-                        : hospitalProcedureId.data.data.hospitalMembers.map(
+                        : hospitalProcedureId.data.data.procedureMembers.map(
                             (member) => {
                               return (
-                                <TeamMemberCard
+                                <HospitalTeamMemberCard
+                                  hospitalProcedureId={params.procedureId}
                                   teamMemberId={member.id}
                                   name={member.name}
                                   qualification={member.qualification}
-                                  role={member.position.en}
+                                  role={member.role ? member.role.en : '---'}
                                   key={member.id}
                                   isEdit={isEditTeamMember}
                                   onOpen={() => {
-                                    setTeamMemberId(member.id);
+                                    // setTeamMemberId(member.id);
                                     setIsCreateHospitalTeamModal(true);
+                                    setSelectedTeamMemberDetails({
+                                      role: member.role,
+                                      position: member.position,
+                                      id: member.id,
+                                      name: member.name,
+                                      qualification: member.qualification,
+                                    });
                                   }}
                                   profile={
                                     member.profilePictureUploaded
@@ -350,15 +379,40 @@ function HospitalDetailsPage({
                 )}
               </>
             )}
-            <CreateHospitalTeamMemberModal
+            <AddTeamMemberAPI
+              hospitalId={params.id}
+              isEditTeamMember={isEditTeamMember}
+              hospitalProcedureId={params.procedureId}
               isOpen={isCreateHospitalTeamModal}
               onClose={() => {
+                setSelectedTeamMemberDetails({
+                  role: {
+                    en: '',
+                    nb: '',
+                    da: '',
+                    sv: '',
+                  },
+                  position: {
+                    en: '',
+                    nb: '',
+                    da: '',
+                    sv: '',
+                  },
+                  id: '',
+                  name: '',
+                  qualification: '',
+                });
                 setIsEditTeamMember(false);
-                setTeamMemberId('');
                 setIsCreateHospitalTeamModal(false);
               }}
-              hospitalId={params.procedureId}
-              memberId={teamMemberId}
+              selectedTeamMemberDetails={selectedTeamMemberDetails}
+              procedureMembers={
+                hospitalProcedureId.data?.success
+                  ? hospitalProcedureId.data?.data.procedureMembers.map(
+                      (member) => member.id,
+                    )
+                  : []
+              }
             />
           </>
         )}

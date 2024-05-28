@@ -4,12 +4,18 @@ import React from 'react';
 import type { SubmitHandler } from 'react-hook-form';
 import { Controller, useForm } from 'react-hook-form';
 import Select from 'react-select';
+import { ClipLoader } from 'react-spinners';
+import { toast } from 'sonner';
 import { z } from 'zod';
 
 import { CloseIcon } from '@/components/Icons/Icons';
 import departmentModalStyle from '@/components/Modal/DepartmentModal/departmentModal.module.scss';
 import { useGetHospitalTeamMembersByHospitalId } from '@/hooks';
 import type { NameJSONType } from '@/hooks/useDepartment';
+import {
+  useAddHospitalMemberToProcedure,
+  useEditHospitalProcedureMember,
+} from '@/hooks/useHospitalProcedure';
 import type { LanguagesType } from '@/types/components';
 import { countryData } from '@/utils/global';
 
@@ -45,38 +51,32 @@ const addTeamMemberFormSchema = z.object({
     .string()
     .min(1, { message: 'Fill in details in all the languages' }),
 });
-export type CreateHospitalTeamMemberFormFields = z.infer<
+export type EditHospitalTeamMemberFormFields = z.infer<
   typeof addTeamMemberFormSchema
 >;
 
-export function AddTeamMemberToHospitalProcedure({
+export function AddTeamMemberAPI({
   isOpen,
   hospitalId,
+  hospitalProcedureId,
   onClose,
-  setTeamMembers,
-  teamMembers,
+  selectedTeamMemberDetails,
+  procedureMembers,
+  isEditTeamMember,
 }: {
+  isEditTeamMember: boolean;
   isOpen: boolean;
+  hospitalProcedureId: string;
   onClose: () => void;
   hospitalId: string;
-  setTeamMembers: React.Dispatch<
-    React.SetStateAction<
-      Array<{
-        member: {
-          id: string;
-          name: string;
-        };
-        role: NameJSONType;
-      }>
-    >
-  >;
-  teamMembers: Array<{
-    role: NameJSONType;
-    member: {
-      id: string;
-      name: string;
-    };
-  }>;
+  selectedTeamMemberDetails: {
+    role: NameJSONType | null;
+    id: string;
+    position: NameJSONType;
+    name: string;
+    qualification: string;
+  };
+  procedureMembers: Array<string>;
 }) {
   const [addAnotherTeamMember, setAddAnotherTeamMember] =
     React.useState<boolean>(false);
@@ -99,9 +99,7 @@ export function AddTeamMemberToHospitalProcedure({
     ) {
       setTeamMemberList(() =>
         hospitalTeamMembers.data.data
-          .filter((teamMember) =>
-            teamMembers.find(({ member: { id } }) => id === teamMember.id),
-          )
+          .filter((member) => !procedureMembers.find((id) => id === member.id))
           .map((teamMember) => ({
             value: teamMember.id,
             name: `${teamMember.name}`,
@@ -109,7 +107,11 @@ export function AddTeamMemberToHospitalProcedure({
           })),
       );
     }
-  }, [hospitalTeamMembers.data, hospitalTeamMembers.isSuccess, teamMembers]);
+  }, [
+    hospitalTeamMembers.data,
+    hospitalTeamMembers.isSuccess,
+    procedureMembers,
+  ]);
   const [selectedOption, setSelectedOption] = React.useState<{
     label: string;
     value: string;
@@ -123,48 +125,81 @@ export function AddTeamMemberToHospitalProcedure({
     control,
     reset,
     formState: { errors },
-  } = useForm<CreateHospitalTeamMemberFormFields>({
+    setValue,
+  } = useForm<EditHospitalTeamMemberFormFields>({
     resolver: zodResolver(addTeamMemberFormSchema),
   });
   const shouldRenderError = countryData.some((c) => {
     const lang = roleObj[c.language] as HospitalTeamMemberSchemaType;
     return errors[lang] && errors[lang]?.message;
   });
-  const onFormSubmit: SubmitHandler<CreateHospitalTeamMemberFormFields> = (
-    data: CreateHospitalTeamMemberFormFields,
+  const addHospitalMemberToProcedure = useAddHospitalMemberToProcedure({
+    hospitalProcedureId,
+    onClose: addAnotherTeamMember ? null : onClose,
+  });
+  const editHospitalProcedureMember = useEditHospitalProcedureMember({
+    hospitalProcedureId,
+    onClose,
+  });
+  const onFormSubmit: SubmitHandler<EditHospitalTeamMemberFormFields> = (
+    data: EditHospitalTeamMemberFormFields,
   ) => {
-    if (
-      teamMembers.find(
-        (member) => member.member.id === data.teamMemberId.value,
-      ) !== undefined
-    ) {
+    if (!hospitalProcedureId) {
+      toast.error('Invalid hospital procedure, refresh the page and try again');
       return;
     }
-    setTeamMembers((prevState) => [
-      ...prevState,
-      {
-        member: {
-          id: data.teamMemberId.value,
-          name: data.teamMemberId.label,
-        },
+    if (isEditTeamMember) {
+      editHospitalProcedureMember.mutate({
         role: {
           en: data.roleEn,
-          nb: data.roleNb,
           da: data.roleDa,
+          nb: data.roleNb,
           sv: data.roleSv,
         },
+        memberId: data.teamMemberId.value,
+        hospitalProcedure: hospitalProcedureId,
+      });
+      return;
+    }
+
+    addHospitalMemberToProcedure.mutate({
+      role: {
+        en: data.roleEn,
+        da: data.roleDa,
+        nb: data.roleNb,
+        sv: data.roleSv,
       },
-    ]);
+      hospitalProcedure: hospitalProcedureId,
+      memberId: data.teamMemberId.value,
+    });
+
     reset();
     setSelectedOption({
       label: '',
       value: '',
       name: '',
     });
-    if (!addAnotherTeamMember) {
-      onClose();
-    }
   };
+  React.useEffect(() => {
+    if (
+      isEditTeamMember &&
+      selectedTeamMemberDetails.id &&
+      selectedTeamMemberDetails.role
+    ) {
+      setValue('roleEn', selectedTeamMemberDetails.role.en);
+      setValue('roleDa', selectedTeamMemberDetails.role.da);
+      setValue('roleSv', selectedTeamMemberDetails.role.sv);
+      setValue('roleNb', selectedTeamMemberDetails.role.nb);
+      setValue('teamMemberId.label', selectedTeamMemberDetails.name);
+      setValue('teamMemberId.value', selectedTeamMemberDetails.id);
+    }
+  }, [
+    isEditTeamMember,
+    selectedTeamMemberDetails.id,
+    selectedTeamMemberDetails.name,
+    selectedTeamMemberDetails.role,
+    setValue,
+  ]);
   return (
     <div>
       {isOpen && (
@@ -172,7 +207,11 @@ export function AddTeamMemberToHospitalProcedure({
           <div className={modalStyle.modal}>
             <div className="mb-14 flex items-start justify-between">
               <h2 className="font-poppins text-lg font-semibold text-neutral-1">
-                Add a team member
+                {isEditTeamMember ? (
+                  <span>Edit team member</span>
+                ) : (
+                  <span>Add a team member</span>
+                )}
               </h2>
               <button
                 type="button"
@@ -224,7 +263,7 @@ export function AddTeamMemberToHospitalProcedure({
                             : {}
                         }
                         onClick={() => setActiveLanguageTab(data.language)}
-                        className={`${errors[lang] && errors[lang]?.message ? '!border-2 !border-error !text-error' : ''}`}
+                        className={`${errors[lang] && errors[lang]?.message ? '!border !border-error !text-error' : ''}`}
                       >
                         {data.language}
                       </button>
@@ -257,15 +296,15 @@ export function AddTeamMemberToHospitalProcedure({
                   </small>
                 )}
               </div>
-              <div className="flex flex-col items-start gap-y-2">
+              <div className="flex flex-col items-start">
                 <label
                   className="font-poppins text-base font-normal text-neutral-2"
                   htmlFor="teamMemberId"
                 >
                   Team member
                 </label>
-                {selectedOption && (
-                  <small className="text-sm font-normal italic">
+                {selectedOption && selectedOption.name && (
+                  <small className="mt-2 font-poppins text-sm font-normal italic text-neutral-2">
                     {selectedOption.name}
                   </small>
                 )}
@@ -283,6 +322,7 @@ export function AddTeamMemberToHospitalProcedure({
                     {...field}
                     className="mt-3"
                     options={teamMemberList}
+                    isDisabled={isEditTeamMember}
                     onChange={(value) => {
                       if (value) {
                         const v = value as {
@@ -304,42 +344,68 @@ export function AddTeamMemberToHospitalProcedure({
                   />
                 )}
               />
-              {errors.teamMemberId && errors.teamMemberId.value && (
+              {errors.teamMemberId && (
                 <div className="mt-1 text-start font-lexend text-base font-normal text-error">
-                  {errors.teamMemberId.value.message}
+                  {errors.teamMemberId.message}
                 </div>
               )}
-              <div style={{ marginTop: '64px', marginBottom: '28px' }}>
-                <label
-                  className={departmentModalStyle.checkboxLabel}
-                  htmlFor="add-member-radio"
-                >
-                  <span className="absolute top-[-2px]">
-                    Add another member
-                  </span>
-                  <input
-                    className={departmentModalStyle.checkboxStyle}
-                    type="checkbox"
-                    checked={addAnotherTeamMember}
-                    id="add-member-radio"
-                    onChange={() =>
-                      setAddAnotherTeamMember((prevState) => !prevState)
-                    }
-                  />
-                  <span className={departmentModalStyle.checkmark} />
-                </label>
-              </div>
+              {!isEditTeamMember && (
+                <div style={{ marginTop: '64px', marginBottom: '28px' }}>
+                  <label
+                    className={departmentModalStyle.checkboxLabel}
+                    htmlFor="add-member-radio"
+                  >
+                    <span className="absolute top-[-2px]">
+                      Add another member
+                    </span>
+                    <input
+                      className={departmentModalStyle.checkboxStyle}
+                      type="checkbox"
+                      checked={addAnotherTeamMember}
+                      id="add-member-radio"
+                      onChange={() =>
+                        setAddAnotherTeamMember((prevState) => !prevState)
+                      }
+                    />
+                    <span className={departmentModalStyle.checkmark} />
+                  </label>
+                </div>
+              )}
               <button
-                className={`
-                flex w-[280px]
-                cursor-pointer items-center justify-center rounded-lg bg-darkteal px-4 py-[15px]`}
-                // ${editHospital.isPending ? 'cursor-not-allowed bg-darkteal/60' : 'cursor-pointer bg-darkteal'}
-                style={{ marginTop: '24px' }}
+                className={`${addHospitalMemberToProcedure.isPending ? 'cursor-not-allowed bg-darkteal/60' : 'cursor-pointer bg-darkteal'} flex w-[280px] items-center justify-center rounded-lg px-4 py-[15px]`}
+                style={
+                  isEditTeamMember
+                    ? { marginTop: '36px' }
+                    : { marginTop: '24px' }
+                }
                 type="submit"
               >
-                <p className="font-poppins text-sm font-bold text-white">
-                  Add member
-                </p>
+                {addHospitalMemberToProcedure.isPending ||
+                editHospitalProcedureMember.isPending ? (
+                  <ClipLoader
+                    loading={
+                      addHospitalMemberToProcedure.isPending ||
+                      editHospitalProcedureMember.isPending
+                    }
+                    color="#fff"
+                    size={20}
+                    aria-label="Loading Spinner"
+                    data-testid="loader"
+                  />
+                ) : (
+                  // eslint-disable-next-line react/jsx-no-useless-fragment
+                  <>
+                    {isEditTeamMember ? (
+                      <p className="font-poppins text-sm font-bold text-white">
+                        Save changes
+                      </p>
+                    ) : (
+                      <p className="font-poppins text-sm font-bold text-white">
+                        Add member
+                      </p>
+                    )}
+                  </>
+                )}
               </button>
             </form>
           </div>

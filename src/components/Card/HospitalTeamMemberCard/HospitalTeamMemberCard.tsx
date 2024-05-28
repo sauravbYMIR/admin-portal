@@ -3,11 +3,12 @@ import React from 'react';
 import { ClipLoader } from 'react-spinners';
 
 import { ProfileIcon } from '@/components/Icons/Icons';
-import { useDeleteTeamMember } from '@/hooks/useMember';
+import { useRemoveHospitalProcedureMember } from '@/hooks/useHospitalProcedure';
 
-import style from './style.module.scss';
+import style from '../TeamMemberCard/style.module.scss';
 
-function TeamMemberCard({
+function HospitalTeamMemberCard({
+  hospitalProcedureId,
   teamMemberId,
   name,
   role,
@@ -15,8 +16,8 @@ function TeamMemberCard({
   isEdit,
   onOpen,
   profile,
-  hospitalId,
 }: {
+  hospitalProcedureId: string;
   teamMemberId: string;
   name: string;
   role: string;
@@ -24,9 +25,11 @@ function TeamMemberCard({
   isEdit: boolean;
   onOpen: () => void;
   profile: string | false;
-  hospitalId: string;
 }) {
-  const deleteTeamMember = useDeleteTeamMember({ hospitalId });
+  const removeHospitalProcedureMember = useRemoveHospitalProcedureMember({
+    hospitalProcedureId,
+  });
+
   return (
     <div className={style.cardContainer}>
       <div className={style.cardHeader}>
@@ -57,11 +60,16 @@ function TeamMemberCard({
           <button
             className="flex items-center justify-between text-darkteal"
             type="button"
-            onClick={() => deleteTeamMember.mutate({ memberId: teamMemberId })}
+            onClick={() =>
+              removeHospitalProcedureMember.mutate({
+                memberId: teamMemberId,
+                hospitalProcedureId,
+              })
+            }
           >
-            {deleteTeamMember.isPending ? (
+            {removeHospitalProcedureMember.isPending ? (
               <ClipLoader
-                loading={deleteTeamMember.isPending}
+                loading={removeHospitalProcedureMember.isPending}
                 color="rgba(9, 111, 144, 1)"
                 size={20}
                 aria-label="Loading Spinner"
@@ -118,4 +126,4 @@ function TeamMemberCard({
   );
 }
 
-export default TeamMemberCard;
+export default HospitalTeamMemberCard;

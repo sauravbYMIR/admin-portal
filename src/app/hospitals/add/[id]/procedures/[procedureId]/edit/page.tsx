@@ -250,7 +250,7 @@ function EditHospitalProcedure({
         <div className="flex items-center gap-x-14">
           <button
             type="button"
-            onClick={() => router.push('/hospitals')}
+            onClick={() => setIsActiveCancelModal(true)}
             className="flex size-10 cursor-pointer items-center justify-center rounded-full border-none bg-rgba244"
           >
             <BackArrowIcon strokeWidth="2" stroke="rgba(17, 17, 17, 0.8)" />

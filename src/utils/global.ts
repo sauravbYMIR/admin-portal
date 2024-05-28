@@ -132,6 +132,8 @@ const SERVER_ERROR_MESSAGE = {
   'send-otp-successful': 'Send otp successful',
   'otp-verify-failed': 'otp verify failed',
   'Incorrect-otp': 'Incorrect otp',
+  'Hospital-member-associated-with-procedure':
+    'Hospital member associated with procedure',
 };
 
 const countryCodes = {

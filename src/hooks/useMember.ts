@@ -2,6 +2,7 @@ import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { toast } from 'sonner';
 
 import { axiosInstance } from '@/utils/axiosInstance';
+import { SERVER_ERROR_MESSAGE } from '@/utils/global';
 
 import type { NameJSONType, ReimbursementJSONType } from './useDepartment';
 
@@ -244,24 +245,30 @@ export const deleteTeamMember = async ({
   const response = await axiosInstance.delete<{
     success: boolean;
     status: number;
-  }>(`${process.env.BASE_URL}/remove-profile-picture/${memberId}`);
+  }>(`${process.env.BASE_URL}/hospital-member/${memberId}`);
   return {
     success: true,
     status: response.data.status,
   };
 };
 
-export const useDeleteTeamMember = () => {
+export const useDeleteTeamMember = ({ hospitalId }: { hospitalId: string }) => {
   const queryClient = useQueryClient();
   return useMutation({
     mutationFn: deleteTeamMember,
     onSuccess: () => {
       queryClient.invalidateQueries({
-        queryKey: [`hospital-member`],
+        queryKey: [`hospital`, hospitalId],
       });
+      toast.success('Team member removed successfully');
     },
     onError: (error) => {
-      toast(`Something went wrong: ${error.message}`);
+      const err = error as unknown as {
+        response: { data: { error: { message: string } } };
+      };
+      toast.error(
+        `${SERVER_ERROR_MESSAGE[err.response.data.error.message as keyof typeof SERVER_ERROR_MESSAGE] ?? 'Server error'}`,
+      );
     },
   });
 };

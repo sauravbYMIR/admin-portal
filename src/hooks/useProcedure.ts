@@ -158,7 +158,7 @@ export const editProcedure = async ({
   };
 };
 
-export const useEditProcedure = () => {
+export const useEditProcedure = ({ onClose }: { onClose: () => void }) => {
   const queryClient = useQueryClient();
   return useMutation({
     mutationFn: editProcedure,
@@ -167,6 +167,7 @@ export const useEditProcedure = () => {
         queryKey: [`department-with-procedure`],
       });
       toast.success('Procedure edited successfully');
+      onClose();
     },
     onError: (error) => {
       toast(`Something went wrong: ${error.message}`);

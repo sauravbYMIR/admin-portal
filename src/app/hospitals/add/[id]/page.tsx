@@ -12,16 +12,18 @@ import { z } from 'zod';
 import {
   BackArrowIcon,
   CreateHospitalTeamMemberModal,
+  EditIcon,
   FacebookStyleLoader,
   Header,
+  PlusIcon,
   TeamMemberCard,
   WithAuth,
 } from '@/components';
 import { useGetHospitalById } from '@/hooks';
 import arrowForward from '@/public/assets/icons/arrowForward.svg';
 import editIcon from '@/public/assets/icons/edit.svg';
-import plusIcon from '@/public/assets/icons/plus.svg';
 import hospitalLogo from '@/public/assets/icons/sampleLogo.svg';
+import emptyTeamMember from '@/public/assets/images/emptyTeamMember.svg';
 
 import style from './hospitalDetailPage.module.scss';
 
@@ -106,7 +108,9 @@ function HospitalDetailsPage({ params: { id } }: { params: { id: string } }) {
 
               <div className={style.titleBreadCrumbContainer}>
                 {hospitalById.isSuccess && hospitalById.data.data && (
-                  <h3>{hospitalById.data.data.name}</h3>
+                  <h3 className="font-poppins text-[30px] font-medium text-darkslategray">
+                    {hospitalById.data.data.name}
+                  </h3>
                 )}
 
                 <div className={style.breadcrumb}>
@@ -122,36 +126,37 @@ function HospitalDetailsPage({ params: { id } }: { params: { id: string } }) {
               type="button"
               onClick={() => router.push(`/hospitals/edit/${id}`)}
             >
-              <Image
-                width={16.25}
-                height={16.25}
-                src={editIcon}
-                alt="edit icon"
-              />
+              <EditIcon className="size-5" stroke="rgba(9, 111, 144, 1)" />
               <p className="font-poppins text-sm font-semibold text-darkteal">
                 Edit Details
               </p>
             </button>
           </div>
 
-          <h3 className={style.subTitle}>About the hospital</h3>
+          <h3 className="mb-4 font-poppins text-[18px] font-medium text-rgba77">
+            About the hospital
+          </h3>
           {hospitalById.isSuccess && hospitalById.data.data && (
-            <p className={style.hospitalDesc}>
+            <p className="mb-12 font-lexend text-base font-light text-neutral-3">
               {hospitalById.data.data.description.en}
             </p>
           )}
 
-          <h3 className={style.subTitle}>Address</h3>
+          <h3 className="mb-4 font-poppins text-[18px] font-medium text-rgba77">
+            Address
+          </h3>
 
           {hospitalById.isSuccess && hospitalById.data.data && (
-            <p className={style.address}>
+            <p className="mb-12 font-lexend text-base font-light text-neutral-3">
               {hospitalById.data.data.streetNumber}{' '}
               {hospitalById.data.data.streetName}, {hospitalById.data.data.city}
               , {hospitalById.data.data.country}
             </p>
           )}
 
-          <h3 className={style.subTitle}>Hospital gallery</h3>
+          <h3 className="mb-7 font-poppins text-[18px] font-medium text-rgba77">
+            Hospital gallery
+          </h3>
 
           {hospitalById.isSuccess &&
           hospitalById.data.data &&
@@ -163,10 +168,11 @@ function HospitalDetailsPage({ params: { id } }: { params: { id: string } }) {
                   <Image
                     key={file.id}
                     src={file.imageUrl}
-                    width={64}
-                    height={64}
+                    width={260}
+                    height={250}
                     alt="hospital-gallery"
-                    className="h-[250px] w-[264px] rounded-lg"
+                    objectFit="contain"
+                    className="h-[250px] w-[260px] rounded-lg"
                   />
                 );
               })}
@@ -175,23 +181,44 @@ function HospitalDetailsPage({ params: { id } }: { params: { id: string } }) {
             <p className={`${style.title} mb-12`}>No images uploaded</p>
           )}
 
-          <h3 className={style.subTitle}>Team members</h3>
+          <h3 className="mb-7 font-poppins text-[18px] font-medium text-rgba77">
+            Team members
+          </h3>
 
           {hospitalById.isSuccess && hospitalById.data.data && (
             // eslint-disable-next-line react/jsx-no-useless-fragment
             <>
               {hospitalById.data.data.members.length === 0 ? (
-                <div className={style.createTeamMemberContainer}>
-                  <p className={style.title}>
-                    No team members have been created yet!
-                  </p>
-
-                  <button
-                    onClick={() => setIsCreateHospitalTeamModal(true)}
-                    className={style.btn}
+                <div className="mb-12 flex w-full flex-col items-start">
+                  <h3 className="my-8 font-poppins text-lg font-medium text-neutral-1">
+                    Team members
+                  </h3>
+                  <div
+                    className="flex w-full flex-col items-center justify-center rounded-xl border py-10"
+                    style={{
+                      borderColor: 'rgba(186, 191, 199, 1)',
+                    }}
                   >
-                    <p>Create team members</p>
-                  </button>
+                    <Image
+                      src={emptyTeamMember}
+                      alt="empty-team-member-list"
+                      width={160}
+                      height={160}
+                    />
+                    <p className="mb-7 mt-3 font-poppins text-base font-normal text-neutral-2">
+                      No team member have been added yet!
+                    </p>
+                    <button
+                      type="button"
+                      className="flex cursor-pointer items-center gap-3 rounded-lg bg-darkteal px-6 py-[14px]"
+                      onClick={() => setIsCreateHospitalTeamModal(true)}
+                    >
+                      <PlusIcon className="size-5" stroke="#fff" />
+                      <p className="font-poppins text-base font-semibold text-primary-6">
+                        Create team members
+                      </p>
+                    </button>
+                  </div>
                 </div>
               ) : (
                 <div className={style.teamMemberViewSection}>
@@ -200,7 +227,7 @@ function HospitalDetailsPage({ params: { id } }: { params: { id: string } }) {
                       className={style.addBtn}
                       onClick={() => setIsCreateHospitalTeamModal(true)}
                     >
-                      <Image src={plusIcon} alt="plus icon" />
+                      <PlusIcon className="size-5" stroke="#fff" />
                       <p>Add a team member</p>
                     </button>
 
@@ -251,19 +278,24 @@ function HospitalDetailsPage({ params: { id } }: { params: { id: string } }) {
             </>
           )}
 
-          <h3 className={style.subTitle}>Procedures</h3>
+          <h3 className="mb-7 font-poppins text-[18px] font-medium text-rgba77">
+            Procedures
+          </h3>
 
-          <div className={style.procedureManagementContainer}>
-            <h2>Procedure management</h2>
-
+          <div className="flex w-[525px] flex-col items-start rounded-lg border border-lightskyblue bg-primary-6 px-6 py-8">
+            <h2 className="mb-6 font-poppins text-[28px] font-medium text-darkteal">
+              Procedure management
+            </h2>
             <button
               onClick={() =>
                 router.push(`/hospitals/add/${hospitalId}/procedures`)
               }
-              className={style.linkBtn}
+              className="flex items-center gap-x-2 border-b border-darkteal pb-2"
               type="button"
             >
-              <p>View all</p>
+              <p className="font-poppins text-base font-semibold text-darkteal">
+                View all
+              </p>
               <Image src={arrowForward} alt="arrow forward icon" />
             </button>
           </div>

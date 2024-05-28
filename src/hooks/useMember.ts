@@ -140,7 +140,11 @@ export const createHospitalMember = async ({
   };
 };
 
-export const useCreateHospitalMember = () => {
+export const useCreateHospitalMember = ({
+  closeModal,
+}: {
+  closeModal: (() => void) | null;
+}) => {
   const queryClient = useQueryClient();
   return useMutation({
     mutationFn: createHospitalMember,
@@ -148,6 +152,10 @@ export const useCreateHospitalMember = () => {
       queryClient.invalidateQueries({
         queryKey: [`hospital`],
       });
+      toast.success('Team member created successfully');
+      if (closeModal) {
+        closeModal();
+      }
     },
     onError: (error) => {
       toast(`Something went wrong: ${error.message}`);

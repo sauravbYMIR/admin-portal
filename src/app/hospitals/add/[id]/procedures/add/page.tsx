@@ -373,6 +373,7 @@ function AddHospitalProcedure({ params }: { params: { id: string } }) {
               render={({ field }) => (
                 <Select
                   className="w-full"
+                  placeholder="Search Department Name/ Sub-category"
                   {...field}
                   options={departmentList}
                   onChange={(value) => {
@@ -788,7 +789,7 @@ function AddHospitalProcedure({ params }: { params: { id: string } }) {
                   height={160}
                 />
                 <p className="mb-7 mt-3 font-poppins text-base font-normal text-neutral-2">
-                  No procedures have been added yet!
+                  No team member have been added yet!
                 </p>
                 <button
                   type="button"
@@ -812,7 +813,7 @@ function AddHospitalProcedure({ params }: { params: { id: string } }) {
                 <ClipLoader
                   loading={createHospitalProcedure.isPending}
                   color="#fff"
-                  size={30}
+                  size={20}
                   aria-label="Loading Spinner"
                   data-testid="loader"
                 />

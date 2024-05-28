@@ -7,14 +7,14 @@ import { Controller, useForm } from 'react-hook-form';
 import { ClipLoader } from 'react-spinners';
 import { z } from 'zod';
 
-import { FileUploadIcon } from '@/components/Icons/Icons';
+import { CloseIcon, FileUploadIcon } from '@/components/Icons/Icons';
+import departmentModalStyle from '@/components/Modal/DepartmentModal/departmentModal.module.scss';
 import {
   useCreateHospitalMember,
   useEditHospitalMember,
   useGetHospitalTeamMemberById,
   useUpdateHospitalProfile,
 } from '@/hooks/useMember';
-import closeIcon from '@/public/assets/icons/close.svg';
 import type { LanguagesType } from '@/types/components';
 import { countryData } from '@/utils/global';
 
@@ -48,7 +48,7 @@ const createTeamMemberFormSchema = z.object({
   positionSv: z
     .string()
     .min(1, { message: 'Fill in details in all the languages' }),
-  profile: z.instanceof(File, { message: 'A file is required' }),
+  profile: z.instanceof(File, { message: 'Profile picture required' }),
 });
 export type CreateHospitalTeamMemberFormFields = z.infer<
   typeof createTeamMemberFormSchema
@@ -66,7 +66,9 @@ function CreateHospitalTeamMemberModal({
   const memberByIdDetails = useGetHospitalTeamMemberById({ id: memberId });
   const [isAnotherMemberChecked, setIsAnotherMemberChecked] =
     React.useState<boolean>(false);
-  const hospitalMember = useCreateHospitalMember();
+  const hospitalMember = useCreateHospitalMember({
+    closeModal: !isAnotherMemberChecked ? onClose : null,
+  });
   const updateHospitalProfile = useUpdateHospitalProfile();
   const [activeLanguageTab, setActiveLanguageTab] =
     React.useState<LanguagesType>('English');
@@ -137,21 +139,13 @@ function CreateHospitalTeamMemberModal({
           formData,
         });
       }
-      if (isAnotherMemberChecked) {
-        reset();
-      } else {
-        onClose();
-      }
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [
-    // getValues,
     hospitalId,
     hospitalMember.data,
     hospitalMember.isSuccess,
     isAnotherMemberChecked,
-    // onClose,
-    // reset,
     editHospitalMember?.data?.data,
   ]);
   React.useEffect(() => {
@@ -169,23 +163,20 @@ function CreateHospitalTeamMemberModal({
           formData,
         });
       }
-      if (isAnotherMemberChecked) {
-        reset();
-      } else {
-        onClose();
-      }
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [
-    // getValues,
     hospitalId,
     hospitalMember.data,
     hospitalMember.isSuccess,
     isAnotherMemberChecked,
-    // onClose,
-    // reset,
     editHospitalMember?.data?.data,
   ]);
+  React.useEffect(() => {
+    if (hospitalMember.isSuccess || editHospitalMember.isSuccess) {
+      reset();
+    }
+  }, [hospitalMember.isSuccess, editHospitalMember.isSuccess, reset]);
   React.useEffect(() => {
     if (
       memberId &&
@@ -213,28 +204,25 @@ function CreateHospitalTeamMemberModal({
       {isOpen && (
         <div className={modalStyle.modalOverlay}>
           <div className={modalStyle.modal}>
-            <div className={modalStyle.modalHeader}>
-              <h2 className={modalStyle.title}>Create a team member</h2>
-
-              <Image
-                className={modalStyle.closeButton}
-                src={closeIcon}
-                alt="modal close icon"
-                width={24}
-                height={24}
-                onClick={() => {
-                  reset();
-                  onClose();
-                }}
-              />
+            <div className="mb-14 flex items-start justify-between">
+              <h2 className="font-poppins text-lg font-semibold text-neutral-1">
+                Create a team member
+              </h2>
+              <button type="button" onClick={onClose}>
+                <p className="hidden">text</p>
+                <CloseIcon className="mb-2 size-6" strokeWidth={1.7} />
+              </button>
             </div>
 
             <form
               className={modalStyle.modalBody}
               onSubmit={handleSubmit(onFormSubmit)}
             >
-              <div className="mb-10 flex w-full flex-col items-start">
-                <label className={modalStyle.label} htmlFor="position">
+              <div className="mb-8 flex w-full flex-col items-start">
+                <label
+                  className="font-poppins text-base font-normal text-neutral-2"
+                  htmlFor="position"
+                >
                   Position
                 </label>
 
@@ -250,14 +238,14 @@ function CreateHospitalTeamMemberModal({
                         style={
                           data.language === activeLanguageTab
                             ? {
-                                border: '1px solid rgba(9, 111, 144, 1)',
+                                border: '2px solid rgba(9, 111, 144, 1)',
                                 color: 'rgba(9, 111, 144, 1)',
                                 backgroundColor: 'rgba(242, 250, 252, 1)',
                               }
                             : {}
                         }
                         onClick={() => setActiveLanguageTab(data.language)}
-                        className={`${errors[lang] && errors[lang]?.message ? '!border !border-error !text-error' : ''}`}
+                        className={`${errors[lang] && errors[lang]?.message ? '!border-2 !border-error !text-error' : ''}`}
                       >
                         {data.language}
                       </button>
@@ -272,7 +260,9 @@ function CreateHospitalTeamMemberModal({
                     <div key={c.countryCode} className="w-full">
                       {c.language === activeLanguageTab && (
                         <input
-                          className={modalStyle.input}
+                          // eslint-disable-next-line jsx-a11y/no-autofocus
+                          autoFocus
+                          className="w-full rounded-lg border-2 border-lightsilver px-4 py-3"
                           type="text"
                           id="position"
                           {...register(lang)}
@@ -288,14 +278,16 @@ function CreateHospitalTeamMemberModal({
                   </small>
                 )}
               </div>
-              <div className="mb-10 flex w-full flex-col items-start">
-                <label className={`${modalStyle.label} mb-2`} htmlFor="name">
-                  Name & surname
+              <div className="mb-8 flex w-full flex-col items-start">
+                <label
+                  className="mb-3 font-poppins text-base font-normal text-neutral-2"
+                  htmlFor="name"
+                >
+                  Full name
                 </label>
                 <input
                   id="name"
-                  className={modalStyle.input}
-                  style={{ margin: '8px 0 8px' }}
+                  className="w-full rounded-lg border-2 border-lightsilver px-4 py-3"
                   type="text"
                   {...register('name')}
                 />
@@ -305,16 +297,16 @@ function CreateHospitalTeamMemberModal({
                   </small>
                 )}
               </div>
-              <div className="mb-10 flex w-full flex-col items-start">
+              <div className="mb-8 flex w-full flex-col items-start">
                 <label
-                  className={`${modalStyle.label} mb-2`}
+                  className="mb-3 font-poppins text-base font-normal text-neutral-2"
                   htmlFor="qualification"
                 >
                   Qualification
                 </label>
                 <input
                   id="qualification"
-                  className={modalStyle.input}
+                  className="w-full rounded-lg border-2 border-lightsilver px-4 py-3"
                   type="text"
                   {...register('qualification')}
                 />
@@ -330,7 +322,7 @@ function CreateHospitalTeamMemberModal({
                 render={({ field: { name, onBlur, onChange } }) => (
                   <button
                     type="button"
-                    className="relative flex size-[220px] flex-col items-center justify-center rounded-full border border-neutral-4"
+                    className="relative flex h-[180px] w-[205px] flex-col items-center justify-center rounded-lg border border-neutral-4 p-4"
                     onClick={() => profileRef.current?.click()}
                     onMouseEnter={() => setShowLogoOverlay(true)}
                     onMouseLeave={() => setShowLogoOverlay(false)}
@@ -374,13 +366,13 @@ function CreateHospitalTeamMemberModal({
                     {profile ? (
                       <Image
                         src={`${URL.createObjectURL(profile)}`}
-                        alt="hospitalLogo"
+                        alt="team-member-profile"
                         key={`${profile}`}
                         fill
                         priority
                         unoptimized
                         style={{ backgroundImage: 'contain' }}
-                        className="inline-block rounded-full"
+                        className="inline-block rounded-lg"
                       />
                     ) : (
                       <>
@@ -395,35 +387,37 @@ function CreateHospitalTeamMemberModal({
                   </button>
                 )}
               />
+              <div className="mt-2" />
               {errors.profile && (
-                <small className="mt-1 text-start font-lexend text-base font-normal text-error">
+                <small className="text-start font-lexend text-base font-normal text-error">
                   {errors.profile.message}
                 </small>
               )}
               {!memberId && (
-                <div className={modalStyle.checkboxContainer}>
-                  <input
-                    className={modalStyle.checkbox}
-                    type="checkbox"
-                    name="another-member"
-                    // value=""
-                    checked={isAnotherMemberChecked}
-                    onChange={() =>
-                      setIsAnotherMemberChecked((prevState) => !prevState)
-                    }
-                  />
+                <div className="mt-16">
                   <label
+                    className={departmentModalStyle.checkboxLabel}
                     htmlFor="another-member"
-                    className={modalStyle.checkboxLabel}
                   >
-                    Create another member
+                    <span className="absolute top-[-2px]">
+                      Create another member
+                    </span>
+                    <input
+                      className={departmentModalStyle.checkboxStyle}
+                      type="checkbox"
+                      checked={isAnotherMemberChecked}
+                      id="another-member"
+                      onChange={() =>
+                        setIsAnotherMemberChecked((prevState) => !prevState)
+                      }
+                    />
+                    <span className={departmentModalStyle.checkmark} />
                   </label>
                 </div>
               )}
 
               <button
-                className={modalStyle.createMemberBtn}
-                style={{ marginTop: '64px' }}
+                className={`${hospitalMember.isPending || editHospitalMember.isPending ? 'cursor-not-allowed bg-darkteal/60' : 'cursor-pointer bg-darkteal'} mt-7 flex w-[280px] items-center justify-center rounded-lg px-4 py-[15px]`}
                 type="submit"
               >
                 {hospitalMember.isPending || editHospitalMember.isPending ? (
@@ -432,13 +426,21 @@ function CreateHospitalTeamMemberModal({
                       hospitalMember.isPending || editHospitalMember.isPending
                     }
                     color="#fff"
-                    size={30}
+                    size={20}
                     aria-label="Loading Spinner"
                     data-testid="loader"
                   />
                 ) : (
                   <div>
-                    {memberId ? <p>Save changes</p> : <p>Create member</p>}
+                    {memberId ? (
+                      <p className="font-poppins text-sm font-bold text-white">
+                        Save changes
+                      </p>
+                    ) : (
+                      <p className="font-poppins text-sm font-bold text-white">
+                        Create member
+                      </p>
+                    )}
                   </div>
                 )}
               </button>

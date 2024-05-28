@@ -187,7 +187,13 @@ export const editDepartment = async ({
   };
 };
 
-export const useEditDepartment = () => {
+export const useEditDepartment = ({
+  isSubCat,
+  onClose,
+}: {
+  isSubCat: boolean;
+  onClose: () => void;
+}) => {
   const queryClient = useQueryClient();
   return useMutation({
     mutationFn: editDepartment,
@@ -195,7 +201,12 @@ export const useEditDepartment = () => {
       queryClient.invalidateQueries({
         queryKey: [`department-with-procedure`],
       });
-      toast.success('Department edited successfully');
+      if (isSubCat) {
+        toast.success('Sub category edited successfully');
+      } else {
+        toast.success('Department edited successfully');
+      }
+      onClose();
     },
     onError: (error) => {
       toast(`Something went wrong: ${error.message}`);

@@ -93,7 +93,7 @@ function CreateProcedureForm({
     value: string;
   } | null>(null);
   const reqProcedure = useGetProcedureById({ id: updateId });
-  const editProcedure = useEditProcedure();
+  const editProcedure = useEditProcedure({ onClose });
   const allDepartment = useGetAllDepartment();
   const [activeLanguageTab, setActiveLanguageTab] =
     useState<LanguagesType>('English');
@@ -278,22 +278,25 @@ function CreateProcedureForm({
       className={procedureModalStyle.createProcedureFormContainer}
       onSubmit={handleSubmit(onFormSubmit)}
     >
-      <p
-        style={{ marginBottom: '8px', display: 'block' }}
-        // className="font-poppins text-base font-normal text-neutral-2"
-      >
-        Choose Department name/ Sub-category
+      <p className="mb-3 font-poppins text-base font-normal text-neutral-2">
+        Department Name/ Sub-category
       </p>
       <Controller
         name="department"
         control={control}
         defaultValue={
-          selectedOption?.label ? selectedOption : { label: '', value: '' }
+          selectedOption?.label
+            ? selectedOption
+            : {
+                label: '',
+                value: '',
+              }
         }
         render={({ field }) => (
           <Select
             {...field}
             options={departmentList}
+            isDisabled={isEdit}
             onChange={(value) => {
               setSelectedOption(value);
               field.onChange(value);

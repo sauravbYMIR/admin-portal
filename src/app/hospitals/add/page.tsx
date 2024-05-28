@@ -16,6 +16,7 @@ import { z } from 'zod';
 
 import {
   BackArrowIcon,
+  CancelModal,
   CloseIcon,
   FileUploadIcon,
   Header,
@@ -28,7 +29,7 @@ import {
   useUpdateHospitalLogo,
 } from '@/hooks';
 import type { LanguagesType } from '@/types/components';
-import { countryData } from '@/utils/global';
+import { availableCountries, countryData } from '@/utils/global';
 
 import addHospitalStyle from './style.module.scss';
 
@@ -93,6 +94,8 @@ function AddHospital() {
     label: '',
     value: '',
   });
+  const [isActiveCancelModal, setIsActiveCancelModal] =
+    React.useState<boolean>(false);
   const router = useRouter();
   const {
     register,
@@ -176,7 +179,18 @@ function AddHospital() {
   ]);
   const logo = watch('logo');
   const gallery = watch('gallery');
-  const countryOptions = React.useMemo(() => countryList().getData(), []);
+  const countryOptions = React.useMemo(
+    () =>
+      countryList()
+        .getData()
+        .filter(
+          (country) =>
+            availableCountries[
+              country.label as keyof typeof availableCountries
+            ],
+        ),
+    [],
+  );
   return (
     <div>
       <Header />
@@ -185,7 +199,7 @@ function AddHospital() {
         <div className="flex items-center gap-x-14">
           <button
             type="button"
-            onClick={() => router.push('/hospitals')}
+            onClick={() => setIsActiveCancelModal(true)}
             className="flex size-10 cursor-pointer items-center justify-center rounded-full border-none bg-rgba244"
           >
             <BackArrowIcon strokeWidth="2" stroke="rgba(17, 17, 17, 0.8)" />
@@ -549,6 +563,7 @@ function AddHospital() {
                         fill
                         priority
                         unoptimized
+                        objectFit="contain"
                       />
                     </div>
                   ))}
@@ -656,6 +671,20 @@ function AddHospital() {
           </div>
         </form>
       </div>
+      {isActiveCancelModal && (
+        <CancelModal
+          heading="Are you sure you want to cancel adding hospital?"
+          msg={`You'll lose all responses collected. We can't recover them once you go back.`}
+          onCancelHandler={() => {
+            setIsActiveCancelModal(false);
+          }}
+          onAcceptHandler={() => {
+            setIsActiveCancelModal(false);
+            router.back();
+          }}
+          cancelMsg="No, Continue editing"
+        />
+      )}
     </div>
   );
 }

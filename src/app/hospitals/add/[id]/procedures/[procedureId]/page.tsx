@@ -12,6 +12,7 @@ import { z } from 'zod';
 import {
   BackArrowIcon,
   CreateHospitalTeamMemberModal,
+  EditIcon,
   FacebookStyleLoader,
   Header,
   SearchIcon,
@@ -130,12 +131,7 @@ function HospitalDetailsPage({
                   )
                 }
               >
-                <Image
-                  width={16.25}
-                  height={16.25}
-                  src={editIcon}
-                  alt="edit icon"
-                />
+                <EditIcon className="size-5" stroke="rgba(9, 111, 144, 1)" />
                 <p className="font-poppins text-sm font-semibold text-darkteal">
                   Edit Details
                 </p>

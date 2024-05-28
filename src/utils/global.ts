@@ -20,6 +20,37 @@ interface IntialLanguagesDataType {
   Swedish: string;
 }
 
+export const availableCountries = {
+  Ireland: {
+    language: 'English',
+    locale: 'en',
+    currency: 'EUR',
+    countryCode: 'ie',
+    flagIcon: irelandFlag,
+  },
+  Norway: {
+    language: 'Norwegian',
+    locale: 'nb',
+    currency: 'NOK',
+    countryCode: 'no',
+    flagIcon: norwayFlag,
+  },
+  Denmark: {
+    language: 'Danish',
+    locale: 'da',
+    currency: 'DKK',
+    countryCode: 'dk',
+    flagIcon: denmarkFlag,
+  },
+  Sweden: {
+    language: 'Swedish',
+    locale: 'sv',
+    currency: 'SEK',
+    countryCode: 'se',
+    flagIcon: swedenFlag,
+  },
+};
+
 const countryData: CountryData[] = [
   {
     name: 'Ireland',

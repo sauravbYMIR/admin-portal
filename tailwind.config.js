@@ -65,6 +65,7 @@ module.exports = {
         gray1: 'rgba(36, 38, 40, 1)',
         gray2: 'rgba(114, 119, 123, 1)',
         rgba244: 'rgba(244, 244, 244, 1)',
+        rgba77: 'rgba(77, 77, 77, 1)',
       },
       fontFamily: {
         poppins: ['Poppins', 'sans-serif'],

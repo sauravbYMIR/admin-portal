@@ -101,15 +101,19 @@ function ProceduresList() {
           updateId={updateId}
         />
       )}
-      {isEditSubCategory ? (
+      {isEditSubCategory && (
         <ProcedureModal
           isOpen={editSubCategoryModalOpen}
-          onClose={() => setEditSubCategoryModalOpen(false)}
+          onClose={() => {
+            setUpdateId('');
+            setEditSubCategoryModalOpen(false);
+          }}
           isEdit={isEditData}
           editSubCategory={isEditSubCategory}
           updateId={updateId}
         />
-      ) : (
+      )}
+      {editProcedureModalOpen && (
         <ProcedureModal
           isOpen={editProcedureModalOpen}
           onClose={() => {
@@ -121,18 +125,6 @@ function ProceduresList() {
           updateId={updateId}
         />
       )}
-      {/* {editProcedureModalOpen && (
-        <ProcedureModal
-          isOpen={editProcedureModalOpen}
-          onClose={() => {
-            setUpdateId('');
-            setEditProcedureModalOpen(false);
-          }}
-          isEdit={isEditData}
-          editSubCategory={false}
-          updateId={updateId}
-        />
-      )} */}
       <CustomHomePage
         heading="Procedure List"
         subHeading="List of all Procedures listed on the platform"

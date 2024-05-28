@@ -141,7 +141,6 @@ function HospitalsPage() {
                     filter: true,
                     floatingFilter: true,
                     flex: 1,
-                    editable: true,
                   },
                   {
                     headerName: 'Hospital name',
@@ -149,7 +148,6 @@ function HospitalsPage() {
                     filter: true,
                     floatingFilter: true,
                     flex: 1,
-                    editable: true,
                   },
                   {
                     headerName: 'Location',
@@ -157,7 +155,6 @@ function HospitalsPage() {
                     filter: true,
                     floatingFilter: true,
                     flex: 1,
-                    editable: true,
                   },
                   {
                     field: '',

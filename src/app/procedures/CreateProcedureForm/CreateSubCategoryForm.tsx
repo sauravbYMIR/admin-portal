@@ -62,7 +62,7 @@ function CreateSubCategoryForm({
     value: string;
   } | null>(null);
   const reqdDept = useGetDepartmentById({ id: updateId });
-  const editDepartment = useEditDepartment();
+  const editDepartment = useEditDepartment({ isSubCat: true, onClose });
 
   const allDepartment = useGetAllDepartment();
   const [departmentList, setDepartmentList] = useState<Array<DepartmentType>>(
@@ -94,7 +94,7 @@ function CreateSubCategoryForm({
 
   const createDepartment = useCreateDepartment({
     isCreateSubCategory: true,
-    closeModal: createAnotherSubCategory ? onClose : null,
+    closeModal: !createAnotherSubCategory ? onClose : null,
   });
 
   const [activeLanguageTab, setActiveLanguageTab] =
@@ -114,7 +114,7 @@ function CreateSubCategoryForm({
   };
   const handleEditSubCategory = (data: SubCategoryFormFields) => {
     editDepartment.mutate({
-      departmentId: data.department.value,
+      departmentId: updateId,
       name: {
         en: data.subCategoryEn,
         nb: data.subCategoryNb,
@@ -191,10 +191,7 @@ function CreateSubCategoryForm({
   });
 
   React.useEffect(() => {
-    if (
-      createAnotherSubCategory &&
-      (createDepartment.isSuccess || editDepartment.isSuccess)
-    ) {
+    if (createDepartment.isSuccess || editDepartment.isSuccess) {
       reset();
     }
   }, [
@@ -213,7 +210,7 @@ function CreateSubCategoryForm({
         style={{ display: 'block', marginBottom: '8px' }}
         className="font-poppins text-base font-normal text-neutral-2"
       >
-        Choose Department name
+        Department Name/ Sub-category
       </label>
 
       <Controller
@@ -230,6 +227,7 @@ function CreateSubCategoryForm({
               setSelectedOption(value);
               field.onChange(value);
             }}
+            isDisabled={isEdit}
             classNames={{
               control: (state) =>
                 state.isFocused
@@ -290,6 +288,8 @@ function CreateSubCategoryForm({
           <div key={c.countryCode}>
             {c.language === activeLanguageTab && (
               <input
+                // eslint-disable-next-line jsx-a11y/no-autofocus
+                autoFocus
                 className="w-full rounded-lg border-2 border-lightsilver px-4 py-3"
                 type="text"
                 placeholder="Enter sub-category name"
@@ -327,7 +327,7 @@ function CreateSubCategoryForm({
 
       {isEdit ? (
         <button
-          className={`${editDepartment.isPending ? 'cursor-not-allowed bg-darkteal/60' : 'cursor-pointer bg-darkteal'} flex w-[280px] items-center justify-center rounded-lg px-4 py-[15px]`}
+          className={`${editDepartment.isPending ? 'cursor-not-allowed bg-darkteal/60' : 'cursor-pointer bg-darkteal'} mt-6 flex w-[280px] items-center justify-center rounded-lg px-4 py-[15px]`}
           type="submit"
         >
           {editDepartment.isPending ? (

@@ -143,26 +143,6 @@ function EditHospital({ params: { id } }: { params: { id: string } }) {
       hospitalId: id,
     });
   };
-  // async function objectToBlob(fileObject) {
-  //   // Fetch the file data from the URL
-  //   const response = await axios.get(fileObject.imageUrl);
-  //   console.log(fileObject, response);
-  //   // Ensure the request was successful
-  //   if (!response.ok) {
-  //     throw new Error(`Network response was not ok ${response.statusText}`);
-  //   }
-
-  //   // Convert the response to a Blob
-  //   const blob = await response.blob();
-
-  //   // Create a new File object (optional, if you need a File instead of a Blob)
-  //   const file = new File([blob], fileObject.originalFileName, {
-  //     type: blob.type,
-  //     lastModified: new Date(fileObject.updatedAt).getTime(),
-  //   });
-
-  //   return file;
-  // }
   React.useEffect(() => {
     if (
       id &&
@@ -225,7 +205,7 @@ function EditHospital({ params: { id } }: { params: { id: string } }) {
         <div className="flex items-center gap-x-14">
           <button
             type="button"
-            onClick={() => router.push('/hospitals')}
+            onClick={() => setIsActiveCancelModal(true)}
             className="flex size-10 cursor-pointer items-center justify-center rounded-full border-none bg-rgba244"
           >
             <BackArrowIcon strokeWidth="2" stroke="rgba(17, 17, 17, 0.8)" />
@@ -672,6 +652,7 @@ function EditHospital({ params: { id } }: { params: { id: string } }) {
                         width={200}
                         height={200}
                         alt="hospital-gallery"
+                        objectFit="contain"
                         className="relative size-[200px] cursor-pointer rounded-lg border border-neutral-4"
                       />
                       <button
@@ -746,7 +727,8 @@ function EditHospital({ params: { id } }: { params: { id: string } }) {
       </div>
       {isActiveCancelModal && (
         <CancelModal
-          msg={`Are you sure you want to cancel editing the hospital procedure. You'll lose all responses collected. We can't recover them once you go back?`}
+          heading="Are you sure you want to cancel editing hospital?"
+          msg={`You'll lose all responses collected. We can't recover them once you go back.`}
           onCancelHandler={() => {
             setIsActiveCancelModal(false);
           }}

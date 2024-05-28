@@ -5,11 +5,13 @@ import { CloseIcon } from '../../index';
 import { ModalWrapper } from '../ModalWrapper/ModalWrapper';
 
 function CancelModal({
+  heading,
   msg,
   onCancelHandler,
   onAcceptHandler,
   cancelMsg,
 }: {
+  heading: string;
   msg: string;
   onCancelHandler: () => void;
   onAcceptHandler: () => void;
@@ -30,25 +32,28 @@ function CancelModal({
         </button>
       </div>
       <div className="flex flex-col items-center justify-center p-4">
-        <p className="text-left font-poppins text-2xl font-light text-neutral-2">
+        <h2 className="mb-4 font-poppins text-2xl font-medium text-neutral-1">
+          {heading}
+        </h2>
+        <p className="font-poppins text-base font-normal text-neutral-2">
           {msg}
         </p>
         <div className="mt-16 flex w-full items-center justify-start gap-6">
           <button
             type="button"
-            className="rounded-sm border-2 border-darkteal px-[111.75px] py-[14px] text-darkteal"
+            className="flex w-[280px] cursor-pointer items-center justify-center rounded-lg border-2 border-neutral-3 bg-white px-4 py-[15px]"
             onClick={onCancelHandler}
           >
-            <p className="text-center font-poppins text-2xl font-medium">
+            <p className="font-poppins text-sm font-bold text-neutral-2">
               {cancelMsg}
             </p>
           </button>
           <button
             type="button"
-            className="rounded-sm border-2 border-darkteal bg-darkteal px-[85.75px] py-[14px] text-white"
+            className="flex w-[280px] cursor-pointer items-center justify-center rounded-lg bg-darkteal px-4 py-[15px]"
             onClick={onAcceptHandler}
           >
-            <p className="text-center font-poppins text-2xl font-medium">
+            <p className="font-poppins text-sm font-bold text-white">
               Yes, Cancel
             </p>
           </button>

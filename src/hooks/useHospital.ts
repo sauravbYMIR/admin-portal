@@ -209,7 +209,7 @@ export const useCreateHospital = () => {
       queryClient.invalidateQueries({
         queryKey: [`hospital`],
       });
-      toast.success('Hospital added  successfully');
+      toast.success('Hospital added successfully');
     },
     onError: (error) => {
       toast(`Something went wrong: ${error.message}`);

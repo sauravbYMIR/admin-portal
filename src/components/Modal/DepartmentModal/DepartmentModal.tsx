@@ -80,14 +80,14 @@ function DepartmentModal({
     resolver: zodResolver(DepartmentFormSchema),
   });
 
-  const editDept = useEditDepartment();
+  const editDept = useEditDepartment({ isSubCat: false, onClose });
   const reqdDept = useGetDepartmentById({ id: updateId });
   const [activeLanguageTab, setActiveLanguageTab] =
     useState<LanguagesType>('English');
   const [isChecked, setIsChecked] = useState<boolean>(false);
   const createDept = useCreateDepartment({
     isCreateSubCategory: false,
-    closeModal: isChecked ? onClose : null,
+    closeModal: !isChecked ? onClose : null,
   });
   const shouldRenderProcedureError = countryData.some((c) => {
     const lang = departmentObj[c.language] as DepartmentFormSchemaType;
@@ -133,11 +133,6 @@ function DepartmentModal({
   React.useEffect(() => {
     if (isChecked && (createDept.isSuccess || editDept.isSuccess)) {
       reset();
-      return;
-    }
-    if (!isChecked && (createDept.isSuccess || editDept.isSuccess)) {
-      reset();
-      onClose();
     }
   }, [createDept.isSuccess, editDept.isSuccess, isChecked, onClose, reset]);
 

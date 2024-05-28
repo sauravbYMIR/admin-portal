@@ -2,8 +2,8 @@ import Image from 'next/image';
 import React from 'react';
 import { toast } from 'sonner';
 
+import { ProfileIcon } from '@/components/Icons/Icons';
 import { useDeleteTeamMember } from '@/hooks/useMember';
-import sampleProfile from '@/public/assets/icons/sampleProfile.svg';
 
 import style from './style.module.scss';
 
@@ -37,21 +37,25 @@ function TeamMemberCard({
         {profile && typeof profile === 'string' ? (
           <Image
             src={profile}
-            width={30}
-            height={30}
-            className="rounded-full"
+            width={32}
+            height={32}
+            className="size-8 rounded-full"
             alt="sample profile image"
+            objectFit="cover"
             priority
             unoptimized
           />
         ) : (
-          <Image src={sampleProfile} alt="sample profile image" />
+          <ProfileIcon className="size-6 rounded-full" />
         )}
-        <p>{name}</p>
+        <p className="font-poppins text-base font-medium text-neutral-1">
+          {name}
+        </p>
       </div>
-
-      <p className={style.memberPosition}>{role}</p>
-      <p className={style.memberQualification}>{qualification}</p>
+      <p className="font-lexend text-base font-light text-neutral-2">{role}</p>
+      <p className="font-lexend text-base font-light text-neutral-2">
+        {qualification}
+      </p>
       {isEdit && (
         <div className="mt-[10px] flex items-center justify-between">
           <button

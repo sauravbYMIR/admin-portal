@@ -649,7 +649,7 @@ function EditHospitalProcedure({
                 <ClipLoader
                   loading={editHospitalProcedure.isPending}
                   color="#fff"
-                  size={30}
+                  size={20}
                   aria-label="Loading Spinner"
                   data-testid="loader"
                 />
@@ -664,7 +664,8 @@ function EditHospitalProcedure({
       </div>
       {isActiveCancelModal && (
         <CancelModal
-          msg={`Are you sure you want to cancel editing the hospital procedure. You'll lose all responses collected. We can't recover them once you go back?`}
+          heading="Are you sure you want to cancel editing procedure?"
+          msg={`You'll lose all responses collected. We can't recover them once you go back.`}
           onCancelHandler={() => {
             setIsActiveCancelModal(false);
           }}

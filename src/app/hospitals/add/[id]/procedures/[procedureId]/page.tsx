@@ -15,13 +15,12 @@ import {
   EditIcon,
   FacebookStyleLoader,
   Header,
+  PlusIcon,
   SearchIcon,
   TeamMemberCard,
   WithAuth,
 } from '@/components';
 import { useGetHospitalProcedureById } from '@/hooks/useHospitalProcedure';
-import editIcon from '@/public/assets/icons/edit.svg';
-import plusIcon from '@/public/assets/icons/plus.svg';
 
 import style from '../../hospitalDetailPage.module.scss';
 
@@ -138,19 +137,19 @@ function HospitalDetailsPage({
               </button>
             </div>
 
-            <h3 className="mb-7 font-poppins text-lg font-normal text-neutral-1">
+            <h3 className="mb-4 font-poppins text-lg font-medium text-neutral-1">
               About the procedure
             </h3>
             {hospitalProcedureId.isSuccess && hospitalProcedureId.data.data && (
-              <p className={style.hospitalDesc}>
+              <p className="mb-12 font-lexend text-base font-light text-neutral-3">
                 {hospitalProcedureId.data.data.description.en}
               </p>
             )}
 
             {hospitalProcedureId.isSuccess && hospitalProcedureId.data.data && (
-              <div className="flex w-[520px] flex-wrap items-center gap-10">
+              <div className="flex w-[520px] flex-wrap items-center gap-x-20 gap-y-10">
                 <div className="flex flex-col items-start justify-start">
-                  <p className="font-lexend text-xl font-normal text-neutral-2">
+                  <p className="font-lexend text-lg font-normal text-neutral-2">
                     Cost of procedure
                   </p>
                   <p className="font-lexend text-base font-light text-neutral-2">
@@ -158,7 +157,7 @@ function HospitalDetailsPage({
                   </p>
                 </div>
                 <div className="flex flex-col items-start justify-start">
-                  <p className="font-lexend text-xl font-normal text-neutral-2">
+                  <p className="font-lexend text-lg font-normal text-neutral-2">
                     Wait of procedure
                   </p>
                   <p className="font-lexend text-base font-light text-neutral-2">
@@ -166,7 +165,7 @@ function HospitalDetailsPage({
                   </p>
                 </div>
                 <div className="flex flex-col items-start justify-start">
-                  <p className="font-lexend text-xl font-normal text-neutral-2">
+                  <p className="font-lexend text-lg font-normal text-neutral-2">
                     Duration of city stay
                   </p>
                   <p className="font-lexend text-base font-light text-neutral-2">
@@ -239,7 +238,8 @@ function HospitalDetailsPage({
                     <div className="my-[32px] flex items-center justify-between">
                       <div className="relative">
                         <input
-                          className="rounded-lg border border-neutral-4 px-4 py-[10px]"
+                          placeholder="Search team members"
+                          className="w-[246px] rounded-lg border border-neutral-4 px-4 py-[10px]"
                           type="text"
                           name="search-member"
                           id="search-member"
@@ -254,7 +254,7 @@ function HospitalDetailsPage({
                           type="button"
                           onClick={() => setIsCreateHospitalTeamModal(true)}
                         >
-                          <Image src={plusIcon} alt="plus icon" />
+                          <PlusIcon className="size-5" stroke="#fff" />
                           <p className="ml-2 font-poppins text-base font-medium">
                             Add a team member
                           </p>
@@ -266,7 +266,10 @@ function HospitalDetailsPage({
                             type="button"
                             onClick={() => setIsEditTeamMember(false)}
                           >
-                            <Image src={editIcon} alt="edit icon" />
+                            <EditIcon
+                              className="size-5"
+                              stroke="rgba(9, 111, 144, 1)"
+                            />
                             <p className="ml-2 font-poppins text-base font-medium">
                               Cancel editing
                             </p>
@@ -277,7 +280,10 @@ function HospitalDetailsPage({
                             onClick={() => setIsEditTeamMember(true)}
                             type="button"
                           >
-                            <Image src={editIcon} alt="edit icon" />
+                            <EditIcon
+                              className="size-5"
+                              stroke="rgba(9, 111, 144, 1)"
+                            />
                             <p className="ml-2 font-poppins text-base font-medium">
                               Edit team members
                             </p>
@@ -286,7 +292,7 @@ function HospitalDetailsPage({
                       </div>
                     </div>
 
-                    <div className={style.teamMemberCardsContainer}>
+                    <div className="mb-16 flex flex-wrap items-center gap-8">
                       {searchMemberQuery
                         ? hospitalProcedureId.data.data.hospitalMembers
                             .filter((member) =>

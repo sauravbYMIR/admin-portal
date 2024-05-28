@@ -27,6 +27,7 @@ function CancelModal({
           className="cursor-pointer border-none bg-transparent"
           type="button"
           aria-label="close"
+          onClick={onCancelHandler}
         >
           <CloseIcon />
         </button>

@@ -14,11 +14,7 @@ import {
 } from '@/components';
 import ShowDataTable from '@/components/Table/PatientsTable/PatientsTable';
 import { useGetAllHospital } from '@/hooks';
-import infoLinkIcon from '@/public/assets/icons/linkArrow.svg';
-import plusIcon from '@/public/assets/icons/plus.svg';
 import emptyHospital from '@/public/assets/images/emptyHospital.svg';
-
-import patientsTableStyle from '../../components/Table/PatientsTable/patientsTable.module.scss';
 
 const EmptyHospitalPage = () => {
   const router = useRouter();
@@ -55,13 +51,14 @@ const CustomStatusEditComponent = (props: CustomCellRendererProps) => {
   };
 
   return (
-    <div className={patientsTableStyle.patientsTableBtnContainer}>
-      <Image
-        className={patientsTableStyle.patientsTableInfoLink}
-        src={infoLinkIcon}
-        alt="patients table info link arrow icon"
+    <div className="flex items-center justify-center">
+      <button
+        type="button"
+        className="cursor-pointer border-none underline decoration-darkteal decoration-2 underline-offset-[5px]"
         onClick={handleClickInfoLink}
-      />
+      >
+        <span className="text-darkteal">View more</span>
+      </button>
     </div>
   );
 };
@@ -112,8 +109,8 @@ function HospitalsPage() {
               className="mb-5 flex items-center justify-between rounded-[6.4px] bg-darkteal px-6 py-3 text-white"
               onClick={() => router.push(`/hospitals/add/`)}
             >
-              <Image src={plusIcon} alt="cta btn text" width={25} height={25} />
-              <p className="font-poppins text-base font-medium">
+              <PlusIcon className="size-5" stroke="#fff" />
+              <p className="ml-3 font-poppins text-base font-medium">
                 Add new hospital
               </p>
             </button>

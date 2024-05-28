@@ -179,12 +179,12 @@ function ProceduresList() {
                       >
                         {procedureData.subCategoryWithProcedures.length > 0 &&
                           procedureData.subCategoryWithProcedures.map(
-                            (subCategoryData, index) => {
+                            (subCategoryData) => {
                               return (
-                                <ol key={subCategoryData.id}>
+                                <ul key={subCategoryData.id}>
                                   <li className="flex items-center justify-between px-4 py-2">
                                     <p className="font-poppins text-sm font-medium text-darkteal">
-                                      <span className="mr-1">{index + 1}.</span>
+                                      {/* <span className="mr-1">{index + 1}.</span> */}
                                       <span>{subCategoryData.name.en}</span>
                                     </p>
                                     <button
@@ -260,7 +260,7 @@ function ProceduresList() {
                                       )}
                                     </div>
                                   )}
-                                </ol>
+                                </ul>
                               );
                             },
                           )}

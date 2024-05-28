@@ -4,7 +4,6 @@
 'use client';
 
 import Image from 'next/image';
-import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
 import { useState } from 'react';
 import { z } from 'zod';
@@ -114,9 +113,21 @@ function HospitalDetailsPage({ params: { id } }: { params: { id: string } }) {
                 )}
 
                 <div className={style.breadcrumb}>
-                  <Link href="/">Hospitals</Link>
+                  <button
+                    className="cursor-pointer"
+                    onClick={() => router.back()}
+                    type="button"
+                  >
+                    <span className="font-lexend text-base font-normal text-neutral-3">
+                      Hospitals
+                    </span>
+                  </button>
                   <span>/</span>
-                  <Link href="/">Details</Link>
+                  <button type="button">
+                    <span className="font-lexend text-base font-normal text-darkteal">
+                      Details
+                    </span>
+                  </button>
                 </div>
               </div>
             </div>

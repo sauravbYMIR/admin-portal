@@ -34,12 +34,18 @@ function Accordion({
       <div
         className={accordionStyles.headerContainer}
         style={
+          // eslint-disable-next-line no-nested-ternary
           type === 'PROCEDURE' && isOpen
             ? {
                 backgroundColor: 'rgba(225, 247, 254, 1)',
                 border: '1px solid rgba(225, 247, 254, 1)',
               }
-            : {}
+            : type === 'SUB-CATEGORY' && isOpen
+              ? {
+                  backgroundColor: 'rgba(242, 250, 252, 1)',
+                  border: '1px solid rgba(242, 250, 252, 1)',
+                }
+              : {}
         }
       >
         <button

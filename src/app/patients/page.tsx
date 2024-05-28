@@ -1,7 +1,6 @@
 'use client';
 
 import type { CustomCellRendererProps } from 'ag-grid-react';
-import Image from 'next/image';
 import { useRouter } from 'next/navigation';
 import React from 'react';
 import { ClipLoader } from 'react-spinners';
@@ -10,7 +9,6 @@ import { toast } from 'sonner';
 import { Header, WithAuth } from '@/components';
 import ShowDataTable from '@/components/Table/PatientsTable/PatientsTable';
 import { useGetAllBookings, useUpdateBookingStatus } from '@/hooks/useBooking';
-import infoLinkIcon from '@/public/assets/icons/linkArrow.svg';
 import { ACCEPT, ACCEPTED, REJECT, REJECTED, REQUESTED } from '@/utils/global';
 
 import patientsTableStyle from '../../components/Table/PatientsTable/patientsTable.module.scss';
@@ -82,12 +80,13 @@ const CustomStatusEditComponent = (props: CustomCellRendererProps) => {
           </button>
         </>
       )}
-      <Image
-        className={patientsTableStyle.patientsTableInfoLink}
-        src={infoLinkIcon}
-        alt="patients table info link arrow icon"
+      <button
+        type="button"
+        className="cursor-pointer border-none underline decoration-darkteal decoration-2 underline-offset-[5px]"
         onClick={handleClickInfoLink}
-      />
+      >
+        <span className="text-darkteal">View more</span>
+      </button>
     </div>
   );
 };
@@ -152,7 +151,6 @@ function PatientsPage() {
                 filter: true,
                 floatingFilter: true,
                 flex: 1,
-                editable: true,
               },
               {
                 headerName: 'Hospital',
@@ -160,7 +158,6 @@ function PatientsPage() {
                 filter: true,
                 floatingFilter: true,
                 flex: 1,
-                editable: true,
               },
               {
                 headerName: 'Status',

@@ -14,11 +14,7 @@ import {
 } from '@/components';
 import ShowDataTable from '@/components/Table/PatientsTable/PatientsTable';
 import { useGetAllHospitalProcedure } from '@/hooks/useHospitalProcedure';
-import infoLinkIcon from '@/public/assets/icons/linkArrow.svg';
-import plusIcon from '@/public/assets/icons/plus.svg';
 import emptyState from '@/public/assets/images/emptyState.svg';
-
-import patientsTableStyle from '../../../../../components/Table/PatientsTable/patientsTable.module.scss';
 
 const CustomStatusEditComponent = (props: CustomCellRendererProps) => {
   const router = useRouter();
@@ -29,13 +25,14 @@ const CustomStatusEditComponent = (props: CustomCellRendererProps) => {
     router.push(`/hospitals/add/${hospitalId}/procedures/${procedureId}`);
   };
   return (
-    <div className={patientsTableStyle.patientsTableBtnContainer}>
-      <Image
-        className={patientsTableStyle.patientsTableInfoLink}
-        src={infoLinkIcon}
-        alt="patients table info link arrow icon"
+    <div className="flex items-center justify-center">
+      <button
+        type="button"
+        className="cursor-pointer border-none underline decoration-darkteal decoration-2 underline-offset-[5px]"
         onClick={handleClickInfoLink}
-      />
+      >
+        <span className="text-darkteal">View more</span>
+      </button>
     </div>
   );
 };
@@ -144,8 +141,8 @@ function HospitalProcedureManagement() {
                 router.push(`/hospitals/add/${hospitalId}/procedures/add`)
               }
             >
-              <Image src={plusIcon} alt="cta btn text" width={25} height={25} />
-              <p className="font-poppins text-base font-medium">
+              <PlusIcon className="size-5" stroke="#fff" />
+              <p className="ml-3 font-poppins text-base font-medium">
                 Add new procedure
               </p>
             </button>
@@ -155,7 +152,7 @@ function HospitalProcedureManagement() {
               <ShowDataTable
                 // onCellClicked={onCellClicked}
                 rowData={procedureByHospitalId.data.data.map((r) => ({
-                  name: `${r.procedure.name.en}`,
+                  name: `${r.procedure.name.en} - ${r.procedure.category.name.en}`,
                   department: r.procedure.category.name.en,
                   waitTime: r.waitingTime,
                   cost: r.cost.en,
@@ -177,12 +174,11 @@ function HospitalProcedureManagement() {
                 }))}
                 colDefs={[
                   {
-                    headerName: 'Procedure /Procedure + sub-category',
+                    headerName: 'Procedure / Procedure + sub-category',
                     field: 'name',
                     filter: true,
                     floatingFilter: true,
                     flex: 1,
-                    editable: true,
                   },
                   {
                     headerName: 'Department',
@@ -190,7 +186,6 @@ function HospitalProcedureManagement() {
                     filter: true,
                     floatingFilter: true,
                     flex: 1,
-                    editable: true,
                   },
                   {
                     headerName: 'Wait time',
@@ -198,7 +193,6 @@ function HospitalProcedureManagement() {
                     filter: true,
                     floatingFilter: true,
                     flex: 1,
-                    editable: true,
                   },
                   {
                     headerName: 'Cost of procedure',
@@ -206,7 +200,6 @@ function HospitalProcedureManagement() {
                     filter: true,
                     floatingFilter: true,
                     flex: 1,
-                    editable: true,
                   },
                   {
                     field: '',

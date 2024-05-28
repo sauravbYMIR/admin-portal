@@ -266,12 +266,7 @@ function CreateProcedureForm({
     if (createProcedure.isSuccess || editProcedure.isSuccess) {
       reset();
     }
-  }, [
-    createProcedure.isSuccess,
-    editProcedure.isSuccess,
-    createAnotherProcedure,
-    reset,
-  ]);
+  }, [createProcedure.isSuccess, editProcedure.isSuccess, reset]);
 
   return (
     <form

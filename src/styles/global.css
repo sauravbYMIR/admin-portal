@@ -40,6 +40,7 @@ input[type=number] {
   min-height: 48px !important;
   border-radius: 10.67px !important;
   padding: 6px 8px;
+  box-shadow: 0 0 0 2px #2684ff !important;
 }
 .css-16xfy0z-control {
   min-height: 48px !important;

@@ -239,7 +239,7 @@ function HospitalDetailsPage({
             {hospitalProcedureId.isSuccess && hospitalProcedureId.data.data && (
               // eslint-disable-next-line react/jsx-no-useless-fragment
               <>
-                {hospitalProcedureId.data.data.hospitalMembers.length === 0 ? (
+                {hospitalProcedureId.data.data.procedureMembers.length === 0 ? (
                   <div className="mb-12 flex w-full flex-col items-start">
                     <h3 className="my-8 font-poppins text-lg font-medium text-neutral-1">
                       Team members
@@ -290,7 +290,10 @@ function HospitalDetailsPage({
                         <button
                           className="flex items-center justify-between rounded-[6.4px] bg-darkteal px-6 py-3 text-white"
                           type="button"
-                          onClick={() => setIsCreateHospitalTeamModal(true)}
+                          onClick={() => {
+                            setIsCreateHospitalTeamModal(true);
+                            setIsEditTeamMember(false);
+                          }}
                         >
                           <PlusIcon className="size-5" stroke="#fff" />
                           <p className="ml-2 font-poppins text-base font-medium">

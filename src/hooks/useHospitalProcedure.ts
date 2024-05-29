@@ -9,7 +9,6 @@ import type {
   NameJSONType,
   ReimbursementJSONType,
 } from './useDepartment';
-import type { HospitalMember } from './useMember';
 
 export type HospitalProcedureType = {
   createdAt: string | null;
@@ -39,7 +38,7 @@ export type HospitalProcedureByIdType = {
   cost: CostJSONType;
   hospitalId: string;
   id: string;
-  hospitalMembers: Array<HospitalMember>;
+  // hospitalMembers: Array<HospitalMember>;
   procedure: {
     category: {
       id: string;

@@ -224,7 +224,6 @@ function AddHospitalProcedure({ params }: { params: { id: string } }) {
       createHospitalProcedure.data &&
       createHospitalProcedure.data.data
     ) {
-      reset();
       const gallery = getValues('gallery');
       if (gallery) {
         const formData = new FormData();

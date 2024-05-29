@@ -142,6 +142,18 @@ function CreateProcedureForm({
       );
     }
   }, [allDepartment.data, allDepartment.isSuccess]);
+
+  const {
+    control,
+    register,
+    handleSubmit,
+    setValue,
+    formState: { errors },
+    reset,
+  } = useForm<ProcedureFormFields>({
+    resolver: zodResolver(procedureFormSchema),
+  });
+
   const handleCreateProcedure = (data: ProcedureFormFields) => {
     createProcedure.mutate({
       name: {
@@ -159,6 +171,7 @@ function CreateProcedureForm({
       },
     });
     setActiveLanguageTab('English');
+    reset();
   };
   const handleEditProcedure = (data: ProcedureFormFields) => {
     editProcedure.mutate({
@@ -178,18 +191,8 @@ function CreateProcedureForm({
     });
     setCreateAnotherProcedure(false);
     setActiveLanguageTab('English');
+    reset();
   };
-
-  const {
-    control,
-    register,
-    handleSubmit,
-    setValue,
-    formState: { errors },
-    reset,
-  } = useForm<ProcedureFormFields>({
-    resolver: zodResolver(procedureFormSchema),
-  });
 
   React.useEffect(() => {
     if (
@@ -265,12 +268,6 @@ function CreateProcedureForm({
     const lang = procedureObj[c.language] as ProcedureFormSchemaType;
     return errors[lang] && errors[lang]?.message;
   });
-
-  React.useEffect(() => {
-    if (createProcedure.isSuccess || editProcedure.isSuccess) {
-      reset();
-    }
-  }, [createProcedure.isSuccess, editProcedure.isSuccess, reset]);
 
   return (
     <form

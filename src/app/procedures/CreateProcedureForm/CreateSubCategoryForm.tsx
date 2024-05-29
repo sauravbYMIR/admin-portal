@@ -100,6 +100,17 @@ function CreateSubCategoryForm({
   const [activeLanguageTab, setActiveLanguageTab] =
     useState<LanguagesType>('English');
 
+  const {
+    control,
+    register,
+    handleSubmit,
+    setValue,
+    formState: { errors },
+    reset,
+  } = useForm<SubCategoryFormFields>({
+    resolver: zodResolver(subCategoryFormSchema),
+  });
+
   const handleCreateSubCategory = (data: SubCategoryFormFields) => {
     createDepartment.mutate({
       name: {
@@ -111,6 +122,7 @@ function CreateSubCategoryForm({
       parentCategoryId: data.department.value,
     });
     setActiveLanguageTab('English');
+    reset();
   };
   const handleEditSubCategory = (data: SubCategoryFormFields) => {
     editDepartment.mutate({
@@ -124,18 +136,8 @@ function CreateSubCategoryForm({
     });
     setCreateAnotherSubCategory(false);
     setActiveLanguageTab('English');
+    reset();
   };
-
-  const {
-    control,
-    register,
-    handleSubmit,
-    setValue,
-    formState: { errors },
-    reset,
-  } = useForm<SubCategoryFormFields>({
-    resolver: zodResolver(subCategoryFormSchema),
-  });
 
   React.useEffect(() => {
     if (
@@ -189,17 +191,6 @@ function CreateSubCategoryForm({
     const lang = subCategoryObj[c.language] as SubCategoryFormSchemaType;
     return errors[lang] && errors[lang]?.message;
   });
-
-  React.useEffect(() => {
-    if (createDepartment.isSuccess || editDepartment.isSuccess) {
-      reset();
-    }
-  }, [
-    createDepartment.isSuccess,
-    editDepartment.isSuccess,
-    createAnotherSubCategory,
-    reset,
-  ]);
 
   return (
     <form

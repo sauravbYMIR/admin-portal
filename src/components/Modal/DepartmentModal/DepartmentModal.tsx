@@ -105,6 +105,7 @@ function DepartmentModal({
         },
         departmentId: updateId,
       });
+      reset();
     } else {
       createDept.mutate({
         name: {
@@ -115,6 +116,7 @@ function DepartmentModal({
         },
         parentCategoryId: '',
       });
+      reset();
     }
   };
   React.useEffect(() => {
@@ -130,11 +132,6 @@ function DepartmentModal({
       setValue('nameNb', reqdDept.data.data.name.nb);
     }
   }, [reqdDept.data, reqdDept.isSuccess, setValue, updateId]);
-  React.useEffect(() => {
-    if (isChecked && (createDept.isSuccess || editDept.isSuccess)) {
-      reset();
-    }
-  }, [createDept.isSuccess, editDept.isSuccess, isChecked, onClose, reset]);
 
   return (
     <div>

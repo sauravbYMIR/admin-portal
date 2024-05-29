@@ -22,10 +22,9 @@ import HospitalTeamMemberCard from '@/components/Card/HospitalTeamMemberCard/Hos
 import { AddTeamMemberAPI } from '@/components/Modal/AddTeamMemberAPI/AddTeamMemberAPI';
 import type { NameJSONType } from '@/hooks/useDepartment';
 import { useGetHospitalProcedureById } from '@/hooks/useHospitalProcedure';
+import emptyTeamMember from '@/public/assets/images/emptyTeamMember.svg';
 
 import style from '../../hospitalDetailPage.module.scss';
-
-// import addHospitalStyle from './style.module.scss';
 
 export type HospitalFormSchemaType =
   | 'hospitalDescEn'
@@ -120,15 +119,23 @@ function HospitalDetailsPage({
                   {hospitalProcedureId.isSuccess &&
                     hospitalProcedureId.data.data && (
                       <div className={style.breadcrumb}>
-                        <Link href="/">
-                          {
-                            hospitalProcedureId.data.data.procedure.category
-                              .name.en
-                          }{' '}
-                          department
+                        <Link href={`/hospitals/add/${params.id}/procedures`}>
+                          <span className="font-lexend text-base font-normal text-neutral-3">
+                            {
+                              hospitalProcedureId.data.data.procedure.category
+                                .name.en
+                            }{' '}
+                            department
+                          </span>
                         </Link>
                         <span>/</span>
-                        <Link href="/">Procedure details</Link>
+                        <Link
+                          href={`/hospitals/add/${params.id}/procedures/${params.procedureId}`}
+                        >
+                          <span className="font-lexend text-base font-normal text-darkteal">
+                            Procedure details
+                          </span>
+                        </Link>
                       </div>
                     )}
                 </div>
@@ -166,7 +173,7 @@ function HospitalDetailsPage({
                     Cost of procedure
                   </p>
                   <p className="font-lexend text-base font-light text-neutral-2">
-                    {hospitalProcedureId.data.data.cost.en}
+                    € {hospitalProcedureId.data.data.cost.price}
                   </p>
                 </div>
                 <div className="flex flex-col items-start justify-start">
@@ -233,18 +240,36 @@ function HospitalDetailsPage({
               // eslint-disable-next-line react/jsx-no-useless-fragment
               <>
                 {hospitalProcedureId.data.data.hospitalMembers.length === 0 ? (
-                  <div className={style.createTeamMemberContainer}>
-                    <p className={style.title}>
-                      No team members have been added yet!
-                    </p>
-
-                    <button
-                      onClick={() => setIsCreateHospitalTeamModal(true)}
-                      className={style.btn}
-                      type="button"
+                  <div className="mb-12 flex w-full flex-col items-start">
+                    <h3 className="my-8 font-poppins text-lg font-medium text-neutral-1">
+                      Team members
+                    </h3>
+                    <div
+                      className="flex w-full flex-col items-center justify-center rounded-xl border py-10"
+                      style={{
+                        borderColor: 'rgba(186, 191, 199, 1)',
+                      }}
                     >
-                      <p>Add team members</p>
-                    </button>
+                      <Image
+                        src={emptyTeamMember}
+                        alt="empty-team-member-list"
+                        width={160}
+                        height={160}
+                      />
+                      <p className="mb-7 mt-3 font-poppins text-base font-normal text-neutral-2">
+                        No team member have been added yet!
+                      </p>
+                      <button
+                        type="button"
+                        className="flex cursor-pointer items-center gap-3 rounded-lg bg-darkteal px-6 py-[14px]"
+                        onClick={() => setIsCreateHospitalTeamModal(true)}
+                      >
+                        <PlusIcon className="size-5" stroke="#fff" />
+                        <p className="font-poppins text-base font-semibold text-primary-6">
+                          Add team members
+                        </p>
+                      </button>
+                    </div>
                   </div>
                 ) : (
                   <div className={style.teamMemberViewSection}>

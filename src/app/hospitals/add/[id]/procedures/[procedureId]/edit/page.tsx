@@ -42,12 +42,6 @@ export type HospitalCostFormSchemaType =
   | 'costNb'
   | 'costDa'
   | 'costSv';
-const costObj = {
-  English: 'costEn',
-  Norwegian: 'costNb',
-  Danish: 'costDa',
-  Swedish: 'costSv',
-};
 const editHospitalProcedureFormSchema = z.object({
   departmentName: z.string(),
   procedureName: z.string(),
@@ -63,19 +57,7 @@ const editHospitalProcedureFormSchema = z.object({
   procedureDescSv: z
     .string()
     .min(1, { message: 'Fill in details in all the languages' }),
-  costEn: z.number({
-    required_error: 'Cost in all language is required',
-    invalid_type_error: 'Cost must be a number',
-  }),
-  costNb: z.number({
-    required_error: 'Cost in all language is required',
-    invalid_type_error: 'Cost must be a number',
-  }),
-  costDa: z.number({
-    required_error: 'Cost in all language is required',
-    invalid_type_error: 'Cost must be a number',
-  }),
-  costSv: z.number({
+  cost: z.number({
     required_error: 'Cost in all language is required',
     invalid_type_error: 'Cost must be a number',
   }),
@@ -100,8 +82,6 @@ function EditHospitalProcedure({
     id: params.procedureId,
   });
   const [activeLanguageTab, setActiveLanguageTab] =
-    React.useState<LanguagesType>('English');
-  const [activeCostTab, setActiveCostTab] =
     React.useState<LanguagesType>('English');
   const [isActiveCancelModal, setIsActiveCancelModal] =
     React.useState<boolean>(false);
@@ -129,10 +109,6 @@ function EditHospitalProcedure({
     const lang = hospitalObj[c.language] as HospitalProcedureFormSchemaType;
     return errors[lang] && errors[lang]?.message;
   });
-  const shouldRenderCostError = countryData.some((c) => {
-    const lang = costObj[c.language] as HospitalCostFormSchemaType;
-    return errors[lang] && errors[lang]?.message;
-  });
   const onFormSubmit: SubmitHandler<EditHospitalProcedureFormFields> = (
     data: EditHospitalProcedureFormFields,
   ) => {
@@ -147,10 +123,8 @@ function EditHospitalProcedure({
         sv: data.procedureDescSv,
       },
       cost: {
-        en: data.costEn,
-        da: data.costDa,
-        nb: data.costNb,
-        sv: data.costSv,
+        price: data.cost,
+        currency: 'EUR',
       },
       hospitalProcedureId: params.procedureId,
     });
@@ -186,10 +160,7 @@ function EditHospitalProcedure({
         'procedureDescSv',
         hospitalProcedureDetails.data.data.description.sv,
       );
-      setValue('costEn', hospitalProcedureDetails.data.data.cost.en);
-      setValue('costNb', hospitalProcedureDetails.data.data.cost.nb);
-      setValue('costDa', hospitalProcedureDetails.data.data.cost.da);
-      setValue('costSv', hospitalProcedureDetails.data.data.cost.sv);
+      setValue('cost', hospitalProcedureDetails.data.data.cost.price);
       setValue('waitingTime', hospitalProcedureDetails.data.data.waitingTime);
       setValue('stayInCity', hospitalProcedureDetails.data.data.stayInCity);
       setValue('stayInHospital', hospitalProcedureDetails.data.data.stayInCity);
@@ -234,10 +205,6 @@ function EditHospitalProcedure({
     id: string;
     isShow: boolean;
   }>({ id: '', isShow: false });
-  // const [isRemoveImgBtn, setIsRemoveImgBtn] = React.useState<{
-  //   id: string;
-  //   isShow: boolean;
-  // }>({ id: '', isShow: false });
   const gallery = watch('gallery');
   const removeHospitalProcedureGallery = useRemoveHospitalProcedureGallery({
     id: params.procedureId,
@@ -370,55 +337,39 @@ function EditHospitalProcedure({
 
           <div className="grid w-full grid-cols-2 gap-x-10 gap-y-4">
             <div className="relative my-4 flex w-full flex-col items-start">
-              <label
-                className="mb-3 font-poppins text-base font-normal text-neutral-2"
-                htmlFor="cost-of-procedure"
-              >
-                Expected cost of procedure
-              </label>
-
-              <div className="absolute top-[38px]">
-                <select
-                  name="cost-of-procedure"
-                  id="cost-of-procedure"
-                  className="rounded-md border-2 border-neutral-4 bg-neutral-6 px-5 py-[8px]"
-                  onChange={(e) =>
-                    setActiveCostTab(e.target.value as LanguagesType)
-                  }
+              <div className="relative my-4 flex w-full flex-col items-start">
+                <label
+                  className="mb-3 font-poppins text-base font-normal text-neutral-2"
+                  htmlFor="cost-of-procedure"
                 >
-                  {countryData.map((country) => {
-                    return (
-                      <option value={country.language} key={country.language}>
-                        <span>{country.currency}</span>
-                      </option>
-                    );
-                  })}
-                </select>
-              </div>
+                  Expected cost of procedure
+                </label>
 
-              {countryData.map((c) => {
-                const costLang = costObj[
-                  c.language
-                ] as HospitalProcedureFormSchemaType;
-                return (
-                  <div key={c.countryCode} className="w-full">
-                    {c.language === activeCostTab && (
-                      <input
-                        className="w-full rounded-lg border-2 border-lightsilver px-4 py-2 placeholder:text-sm placeholder:font-normal placeholder:text-neutral-3"
-                        style={{ paddingLeft: '110px' }}
-                        id="cost-of-procedure"
-                        {...register(costLang)}
-                      />
-                    )}
+                <div className="absolute top-[37px]">
+                  <div className="rounded-md border-2 border-neutral-4 bg-neutral-6 px-5 py-[7px]">
+                    <span className="font-poppins text-sm font-normal text-neutral-2">
+                      EUR
+                    </span>
                   </div>
-                );
-              })}
+                </div>
 
-              {shouldRenderCostError && (
-                <small className="mb-5 mt-1 text-start font-lexend text-base font-normal text-error">
-                  Fill in details in all the languages
-                </small>
-              )}
+                <input
+                  className="w-full rounded-lg border-2 border-lightsilver px-4 py-2 placeholder:text-sm placeholder:font-normal placeholder:text-neutral-3"
+                  style={{ paddingLeft: '75px' }}
+                  id="cost-of-procedure"
+                  {...register('cost', { valueAsNumber: true })}
+                  type="number"
+                  onWheel={(e: React.WheelEvent<HTMLInputElement>) => {
+                    const target = e.target as HTMLElement;
+                    target.blur();
+                  }}
+                />
+                {errors.cost && (
+                  <small className="mt-1 text-start font-lexend text-base font-normal text-error">
+                    {errors.cost.message}
+                  </small>
+                )}
+              </div>
             </div>
             <div className="my-4 flex w-full flex-col items-start">
               <label

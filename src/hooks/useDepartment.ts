@@ -15,6 +15,10 @@ export type ReimbursementJSONType = {
   da: number;
   sv: number;
 };
+export type CostJSONType = {
+  price: number;
+  currency: string;
+};
 
 export type ProcedureType = {
   id: string;

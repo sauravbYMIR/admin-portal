@@ -40,7 +40,7 @@ function Header() {
   };
   return (
     <nav className={`h-24 w-full items-center ${headerStyle.headerContainer}`}>
-      <button type="button" onClick={() => router.push('/')}>
+      <button type="button" onClick={() => router.push('/patients')}>
         <Image src={brandLogo} alt="branch icon" width={120} height={48} />
       </button>
       <ul

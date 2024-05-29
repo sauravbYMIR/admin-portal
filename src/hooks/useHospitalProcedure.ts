@@ -3,7 +3,11 @@ import { toast } from 'sonner';
 
 import { axiosInstance } from '@/utils/axiosInstance';
 
-import type { NameJSONType, ReimbursementJSONType } from './useDepartment';
+import type {
+  CostJSONType,
+  NameJSONType,
+  ReimbursementJSONType,
+} from './useDepartment';
 import type { HospitalMember } from './useMember';
 
 export type HospitalProcedureType = {
@@ -31,7 +35,7 @@ export type HospitalProcedureByIdType = {
   createdAt: string | null;
   deletedAt: string | null;
   description: NameJSONType;
-  cost: ReimbursementJSONType;
+  cost: CostJSONType;
   hospitalId: string;
   id: string;
   hospitalMembers: Array<HospitalMember>;
@@ -125,7 +129,7 @@ export const editHospitalProcedure = async ({
   stayInHospital: string;
   stayInCity: string;
   description: NameJSONType;
-  cost: ReimbursementJSONType;
+  cost: CostJSONType;
   hospitalProcedureId: string;
 }): Promise<{
   success: boolean;
@@ -206,7 +210,7 @@ export const createHospitalProcedure = async ({
   procedureId: string;
   hospitalId: string;
   description: NameJSONType;
-  cost: { price: number; currency: string };
+  cost: CostJSONType;
   waitingTime: string;
   stayInHospital: string;
   stayInCity: string;

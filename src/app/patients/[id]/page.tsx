@@ -40,11 +40,11 @@ const PatientBooking = ({ params }: { params: { id: string } }) => {
           { label: 'Estimated wait', value: bookingDetail.data.data.waitTime },
           {
             label: 'Cost of procedure',
-            value: bookingDetail.data.data.costOfProcedure.en,
+            value: bookingDetail.data.data.costOfProcedure.ie,
           },
           {
             label: 'Reimbursement offered',
-            value: bookingDetail.data.data.reimbursementCost.en,
+            value: bookingDetail.data.data.reimbursementCost.ie,
           },
         ]
       : [

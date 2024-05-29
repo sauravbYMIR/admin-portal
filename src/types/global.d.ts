@@ -2,4 +2,4 @@
 // Use type safe message keys with `next-intl`
 type Messages = typeof import('../locales/en.json');
 declare interface IntlMessages extends Messages {}
-export type LangType = 'en' | 'nb' | 'da' | 'sv';
+export type LangType = 'dk' | 'ie' | 'no' | 'se';

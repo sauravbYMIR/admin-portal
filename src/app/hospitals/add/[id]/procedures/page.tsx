@@ -155,7 +155,7 @@ function HospitalProcedureManagement() {
                   name: `${r.procedure.name.en} - ${r.procedure.category.name.en}`,
                   department: r.procedure.category.name.en,
                   waitTime: r.waitingTime,
-                  cost: r.cost.en,
+                  cost: r.cost.ie,
                   id: r.id,
                   stayInHospital: r.stayInHospital,
                   stayInCity: r.stayInCity,
@@ -166,10 +166,10 @@ function HospitalProcedureManagement() {
                     nb: r.description.nb,
                   },
                   costObj: {
-                    en: r.cost.en,
-                    da: r.cost.da,
-                    sv: r.cost.sv,
-                    nb: r.cost.nb,
+                    ie: r.cost.ie,
+                    dk: r.cost.dk,
+                    se: r.cost.se,
+                    no: r.cost.no,
                   },
                 }))}
                 colDefs={[

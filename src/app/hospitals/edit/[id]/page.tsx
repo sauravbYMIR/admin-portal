@@ -197,7 +197,6 @@ function EditHospital({ params: { id } }: { params: { id: string } }) {
   }, [editHospital.data, editHospital.isSuccess]);
   const removeGallery = useRemoveGallery({ id });
   const countryOptions = React.useMemo(() => countryList().getData(), []);
-  console.log(logo, reqdHospital);
   return (
     <div>
       <Header />

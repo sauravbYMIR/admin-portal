@@ -10,10 +10,10 @@ export type NameJSONType = {
   sv: string;
 };
 export type ReimbursementJSONType = {
-  en: number;
-  nb: number;
-  da: number;
-  sv: number;
+  ie: number;
+  no: number;
+  dk: number;
+  se: number;
 };
 export type CostJSONType = {
   price: number;

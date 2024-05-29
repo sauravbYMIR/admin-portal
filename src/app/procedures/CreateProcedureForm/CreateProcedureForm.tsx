@@ -31,10 +31,10 @@ export type ProcedureFormSchemaType =
   | 'procedureNb'
   | 'procedureDa'
   | 'procedureSv'
-  | 'reimbursementEn'
-  | 'reimbursementNb'
-  | 'reimbursementDa'
-  | 'reimbursementSv'
+  | 'reimbursementIe'
+  | 'reimbursementNo'
+  | 'reimbursementDk'
+  | 'reimbursementSe'
   | 'department';
 
 export const departmentTypeSchema = z.object({
@@ -59,22 +59,22 @@ const procedureFormSchema = z.object({
   procedureSv: z
     .string()
     .min(1, { message: 'Fill in details in all the languages' }),
-  reimbursementEn: z
+  reimbursementIe: z
     .string()
     .refine((val) => !Number.isNaN(parseInt(val, 10)), {
       message: 'Fill in all required details in correct format',
     }),
-  reimbursementNb: z
+  reimbursementNo: z
     .string()
     .refine((val) => !Number.isNaN(parseInt(val, 10)), {
       message: 'Fill in all required details in correct format',
     }),
-  reimbursementDa: z
+  reimbursementDk: z
     .string()
     .refine((val) => !Number.isNaN(parseInt(val, 10)), {
       message: 'Fill in all required details in correct format',
     }),
-  reimbursementSv: z
+  reimbursementSe: z
     .string()
     .refine((val) => !Number.isNaN(parseInt(val, 10)), {
       message: 'Fill in all required details in correct format',
@@ -152,10 +152,10 @@ function CreateProcedureForm({
       },
       categoryId: data.department.value,
       reimbursement: {
-        en: Number(data.reimbursementEn),
-        nb: Number(data.reimbursementNb),
-        da: Number(data.reimbursementDa),
-        sv: Number(data.reimbursementSv),
+        ie: Number(data.reimbursementIe),
+        no: Number(data.reimbursementNo),
+        dk: Number(data.reimbursementDk),
+        se: Number(data.reimbursementSe),
       },
     });
     setActiveLanguageTab('English');
@@ -170,10 +170,10 @@ function CreateProcedureForm({
         sv: data.procedureSv,
       },
       reimbursement: {
-        en: Number(data.reimbursementEn),
-        nb: Number(data.reimbursementNb),
-        da: Number(data.reimbursementDa),
-        sv: Number(data.reimbursementSv),
+        ie: Number(data.reimbursementIe),
+        no: Number(data.reimbursementNo),
+        dk: Number(data.reimbursementDk),
+        se: Number(data.reimbursementSe),
       },
     });
     setCreateAnotherProcedure(false);
@@ -220,20 +220,20 @@ function CreateProcedureForm({
       setValue('procedureSv', reqProcedure.data.data.name.sv);
       setValue('procedureNb', reqProcedure.data.data.name.nb);
       setValue(
-        'reimbursementEn',
-        reqProcedure.data.data.reimbursement.en.toString(),
+        'reimbursementIe',
+        reqProcedure.data.data.reimbursement.ie.toString(),
       );
       setValue(
-        'reimbursementNb',
-        reqProcedure.data.data.reimbursement.nb.toString(),
+        'reimbursementNo',
+        reqProcedure.data.data.reimbursement.no.toString(),
       );
       setValue(
-        'reimbursementSv',
-        reqProcedure.data.data.reimbursement.sv.toString(),
+        'reimbursementSe',
+        reqProcedure.data.data.reimbursement.se.toString(),
       );
       setValue(
-        'reimbursementDa',
-        reqProcedure.data.data.reimbursement.da.toString(),
+        'reimbursementDk',
+        reqProcedure.data.data.reimbursement.dk.toString(),
       );
     }
   }, [reqProcedure.data, reqProcedure.isSuccess, setValue, updateId]);
@@ -255,10 +255,10 @@ function CreateProcedureForm({
     Swedish: 'procedureSv',
   };
   const reimburismentObj = {
-    English: 'reimbursementEn',
-    Norwegian: 'reimbursementNb',
-    Danish: 'reimbursementDa',
-    Swedish: 'reimbursementSv',
+    English: 'reimbursementIe',
+    Norwegian: 'reimbursementNo',
+    Danish: 'reimbursementDk',
+    Swedish: 'reimbursementSe',
   };
 
   const shouldRenderProcedureError = countryData.some((c) => {

@@ -5,11 +5,8 @@ import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
 
 import brandLogo from '@/public/assets/images/brandLogo.svg';
-import {
-  handleGetLocalStorage,
-  handleRemoveFromLocalStorage,
-} from '@/utils/global';
 
+import LogButton from '../LogButton/LogButton';
 import headerStyle from './header.module.scss';
 
 const menuItems = {
@@ -32,12 +29,6 @@ const menuItems = {
 function Header() {
   const router = useRouter();
   const pathname = usePathname();
-  const accessToken = handleGetLocalStorage({ tokenKey: 'access_token' });
-  const handleLogoutUser = () => {
-    handleRemoveFromLocalStorage({ tokenKey: 'access_token' });
-    handleRemoveFromLocalStorage({ tokenKey: 'refresh_token' });
-    router.push('/');
-  };
   return (
     <nav className={`h-24 w-full items-center ${headerStyle.headerContainer}`}>
       <button type="button" onClick={() => router.push('/patients')}>
@@ -60,23 +51,7 @@ function Header() {
         })}
       </ul>
 
-      <ul className="flex list-none items-center gap-8">
-        <li>
-          {!accessToken ? (
-            <button className={headerStyle.headerLoginBtn} type="button">
-              Log in
-            </button>
-          ) : (
-            <button
-              className={`flex items-center justify-center ${headerStyle.headerLoginBtn}`}
-              type="button"
-              onClick={handleLogoutUser}
-            >
-              Log out
-            </button>
-          )}
-        </li>
-      </ul>
+      <LogButton />
     </nav>
   );
 }

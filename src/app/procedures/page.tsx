@@ -250,7 +250,8 @@ function ProceduresList() {
                                                     key as LangType;
                                                   const countryName =
                                                     countryData.find(
-                                                      (c) => c.locale === key,
+                                                      (c) =>
+                                                        c.countryCode === key,
                                                     )?.name;
                                                   return (
                                                     <ReimbursementWrapper

@@ -1,18 +1,48 @@
 'use client';
 
 import type { CustomCellRendererProps } from 'ag-grid-react';
+import Image from 'next/image';
 import { useRouter } from 'next/navigation';
 import React from 'react';
 import { ClipLoader } from 'react-spinners';
 import { toast } from 'sonner';
 
-import { Header, WithAuth } from '@/components';
+import { DataTable, Header, WithAuth } from '@/components';
 import ShowDataTable from '@/components/Table/PatientsTable/PatientsTable';
 import { useGetAllBookings, useUpdateBookingStatus } from '@/hooks/useBooking';
+import emptyState from '@/public/assets/images/emptyState.svg';
 import { ACCEPT, ACCEPTED, REJECT, REJECTED, REQUESTED } from '@/utils/global';
 
 import patientsTableStyle from '../../components/Table/PatientsTable/patientsTable.module.scss';
 import patientsStyle from './patients.module.scss';
+
+const EmptyBookingsPage = () => {
+  return (
+    <div className="mt-[100px] flex w-screen flex-col items-center justify-center">
+      <Image
+        src={emptyState}
+        alt="empty-procedure-list"
+        width={160}
+        height={160}
+      />
+      <p className="mb-7 mt-3 font-poppins text-base font-normal text-neutral-2">
+        No bookings have been created yet!
+      </p>
+      {/* <button
+        type="button"
+        className="flex cursor-pointer items-center gap-3 rounded-lg bg-darkteal px-6 py-[14px]"
+        onClick={() =>
+          router.push(`/hospitals/add/${hospitalId}/procedures/add`)
+        }
+      >
+        <PlusIcon className="size-5" stroke="#fff" />
+        <p className="font-poppins text-base font-semibold text-primary-6">
+          Add procedures
+        </p>
+      </button> */}
+    </div>
+  );
+};
 
 const CustomStatusEditComponent = (props: CustomCellRendererProps) => {
   const router = useRouter();
@@ -197,7 +227,9 @@ function PatientsPage() {
             ]}
           />
         ) : (
-          <p>No Bookings present</p>
+          <div>
+            {allBookings.isPending ? <DataTable /> : <EmptyBookingsPage />}
+          </div>
         )}
       </div>
     </div>

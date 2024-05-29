@@ -99,8 +99,9 @@ export function AddTeamMemberToHospitalProcedure({
     ) {
       setTeamMemberList(() =>
         hospitalTeamMembers.data.data
-          .filter((teamMember) =>
-            teamMembers.find(({ member: { id } }) => id === teamMember.id),
+          .filter(
+            (teamMember) =>
+              !teamMembers.find(({ member: { id } }) => id === teamMember.id),
           )
           .map((teamMember) => ({
             value: teamMember.id,
@@ -133,13 +134,13 @@ export function AddTeamMemberToHospitalProcedure({
   const onFormSubmit: SubmitHandler<CreateHospitalTeamMemberFormFields> = (
     data: CreateHospitalTeamMemberFormFields,
   ) => {
-    if (
-      teamMembers.find(
-        (member) => member.member.id === data.teamMemberId.value,
-      ) !== undefined
-    ) {
-      return;
-    }
+    // if (
+    //   teamMembers.find(
+    //     (member) => member.member.id === data.teamMemberId.value,
+    //   ) !== undefined
+    // ) {
+    //   return;
+    // }
     setTeamMembers((prevState) => [
       ...prevState,
       {

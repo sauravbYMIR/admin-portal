@@ -58,8 +58,8 @@ const createHospitalFormSchema = z.object({
   logo: z.instanceof(File, { message: 'A file is required' }),
   gallery: z
     .array(z.instanceof(File))
-    .min(1, 'At least one image is required')
-    .max(3, 'You can upload up to 3 images'),
+    .min(3, 'At least 3 image is required')
+    .max(10, 'You can upload up to 10 images'),
 });
 export type CreateHospitalFormFields = z.infer<typeof createHospitalFormSchema>;
 function HospitalDetailsPage({

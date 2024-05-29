@@ -96,7 +96,7 @@ function HospitalDetailsPage({
       <div className={style.hospitalDetailPageContainer}>
         <button
           type="button"
-          onClick={() => router.back()}
+          onClick={() => router.push(`/hospitals/add/${params.id}/procedures`)}
           className="flex size-10 cursor-pointer items-center justify-center rounded-full border-none bg-rgba244"
         >
           <BackArrowIcon strokeWidth="2" stroke="rgba(17, 17, 17, 0.8)" />

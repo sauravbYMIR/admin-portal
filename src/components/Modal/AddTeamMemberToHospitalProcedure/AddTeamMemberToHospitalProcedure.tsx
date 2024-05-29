@@ -88,6 +88,7 @@ export function AddTeamMemberToHospitalProcedure({
       label: string;
       value: string;
       name: string;
+      role: NameJSONType;
     }>
   >([]);
   React.useEffect(() => {
@@ -107,6 +108,7 @@ export function AddTeamMemberToHospitalProcedure({
             value: teamMember.id,
             name: `${teamMember.name}`,
             label: `${teamMember.name} - ${teamMember.position.en} - ${teamMember.qualification}`,
+            role: teamMember.position,
           })),
       );
     }
@@ -124,6 +126,7 @@ export function AddTeamMemberToHospitalProcedure({
     control,
     reset,
     formState: { errors },
+    setValue,
   } = useForm<CreateHospitalTeamMemberFormFields>({
     resolver: zodResolver(addTeamMemberFormSchema),
   });
@@ -199,6 +202,65 @@ export function AddTeamMemberToHospitalProcedure({
               onSubmit={handleSubmit(onFormSubmit)}
             >
               <div className="mb-10 flex w-full flex-col items-start">
+                <div className="flex flex-col items-start gap-y-2">
+                  <label
+                    className="font-poppins text-base font-normal text-neutral-2"
+                    htmlFor="teamMemberId"
+                  >
+                    Team member
+                  </label>
+                  {selectedOption && (
+                    <small className="text-sm font-normal italic">
+                      {selectedOption.name}
+                    </small>
+                  )}
+                </div>
+                <Controller
+                  name="teamMemberId"
+                  control={control}
+                  defaultValue={
+                    selectedOption?.label
+                      ? selectedOption
+                      : { label: '', value: '' }
+                  }
+                  render={({ field }) => (
+                    <Select
+                      {...field}
+                      className="mt-3 w-full"
+                      options={teamMemberList}
+                      onChange={(value) => {
+                        if (value) {
+                          const v = value as {
+                            name: string;
+                            value: string;
+                            label: string;
+                            role: NameJSONType;
+                          };
+                          setValue('roleEn', v.role.en);
+                          setValue('roleNb', v.role.nb);
+                          setValue('roleDa', v.role.da);
+                          setValue('roleSv', v.role.sv);
+                          setSelectedOption({
+                            label: v.name,
+                            value: v.value,
+                            name: v.label,
+                          });
+                          field.onChange({
+                            label: v.name,
+                            value: v.value,
+                          });
+                        }
+                      }}
+                    />
+                  )}
+                />
+                {errors.teamMemberId && errors.teamMemberId.value && (
+                  <div className="mt-1 text-start font-lexend text-base font-normal text-error">
+                    {errors.teamMemberId.value.message}
+                  </div>
+                )}
+              </div>
+              <div className="flex w-full flex-col items-start">
                 <label
                   className="font-poppins text-base font-normal text-neutral-2"
                   htmlFor="position"
@@ -258,58 +320,7 @@ export function AddTeamMemberToHospitalProcedure({
                   </small>
                 )}
               </div>
-              <div className="flex flex-col items-start gap-y-2">
-                <label
-                  className="font-poppins text-base font-normal text-neutral-2"
-                  htmlFor="teamMemberId"
-                >
-                  Team member
-                </label>
-                {selectedOption && (
-                  <small className="text-sm font-normal italic">
-                    {selectedOption.name}
-                  </small>
-                )}
-              </div>
-              <Controller
-                name="teamMemberId"
-                control={control}
-                defaultValue={
-                  selectedOption?.label
-                    ? selectedOption
-                    : { label: '', value: '' }
-                }
-                render={({ field }) => (
-                  <Select
-                    {...field}
-                    className="mt-3"
-                    options={teamMemberList}
-                    onChange={(value) => {
-                      if (value) {
-                        const v = value as {
-                          name: string;
-                          value: string;
-                          label: string;
-                        };
-                        setSelectedOption({
-                          label: v.name,
-                          value: v.value,
-                          name: v.label,
-                        });
-                        field.onChange({
-                          label: v.name,
-                          value: v.value,
-                        });
-                      }
-                    }}
-                  />
-                )}
-              />
-              {errors.teamMemberId && errors.teamMemberId.value && (
-                <div className="mt-1 text-start font-lexend text-base font-normal text-error">
-                  {errors.teamMemberId.value.message}
-                </div>
-              )}
+
               <div style={{ marginTop: '64px', marginBottom: '28px' }}>
                 <label
                   className={departmentModalStyle.checkboxLabel}
@@ -331,10 +342,7 @@ export function AddTeamMemberToHospitalProcedure({
                 </label>
               </div>
               <button
-                className={`
-                flex w-[280px]
-                cursor-pointer items-center justify-center rounded-lg bg-darkteal px-4 py-[15px]`}
-                // ${editHospital.isPending ? 'cursor-not-allowed bg-darkteal/60' : 'cursor-pointer bg-darkteal'}
+                className="flex w-[280px] cursor-pointer items-center justify-center rounded-lg bg-darkteal px-4 py-[15px]"
                 style={{ marginTop: '24px' }}
                 type="submit"
               >

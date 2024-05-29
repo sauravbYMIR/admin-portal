@@ -15,7 +15,10 @@ import { toast } from 'sonner';
 import { z } from 'zod';
 
 import type { DepartmentType } from '@/app/procedures/CreateProcedureForm/CreateProcedureForm';
-import { departmentTypeSchema } from '@/app/procedures/CreateProcedureForm/CreateProcedureForm';
+import {
+  departmentTypeSchema,
+  procedureTypeSchema,
+} from '@/app/procedures/CreateProcedureForm/CreateProcedureForm';
 import {
   AddTeamMemberToHospitalProcedure,
   BackArrowIcon,
@@ -43,7 +46,7 @@ import type { HospitalProcedureFormSchemaType } from '../[procedureId]/edit/page
 
 const createHospitalProcedureFormSchema = z.object({
   department: departmentTypeSchema,
-  procedure: departmentTypeSchema,
+  procedure: procedureTypeSchema,
   procedureDescEn: z
     .string()
     .min(1, { message: 'Fill in details in all the languages' }),
@@ -188,7 +191,7 @@ function AddHospitalProcedure({ params }: { params: { id: string } }) {
     data: CreateHospitalProcedureFormFields,
   ) => {
     if (teamMembers.length === 0) {
-      toast('Please add team member to proceed');
+      toast.info('Please add team member to proceed');
       return;
     }
     createHospitalProcedure.mutate({
@@ -297,15 +300,9 @@ function AddHospitalProcedure({ params }: { params: { id: string } }) {
       createHospitalProcedure.isSuccess &&
       createHospitalProcedure.data?.data
     ) {
-      toast('Procedure added successfully');
+      toast.success('Procedure added successfully');
       router.push(
         `/hospitals/add/${params.id}/procedures/${createHospitalProcedure.data.data}`,
-      );
-      return;
-    }
-    if (createHospitalProcedure.isError) {
-      toast(
-        'Oops! something went wrong while creating the procedure. Try again.',
       );
     }
   }, [
@@ -366,9 +363,9 @@ function AddHospitalProcedure({ params }: { params: { id: string } }) {
                 />
               )}
             />
-            {errors.department && (
+            {errors.department && errors.department.label && (
               <div className="mt-1 text-start font-lexend text-base font-normal text-error">
-                {errors.department.message}
+                {errors.department.label.message}
               </div>
             )}
           </div>
@@ -400,9 +397,9 @@ function AddHospitalProcedure({ params }: { params: { id: string } }) {
                 />
               )}
             />
-            {errors.department && (
+            {errors.procedure && errors.procedure.label && (
               <div className="mt-1 text-start font-lexend text-base font-normal text-error">
-                {errors.department.message}
+                {errors.procedure.label.message}
               </div>
             )}
           </div>
@@ -434,7 +431,7 @@ function AddHospitalProcedure({ params }: { params: { id: string } }) {
                           }
                         : {}
                     }
-                    className={`${errors[lang] && errors[lang]?.message ? '!border !border-error !text-error' : ''}`}
+                    className={`${errors[lang] && errors[lang]?.message ? '!border-2 !border-error !text-error' : ''}`}
                   >
                     {data.language}
                   </button>

@@ -38,8 +38,12 @@ export type ProcedureFormSchemaType =
   | 'department';
 
 export const departmentTypeSchema = z.object({
-  label: z.string(),
-  value: z.string(),
+  label: z.string().min(1, { message: 'Please select department to proceed' }),
+  value: z.string().min(1, { message: 'Please select department to proceed' }),
+});
+export const procedureTypeSchema = z.object({
+  label: z.string().min(1, { message: 'Please select procedure to proceed' }),
+  value: z.string().min(1, { message: 'Please select procedure to proceed' }),
 });
 
 const procedureFormSchema = z.object({
@@ -299,9 +303,9 @@ function CreateProcedureForm({
           />
         )}
       />
-      {errors.department && (
+      {errors.department && errors.department.label && (
         <div className="mt-1 text-start font-lexend text-base font-normal text-error">
-          {errors.department.message}
+          {errors.department.label.message}
         </div>
       )}
       <p

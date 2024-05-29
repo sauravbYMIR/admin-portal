@@ -280,7 +280,6 @@ function ProceduresList() {
                             className={
                               proceduresStyle.proceduresAccordionContainer
                             }
-                            style={{ border: '1px solid red' }}
                           >
                             {procedureData.procedures.map((procedure) => {
                               return (

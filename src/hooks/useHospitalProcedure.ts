@@ -2,6 +2,7 @@ import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { toast } from 'sonner';
 
 import { axiosInstance } from '@/utils/axiosInstance';
+import { SERVER_ERROR_MESSAGE } from '@/utils/global';
 
 import type {
   CostJSONType,
@@ -253,7 +254,12 @@ export const useCreateHospitalProcedure = () => {
       });
     },
     onError: (error) => {
-      toast(`Something went wrong: ${error.message}`);
+      const err = error as unknown as {
+        response: { data: { error: { message: string } } };
+      };
+      toast.error(
+        `${SERVER_ERROR_MESSAGE[err.response.data.error.message as keyof typeof SERVER_ERROR_MESSAGE] ?? 'Server error'}`,
+      );
     },
   });
 };

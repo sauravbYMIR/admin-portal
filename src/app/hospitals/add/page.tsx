@@ -165,7 +165,7 @@ function AddHospital() {
         });
         reset();
       }
-      router.push(`/hospitals/edit/${createHospital.data.data.id}`);
+      router.push(`/hospitals`);
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [

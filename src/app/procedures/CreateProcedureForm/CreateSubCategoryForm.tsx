@@ -237,9 +237,9 @@ function CreateSubCategoryForm({
           />
         )}
       />
-      {errors.department && (
+      {errors.department && errors.department.label && (
         <div className="mt-1 text-start font-lexend text-base font-normal text-error">
-          {errors.department.message}
+          {errors.department.label.message}
         </div>
       )}
       <p

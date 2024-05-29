@@ -197,6 +197,7 @@ function EditHospital({ params: { id } }: { params: { id: string } }) {
   }, [editHospital.data, editHospital.isSuccess]);
   const removeGallery = useRemoveGallery({ id });
   const countryOptions = React.useMemo(() => countryList().getData(), []);
+  console.log(logo, reqdHospital);
   return (
     <div>
       <Header />
@@ -651,9 +652,10 @@ function EditHospital({ params: { id } }: { params: { id: string } }) {
                         src={image.imageUrl}
                         width={200}
                         height={200}
+                        unoptimized
+                        priority
                         alt="hospital-gallery"
-                        objectFit="contain"
-                        className="relative size-[200px] cursor-pointer rounded-lg border border-neutral-4"
+                        className="relative aspect-square size-[200px] cursor-pointer rounded-lg border border-neutral-4 object-contain"
                       />
                       <button
                         type="button"

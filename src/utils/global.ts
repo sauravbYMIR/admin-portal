@@ -134,6 +134,7 @@ const SERVER_ERROR_MESSAGE = {
   'Incorrect-otp': 'Incorrect otp',
   'Hospital-member-associated-with-procedure':
     'Hospital member associated with procedure',
+  'Hospital-procedure-already-present': 'Hospital procedure already present',
 };
 
 const countryCodes = {

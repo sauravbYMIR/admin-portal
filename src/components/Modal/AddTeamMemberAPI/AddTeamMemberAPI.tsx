@@ -28,7 +28,7 @@ const roleObj = {
   Swedish: 'roleSv',
 };
 export const teamMemberTypeSchema = z.object({
-  label: z.string(),
+  label: z.string().min(1, { message: 'Please select member to proceed' }),
   value: z.string().min(1, { message: 'Please select member to proceed' }),
 });
 export type HospitalTeamMemberSchemaType =
@@ -88,6 +88,7 @@ export function AddTeamMemberAPI({
       label: string;
       value: string;
       name: string;
+      role: NameJSONType;
     }>
   >([]);
   React.useEffect(() => {
@@ -104,6 +105,7 @@ export function AddTeamMemberAPI({
             value: teamMember.id,
             name: `${teamMember.name}`,
             label: `${teamMember.name} - ${teamMember.position.en} - ${teamMember.qualification}`,
+            role: teamMember.position,
           })),
       );
     }
@@ -203,8 +205,8 @@ export function AddTeamMemberAPI({
   return (
     <div>
       {isOpen && (
-        <div className={modalStyle.modalOverlay}>
-          <div className={modalStyle.modal}>
+        <div className={modalStyle.modalOverlayDup}>
+          <div className={modalStyle.modalDup}>
             <div className="mb-14 flex items-start justify-between">
               <h2 className="font-poppins text-lg font-semibold text-neutral-1">
                 {isEditTeamMember ? (
@@ -233,10 +235,70 @@ export function AddTeamMemberAPI({
             </div>
 
             <form
-              className={modalStyle.modalBody}
+              className={modalStyle.modalBodyDup}
               onSubmit={handleSubmit(onFormSubmit)}
             >
               <div className="mb-10 flex w-full flex-col items-start">
+                <div className="flex flex-col items-start">
+                  <label
+                    className="font-poppins text-base font-normal text-neutral-2"
+                    htmlFor="teamMemberId"
+                  >
+                    Team member
+                  </label>
+                  {selectedOption && selectedOption.name && (
+                    <small className="mt-2 font-poppins text-sm font-normal italic text-neutral-2">
+                      {selectedOption.name}
+                    </small>
+                  )}
+                </div>
+                <Controller
+                  name="teamMemberId"
+                  control={control}
+                  defaultValue={
+                    selectedOption?.label
+                      ? selectedOption
+                      : { label: '', value: '' }
+                  }
+                  render={({ field }) => (
+                    <Select
+                      {...field}
+                      className="mt-3 w-full"
+                      options={teamMemberList}
+                      isDisabled={isEditTeamMember}
+                      onChange={(value) => {
+                        if (value) {
+                          const v = value as {
+                            name: string;
+                            value: string;
+                            label: string;
+                            role: NameJSONType;
+                          };
+                          setValue('roleEn', v.role.en);
+                          setValue('roleNb', v.role.nb);
+                          setValue('roleDa', v.role.da);
+                          setValue('roleSv', v.role.sv);
+                          setSelectedOption({
+                            label: v.name,
+                            value: v.value,
+                            name: v.label,
+                          });
+                          field.onChange({
+                            label: v.name,
+                            value: v.value,
+                          });
+                        }
+                      }}
+                    />
+                  )}
+                />
+                {errors.teamMemberId && errors.teamMemberId.label && (
+                  <div className="mt-1 text-start font-lexend text-base font-normal text-error">
+                    {errors.teamMemberId.label.message}
+                  </div>
+                )}
+              </div>
+              <div className="flex w-full flex-col items-start">
                 <label
                   className="font-poppins text-base font-normal text-neutral-2"
                   htmlFor="position"
@@ -296,59 +358,7 @@ export function AddTeamMemberAPI({
                   </small>
                 )}
               </div>
-              <div className="flex flex-col items-start">
-                <label
-                  className="font-poppins text-base font-normal text-neutral-2"
-                  htmlFor="teamMemberId"
-                >
-                  Team member
-                </label>
-                {selectedOption && selectedOption.name && (
-                  <small className="mt-2 font-poppins text-sm font-normal italic text-neutral-2">
-                    {selectedOption.name}
-                  </small>
-                )}
-              </div>
-              <Controller
-                name="teamMemberId"
-                control={control}
-                defaultValue={
-                  selectedOption?.label
-                    ? selectedOption
-                    : { label: '', value: '' }
-                }
-                render={({ field }) => (
-                  <Select
-                    {...field}
-                    className="mt-3"
-                    options={teamMemberList}
-                    isDisabled={isEditTeamMember}
-                    onChange={(value) => {
-                      if (value) {
-                        const v = value as {
-                          name: string;
-                          value: string;
-                          label: string;
-                        };
-                        setSelectedOption({
-                          label: v.name,
-                          value: v.value,
-                          name: v.label,
-                        });
-                        field.onChange({
-                          label: v.name,
-                          value: v.value,
-                        });
-                      }
-                    }}
-                  />
-                )}
-              />
-              {errors.teamMemberId && (
-                <div className="mt-1 text-start font-lexend text-base font-normal text-error">
-                  {errors.teamMemberId.message}
-                </div>
-              )}
+
               {!isEditTeamMember && (
                 <div style={{ marginTop: '64px', marginBottom: '28px' }}>
                   <label

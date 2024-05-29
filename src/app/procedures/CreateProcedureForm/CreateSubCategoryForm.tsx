@@ -210,7 +210,7 @@ function CreateSubCategoryForm({
         style={{ display: 'block', marginBottom: '8px' }}
         className="font-poppins text-base font-normal text-neutral-2"
       >
-        Department Name/ Sub-category
+        Department Name
       </label>
 
       <Controller

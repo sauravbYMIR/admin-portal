@@ -161,11 +161,25 @@ function HospitalDetailsPage({ params: { id } }: { params: { id: string } }) {
             </h3>
 
             {hospitalById.isSuccess && hospitalById.data.data && (
-              <p className="mb-12 font-lexend text-base font-light text-neutral-3">
-                {hospitalById.data.data.streetNumber}{' '}
-                {hospitalById.data.data.streetName},{' '}
-                {hospitalById.data.data.city}, {hospitalById.data.data.country}
-              </p>
+              <div className="mb-12 flex flex-col items-start gap-y-[2px]">
+                <div className="flex items-center gap-x-2">
+                  <p className="font-lexend text-base font-light text-neutral-3">
+                    {hospitalById.data.data.streetNumber}
+                  </p>
+                  <p className="font-lexend text-base font-light text-neutral-3">
+                    {hospitalById.data.data.streetName},
+                  </p>
+                </div>
+                <p className="font-lexend text-base font-light text-neutral-3">
+                  {hospitalById.data.data.city}
+                </p>
+                <p className="font-lexend text-base font-light text-neutral-3">
+                  {hospitalById.data.data.country}
+                </p>
+                <p className="font-lexend text-base font-light text-neutral-3">
+                  {hospitalById.data.data.zipcode}
+                </p>
+              </div>
             )}
 
             <h3 className="mb-7 font-poppins text-[18px] font-medium text-rgba77">

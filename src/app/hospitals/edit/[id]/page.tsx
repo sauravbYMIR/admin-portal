@@ -411,7 +411,7 @@ function EditHospital({ params: { id } }: { params: { id: string } }) {
               <input
                 className="w-full rounded-lg border-2 border-lightsilver px-4 py-2 placeholder:text-sm placeholder:font-normal placeholder:text-neutral-3"
                 type="text"
-                placeholder="Type here"
+                placeholder="Enter hospital name"
                 id="hospital-name"
                 {...register('hospitalName')}
               />
@@ -432,6 +432,9 @@ function EditHospital({ params: { id } }: { params: { id: string } }) {
 
               <div className={addHospitalStyle.langTabContainer}>
                 {countryData.map((data) => {
+                  const lang = hospitalObj[
+                    data.language
+                  ] as HospitalFormSchemaType;
                   return (
                     <button
                       key={data.locale}
@@ -444,7 +447,7 @@ function EditHospital({ params: { id } }: { params: { id: string } }) {
                             }
                           : {}
                       }
-                      className="px-3 py-2"
+                      className={`px-3 py-2 ${errors[lang] && errors[lang]?.message ? '!border-2 !border-error !text-error' : ''}`}
                       type="button"
                       onClick={() => {
                         setActiveLanguageTab(data.language);
@@ -467,7 +470,7 @@ function EditHospital({ params: { id } }: { params: { id: string } }) {
                         // eslint-disable-next-line jsx-a11y/no-autofocus
                         autoFocus
                         className={`${errors[lang]?.message ? 'outline-2 outline-error' : ''} w-full rounded-lg border-2 border-lightsilver px-4 py-2 placeholder:text-sm placeholder:font-normal placeholder:text-neutral-3`}
-                        placeholder="Type here"
+                        placeholder="Enter hospital description"
                         id="hospital-description"
                         {...register(lang)}
                       />

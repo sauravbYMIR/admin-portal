@@ -203,12 +203,19 @@ function CreateHospitalTeamMemberModal({
     <div>
       {isOpen && (
         <div className={modalStyle.modalOverlay}>
-          <div className={modalStyle.modal}>
-            <div className="mb-14 flex items-start justify-between">
-              <h2 className="font-poppins text-lg font-semibold text-neutral-1">
+          <div
+            className={modalStyle.modal}
+            style={{ paddingTop: '0px !important' }}
+          >
+            <div className="fixed flex w-[660px] items-start justify-between bg-white pt-8">
+              <h2 className="font-poppins text-[32px] font-semibold text-neutral-1">
                 Create a team member
               </h2>
-              <button type="button" onClick={onClose}>
+              <button
+                type="button"
+                onClick={onClose}
+                className="absolute right-2 top-10"
+              >
                 <p className="hidden">text</p>
                 <CloseIcon className="mb-2 size-6" strokeWidth={1.7} />
               </button>
@@ -216,6 +223,9 @@ function CreateHospitalTeamMemberModal({
 
             <form
               className={modalStyle.modalBody}
+              style={{
+                marginTop: '120px',
+              }}
               onSubmit={handleSubmit(onFormSubmit)}
             >
               <div className="mb-8 flex w-full flex-col items-start">

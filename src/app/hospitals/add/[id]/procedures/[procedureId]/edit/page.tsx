@@ -292,7 +292,7 @@ function EditHospitalProcedure({
                     style={
                       data.language === activeLanguageTab
                         ? {
-                            border: '1px solid rgba(9, 111, 144, 1)',
+                            border: '2px solid rgba(9, 111, 144, 1)',
                             color: 'rgba(9, 111, 144, 1)',
                             backgroundColor: 'rgba(242, 250, 252, 1)',
                           }
@@ -300,7 +300,7 @@ function EditHospitalProcedure({
                     }
                     type="button"
                     onClick={() => setActiveLanguageTab(data.language)}
-                    className={`${errors[lang] && errors[lang]?.message ? '!border !border-error !text-error' : ''}`}
+                    className={`${errors[lang] && errors[lang]?.message ? '!border-2 !border-error !text-error' : ''}`}
                   >
                     {data.language}
                   </button>

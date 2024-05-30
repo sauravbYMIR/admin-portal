@@ -306,7 +306,7 @@ function AddHospital() {
               <input
                 className="w-full rounded-lg border-2 border-lightsilver px-4 py-2 placeholder:text-sm placeholder:font-normal placeholder:text-neutral-3"
                 type="text"
-                placeholder="Type here"
+                placeholder="Enter hospital name"
                 id="hospital-name"
                 {...register('hospitalName')}
               />
@@ -328,6 +328,9 @@ function AddHospital() {
 
               <div className={addHospitalStyle.langTabContainer}>
                 {countryData.map((data) => {
+                  const lang = hospitalObj[
+                    data.language
+                  ] as HospitalFormSchemaType;
                   return (
                     <button
                       key={data.locale}
@@ -342,9 +345,11 @@ function AddHospital() {
                             }
                           : {}
                       }
-                      className="px-3 py-2"
+                      className={`px-3 py-2 ${errors[lang] && errors[lang]?.message ? '!border-2 !border-error !text-error' : ''}`}
                     >
-                      <span className="font-poppins text-sm font-medium text-darkteal">
+                      <span
+                        className={`${errors[lang] && errors[lang]?.message ? '!text-error' : 'text-darkteal'} font-poppins text-sm font-medium`}
+                      >
                         {data.language}
                       </span>
                     </button>
@@ -360,8 +365,8 @@ function AddHospital() {
                       <textarea
                         // eslint-disable-next-line jsx-a11y/no-autofocus
                         autoFocus
-                        className={`${errors[lang]?.message ? 'outline-2 outline-error' : ''} w-full rounded-lg border-2 border-lightsilver px-4 py-2 placeholder:text-sm placeholder:font-normal placeholder:text-neutral-3`}
-                        placeholder="Type here"
+                        className={`${errors[lang]?.message ? 'outline-2 outline-error' : ''} h-[150px]  w-full rounded-lg border-2 border-lightsilver px-4 py-2 placeholder:text-sm placeholder:font-normal placeholder:text-neutral-3`}
+                        placeholder="Enter hospital description"
                         id="hospital-description"
                         {...register(lang)}
                       />
@@ -393,6 +398,7 @@ function AddHospital() {
                   className="w-full rounded-lg border-2 border-lightsilver px-4 py-2 placeholder:text-sm placeholder:font-normal placeholder:text-neutral-3"
                   type="text"
                   id="street-name"
+                  placeholder="Enter street name"
                   {...register('streetName')}
                 />
                 {errors.streetName && (
@@ -413,6 +419,7 @@ function AddHospital() {
                     className="w-full rounded-lg border-2 border-lightsilver px-4 py-2 placeholder:text-sm placeholder:font-normal placeholder:text-neutral-3"
                     type="text"
                     id="street-number"
+                    placeholder="Enter street number"
                     {...register('streetNumber')}
                   />
                   {errors.streetNumber && (
@@ -477,6 +484,7 @@ function AddHospital() {
                     className="w-full rounded-lg border-2 border-lightsilver px-4 py-2 placeholder:text-sm placeholder:font-normal placeholder:text-neutral-3"
                     type="text"
                     id="city"
+                    placeholder="Enter city"
                     {...register('city')}
                   />
                   {errors.city && (
@@ -497,6 +505,7 @@ function AddHospital() {
                     className="w-full rounded-lg border-2 border-lightsilver px-4 py-2 placeholder:text-sm placeholder:font-normal placeholder:text-neutral-3"
                     type="text"
                     id="zidCode"
+                    placeholder="Enter zipcode"
                     {...register('zipCode')}
                   />
                   {errors.zipCode && (

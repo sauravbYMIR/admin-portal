@@ -329,7 +329,7 @@ function CreateProcedureForm({
               }
               className={`${
                 activeLanguageTab === data.language
-                  ? `px-3 py-2 ${procedureModalStyle.activeLanguageTab} ${errors[lang] && errors[lang]?.message ? '!border !border-error !text-error' : ''}`
+                  ? `px-3 py-2 ${procedureModalStyle.activeLanguageTab} ${errors[lang] && errors[lang]?.message ? '!border-2 !border-error !text-error' : ''}`
                   : ''
               }`}
               type="button"

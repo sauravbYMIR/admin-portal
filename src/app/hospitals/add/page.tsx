@@ -667,7 +667,11 @@ function AddHospital() {
                 </button>
               )}
             </div>
-            <div className="mt-16">
+            <div className="mt-16 flex flex-col items-start gap-y-2">
+              <small className="text-sm font-medium italic text-stone-500">
+                Note: Once you add hospital, please provide elfsight iframe url
+                or widget id to development team.
+              </small>
               <button
                 className={`${createHospital.isPending ? 'cursor-not-allowed bg-darkteal/60' : 'cursor-pointer bg-darkteal'} flex w-[280px] items-center justify-center rounded-lg px-4 py-[15px]`}
                 type="submit"

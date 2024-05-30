@@ -48,7 +48,7 @@ const createTeamMemberFormSchema = z.object({
   positionSv: z
     .string()
     .min(1, { message: 'Fill in details in all the languages' }),
-  profile: z.instanceof(File, { message: 'Please upload profile image' }),
+  profile: z.instanceof(File).optional(),
 });
 export type CreateHospitalTeamMemberFormFields = z.infer<
   typeof createTeamMemberFormSchema

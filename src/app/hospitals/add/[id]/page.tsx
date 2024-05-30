@@ -20,7 +20,6 @@ import {
 } from '@/components';
 import { useGetHospitalById } from '@/hooks';
 import arrowForward from '@/public/assets/icons/arrowForward.svg';
-import editIcon from '@/public/assets/icons/edit.svg';
 import hospitalLogo from '@/public/assets/icons/sampleLogo.svg';
 import emptyTeamMember from '@/public/assets/images/emptyTeamMember.svg';
 
@@ -265,7 +264,10 @@ function HospitalDetailsPage({ params: { id } }: { params: { id: string } }) {
                           className={style.editBtn}
                           onClick={() => setIsEditTeamMember(false)}
                         >
-                          <Image src={editIcon} alt="edit icon" />
+                          <EditIcon
+                            className="size-5"
+                            stroke="rgba(9, 111, 144, 1)"
+                          />
                           <p>Cancel editing</p>
                         </button>
                       ) : (
@@ -273,7 +275,10 @@ function HospitalDetailsPage({ params: { id } }: { params: { id: string } }) {
                           className={style.editBtn}
                           onClick={() => setIsEditTeamMember(true)}
                         >
-                          <Image src={editIcon} alt="edit icon" />
+                          <EditIcon
+                            className="size-5"
+                            stroke="rgba(9, 111, 144, 1)"
+                          />
                           <p>Edit team members</p>
                         </button>
                       )}

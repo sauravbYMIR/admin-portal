@@ -136,8 +136,8 @@ function CreateHospitalTeamMemberModal({
           formData,
         });
       }
+      reset();
     }
-    reset();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [
     memberId,
@@ -162,8 +162,8 @@ function CreateHospitalTeamMemberModal({
           formData,
         });
       }
+      reset();
     }
-    reset();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [
     memberId,

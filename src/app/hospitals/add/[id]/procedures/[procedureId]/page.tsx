@@ -222,7 +222,7 @@ function HospitalDetailsPage({
                                 width={220}
                                 height={220}
                                 alt="hospital-gallery"
-                                className="size-[220px] rounded-lg"
+                                className="size-[220px] rounded-lg object-contain"
                               />
                             );
                           },

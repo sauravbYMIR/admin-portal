@@ -68,7 +68,10 @@ const createHospitalProcedureFormSchema = z.object({
     .string()
     .min(1, { message: 'Stay in hospital is required' }),
   stayInCity: z.string().min(1, { message: 'Stay in city is required' }),
-  gallery: z.array(z.instanceof(File)).optional(),
+  gallery: z
+    .array(z.instanceof(File))
+    .max(10, 'You can upload up to 10 images')
+    .optional(),
 });
 export type CreateHospitalProcedureFormFields = z.infer<
   typeof createHospitalProcedureFormSchema
@@ -357,6 +360,7 @@ function AddHospitalProcedure({ params }: { params: { id: string } }) {
                   options={departmentList}
                   onChange={(value) => {
                     setSelectedOption(value);
+                    setProcedureList([]);
                     field.onChange(value);
                   }}
                 />

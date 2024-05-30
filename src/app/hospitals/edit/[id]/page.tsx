@@ -131,7 +131,10 @@ function EditHospital({ params: { id } }: { params: { id: string } }) {
     const lang = hospitalObj[c.language] as HospitalFormSchemaType;
     return errors[lang] && errors[lang]?.message;
   });
-  const handleCheckIsNoOfImagesValid = (galleryImg: File[] | undefined) => {
+  const handleCheckIsNoOfImagesValid = (
+    galleryImg: File[] | undefined,
+    minimumNoOfImages: number,
+  ) => {
     if (hospitalImages) {
       const noOfGalleryImage =
         Array.isArray(galleryImg) && galleryImg.length > 0
@@ -139,7 +142,7 @@ function EditHospital({ params: { id } }: { params: { id: string } }) {
           : 0;
       const noOfHospitalImage = hospitalImages.length;
       const totalImages = noOfHospitalImage + noOfGalleryImage;
-      if (totalImages < 3) {
+      if (totalImages < minimumNoOfImages) {
         toast.error('Minimum of 3 hospital image need to be uploaded');
         return false;
       }
@@ -150,7 +153,7 @@ function EditHospital({ params: { id } }: { params: { id: string } }) {
   const onFormSubmit: SubmitHandler<EditHospitalFormFields> = (
     data: EditHospitalFormFields,
   ) => {
-    const isValidNoOfImages = handleCheckIsNoOfImagesValid(data.gallery);
+    const isValidNoOfImages = handleCheckIsNoOfImagesValid(data.gallery, 3);
     if (!isValidNoOfImages) {
       return;
     }
@@ -652,6 +655,11 @@ function EditHospital({ params: { id } }: { params: { id: string } }) {
                             className="absolute right-4 top-4 z-10"
                             onClick={(e) => {
                               e.preventDefault();
+                              const isValidNoOfImages =
+                                handleCheckIsNoOfImagesValid(gallery, 4);
+                              if (!isValidNoOfImages) {
+                                return;
+                              }
                               const updatedGallery = gallery.filter(
                                 (f) =>
                                   f.lastModified !==
@@ -698,7 +706,7 @@ function EditHospital({ params: { id } }: { params: { id: string } }) {
                         onClick={(e) => {
                           e.preventDefault();
                           const isValidNoOfImages =
-                            handleCheckIsNoOfImagesValid(gallery);
+                            handleCheckIsNoOfImagesValid(gallery, 4);
                           if (!isValidNoOfImages) {
                             return;
                           }

@@ -213,7 +213,10 @@ function CreateHospitalTeamMemberModal({
               </h2>
               <button
                 type="button"
-                onClick={onClose}
+                onClick={() => {
+                  onClose();
+                  setActiveLanguageTab('English');
+                }}
                 className="absolute right-2 top-10"
               >
                 <p className="hidden">text</p>

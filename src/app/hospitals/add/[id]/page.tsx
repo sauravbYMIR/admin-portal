@@ -201,7 +201,7 @@ function HospitalDetailsPage({ params: { id } }: { params: { id: string } }) {
                       alt="hospital-gallery"
                       unoptimized
                       priority
-                      className="aspect-square h-[250px] w-[260px] rounded-lg object-cover"
+                      className="aspect-square h-[250px] w-[260px] rounded-lg border border-stone-400 object-contain"
                     />
                   );
                 })}

@@ -332,7 +332,7 @@ function EditHospital({ params: { id } }: { params: { id: string } }) {
               typeof reqdHospital.data.data.logo === 'string' && (
                 <div className="relative size-[220px] rounded-full">
                   <Image
-                    src={reqdHospital.data.data.logo}
+                    src={`${reqdHospital.data.data.logo}?version=${new Date().getTime()}`}
                     fill
                     priority
                     unoptimized
@@ -684,7 +684,7 @@ function EditHospital({ params: { id } }: { params: { id: string } }) {
                     <div className="relative" key={image.id}>
                       <Image
                         key={image.id}
-                        src={image.imageUrl}
+                        src={`${image.imageUrl}?version=${new Date().getTime()}`}
                         width={200}
                         height={200}
                         unoptimized

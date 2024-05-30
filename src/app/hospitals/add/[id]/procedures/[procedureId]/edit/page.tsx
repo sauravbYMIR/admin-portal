@@ -478,7 +478,7 @@ function EditHospitalProcedure({
                           )}
                         <Image
                           key={file.id}
-                          src={file.imageUrl}
+                          src={`${file.imageUrl}?version=${new Date().getTime()}`}
                           width={64}
                           height={64}
                           alt="hospital-gallery"

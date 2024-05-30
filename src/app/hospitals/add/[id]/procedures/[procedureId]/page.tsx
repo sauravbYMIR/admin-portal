@@ -218,7 +218,7 @@ function HospitalDetailsPage({
                             return (
                               <Image
                                 key={file.id}
-                                src={file.imageUrl}
+                                src={`${file.imageUrl}?version=${new Date().getTime()}`}
                                 width={220}
                                 height={220}
                                 alt="hospital-gallery"

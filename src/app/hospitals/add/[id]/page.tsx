@@ -118,7 +118,7 @@ function HospitalDetailsPage({ params: { id } }: { params: { id: string } }) {
                   <div className={style.breadcrumb}>
                     <button
                       className="cursor-pointer"
-                      onClick={() => router.back()}
+                      onClick={() => router.push('/hospitals')}
                       type="button"
                     >
                       <span className="font-lexend text-base font-normal text-neutral-3">

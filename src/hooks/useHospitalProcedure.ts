@@ -14,7 +14,10 @@ export type HospitalProcedureType = {
   createdAt: string | null;
   deletedAt: string | null;
   description: NameJSONType;
-  cost: ReimbursementJSONType;
+  cost: {
+    price: number;
+    currency: string;
+  };
   hospitalId: string;
   id: string;
   procedure: {

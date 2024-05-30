@@ -421,7 +421,7 @@ function CreateHospitalTeamMemberModal({
                         ) : (
                           <>
                             <p className="mt-3 font-poppins text-sm font-medium text-darkgray">
-                              Click to upload a image
+                              click to upload an image
                             </p>
                             <p className="font-lexend text-sm font-normal text-neutral-3">
                               PNG, JPG (max. 10 MB)

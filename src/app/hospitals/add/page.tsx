@@ -275,7 +275,7 @@ function AddHospital() {
                   ) : (
                     <>
                       <p className="mt-3 font-poppins text-xs font-semibold text-gray1">
-                        Click to upload a image
+                        click to upload an image
                       </p>
                       <p className="font-lexend text-xs font-medium text-gray2">
                         PNG, JPG (max. 10 MB)
@@ -654,7 +654,7 @@ function AddHospital() {
                   />
 
                   <p className="mt-3 font-poppins text-xs font-semibold text-gray1">
-                    Click to upload a image
+                    click to upload an image
                   </p>
                   <p className="font-lexend text-xs font-medium text-gray2">
                     PNG, JPG (max. 10 MB)

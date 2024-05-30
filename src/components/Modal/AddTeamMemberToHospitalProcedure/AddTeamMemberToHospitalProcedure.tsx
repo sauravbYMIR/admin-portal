@@ -172,8 +172,8 @@ export function AddTeamMemberToHospitalProcedure({
   return (
     <div>
       {isOpen && (
-        <div className={modalStyle.modalOverlay}>
-          <div className={modalStyle.modal}>
+        <div className={modalStyle.modalOverlayDup}>
+          <div className={modalStyle.modalDup}>
             <div className="mb-14 flex items-start justify-between">
               <h2 className="font-poppins text-lg font-semibold text-neutral-1">
                 Add a team member
@@ -198,7 +198,7 @@ export function AddTeamMemberToHospitalProcedure({
             </div>
 
             <form
-              className={modalStyle.modalBody}
+              className={modalStyle.modalBodyDup}
               onSubmit={handleSubmit(onFormSubmit)}
             >
               <div className="mb-10 flex w-full flex-col items-start">

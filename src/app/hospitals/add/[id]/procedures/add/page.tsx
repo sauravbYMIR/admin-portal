@@ -453,7 +453,7 @@ function AddHospitalProcedure({ params }: { params: { id: string } }) {
                       // eslint-disable-next-line jsx-a11y/no-autofocus
                       autoFocus
                       className={`${errors[lang]?.message ? 'outline-2 outline-error' : ''} h-[128px] w-full rounded-lg border-2 border-lightsilver px-4 py-2 placeholder:text-sm placeholder:font-normal placeholder:text-neutral-3`}
-                      placeholder="Type here"
+                      placeholder="Enter procedure description"
                       id="procedure-description"
                       {...register(lang)}
                     />
@@ -489,6 +489,7 @@ function AddHospitalProcedure({ params }: { params: { id: string } }) {
               <input
                 className="w-full rounded-lg border-2 border-lightsilver px-4 py-2 placeholder:text-sm placeholder:font-normal placeholder:text-neutral-3"
                 style={{ paddingLeft: '75px' }}
+                placeholder="Enter cost of procedure"
                 id="cost-of-procedure"
                 {...register('cost', { valueAsNumber: true })}
                 type="number"
@@ -513,6 +514,7 @@ function AddHospitalProcedure({ params }: { params: { id: string } }) {
               <input
                 className="w-full rounded-lg border-2 border-lightsilver px-4 py-2 placeholder:text-sm placeholder:font-normal placeholder:text-neutral-3"
                 type="number"
+                placeholder="Enter waiting time (in days)"
                 onWheel={(e: React.WheelEvent<HTMLInputElement>) => {
                   const target = e.target as HTMLElement;
                   target.blur();
@@ -539,6 +541,7 @@ function AddHospitalProcedure({ params }: { params: { id: string } }) {
               <input
                 className="w-full rounded-lg border-2 border-lightsilver px-4 py-2 placeholder:text-sm placeholder:font-normal placeholder:text-neutral-3"
                 type="number"
+                placeholder="Enter stay in hospital (in days)"
                 onWheel={(e: React.WheelEvent<HTMLInputElement>) => {
                   const target = e.target as HTMLElement;
                   target.blur();
@@ -565,6 +568,7 @@ function AddHospitalProcedure({ params }: { params: { id: string } }) {
               <input
                 className="w-full rounded-lg border-2 border-lightsilver px-4 py-2 placeholder:text-sm placeholder:font-normal placeholder:text-neutral-3"
                 type="number"
+                placeholder="Enter stay in city (in days)"
                 onWheel={(e: React.WheelEvent<HTMLInputElement>) => {
                   const target = e.target as HTMLElement;
                   target.blur();
@@ -659,6 +663,16 @@ function AddHospitalProcedure({ params }: { params: { id: string } }) {
                         onBlur={onBlur}
                         onChange={(e) => {
                           if (e.target.files) {
+                            if (
+                              gallery &&
+                              Array.isArray(gallery) &&
+                              gallery.length > 0
+                            ) {
+                              let files = Array.from(e.target.files);
+                              files = [...files, ...gallery];
+                              onChange(files);
+                              return;
+                            }
                             const files = Array.from(e.target.files);
                             onChange(files);
                           }
@@ -702,7 +716,7 @@ function AddHospitalProcedure({ params }: { params: { id: string } }) {
                   />
 
                   <p className="mt-3 font-poppins text-xs font-semibold text-gray1">
-                    Click to upload a image
+                    click to upload an image
                   </p>
                   <p className="font-lexend text-xs font-medium text-gray2">
                     PNG, JPG (max. 10 MB)

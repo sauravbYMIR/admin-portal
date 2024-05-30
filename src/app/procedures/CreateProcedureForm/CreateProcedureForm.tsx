@@ -222,22 +222,30 @@ function CreateProcedureForm({
       setValue('procedureDa', reqProcedure.data.data.name.da);
       setValue('procedureSv', reqProcedure.data.data.name.sv);
       setValue('procedureNb', reqProcedure.data.data.name.nb);
-      setValue(
-        'reimbursementIe',
-        reqProcedure.data.data.reimbursement.ie.toString(),
-      );
-      setValue(
-        'reimbursementNo',
-        reqProcedure.data.data.reimbursement.no.toString(),
-      );
-      setValue(
-        'reimbursementSe',
-        reqProcedure.data.data.reimbursement.se.toString(),
-      );
-      setValue(
-        'reimbursementDk',
-        reqProcedure.data.data.reimbursement.dk.toString(),
-      );
+      if (reqProcedure.data.data.reimbursement?.ie) {
+        setValue(
+          'reimbursementIe',
+          reqProcedure.data.data.reimbursement.ie.toString(),
+        );
+      }
+      if (reqProcedure.data.data.reimbursement?.no) {
+        setValue(
+          'reimbursementNo',
+          reqProcedure.data.data.reimbursement.no.toString(),
+        );
+      }
+      if (reqProcedure.data.data.reimbursement?.se) {
+        setValue(
+          'reimbursementSe',
+          reqProcedure.data.data.reimbursement.se.toString(),
+        );
+      }
+      if (reqProcedure.data.data.reimbursement?.dk) {
+        setValue(
+          'reimbursementDk',
+          reqProcedure.data.data.reimbursement.dk.toString(),
+        );
+      }
     }
   }, [reqProcedure.data, reqProcedure.isSuccess, setValue, updateId]);
 

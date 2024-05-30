@@ -219,9 +219,9 @@ function HospitalDetailsPage({ params: { id } }: { params: { id: string } }) {
               <>
                 {hospitalById.data.data.members.length === 0 ? (
                   <div className="mb-12 flex w-full flex-col items-start">
-                    <h3 className="my-8 font-poppins text-lg font-medium text-neutral-1">
+                    {/* <h3 className="my-8 font-poppins text-lg font-medium text-neutral-1">
                       Team members
-                    </h3>
+                    </h3> */}
                     <div
                       className="flex w-full flex-col items-center justify-center rounded-xl border py-10"
                       style={{

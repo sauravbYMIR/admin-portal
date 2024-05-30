@@ -31,6 +31,16 @@ export type HospitalProcedureType = {
   updatedAt: string | null;
   waitingTime: string;
 };
+export type HospitalProcedureImageType = {
+  id: string;
+  hospitalProcedureId: string;
+  fileName: string;
+  originalFileName: string;
+  createdAt: string;
+  updatedAt: string;
+  deletedAt: null | string;
+  imageUrl: string;
+};
 export type HospitalProcedureByIdType = {
   createdAt: string | null;
   deletedAt: string | null;
@@ -52,16 +62,7 @@ export type HospitalProcedureByIdType = {
   stayInHospital: string;
   updatedAt: string | null;
   waitingTime: string;
-  hospitalProcedureImages: Array<{
-    id: string;
-    hospitalProcedureId: string;
-    fileName: string;
-    originalFileName: string;
-    createdAt: string;
-    updatedAt: string;
-    deletedAt: null | string;
-    imageUrl: string;
-  }>;
+  hospitalProcedureImages: Array<HospitalProcedureImageType>;
   procedureMembers: Array<{
     hospitalId: string;
     id: string;
@@ -124,6 +125,7 @@ export const editHospitalProcedure = async ({
   description,
   cost,
   hospitalProcedureId,
+  removeImageIds,
 }: {
   waitingTime: string;
   stayInHospital: string;
@@ -131,6 +133,7 @@ export const editHospitalProcedure = async ({
   description: NameJSONType;
   cost: CostJSONType;
   hospitalProcedureId: string;
+  removeImageIds: Array<string>;
 }): Promise<{
   success: boolean;
   status: number;
@@ -148,6 +151,7 @@ export const editHospitalProcedure = async ({
       stayInCity,
       description,
       cost,
+      removeImageIds,
     },
   );
   return {
@@ -164,6 +168,7 @@ export const useEditHospitalProcedure = () => {
       queryClient.invalidateQueries({
         queryKey: [`hospital-procedure`],
       });
+      toast.success('Hospital procedure edited successfully!');
     },
     onError: (error) => {
       toast(`Something went wrong: ${error.message}`);
@@ -251,6 +256,7 @@ export const useCreateHospitalProcedure = () => {
       queryClient.invalidateQueries({
         queryKey: [`hospital-procedure`],
       });
+      toast.success('Hospital procedure created successfully!');
     },
     onError: (error) => {
       const err = error as unknown as {

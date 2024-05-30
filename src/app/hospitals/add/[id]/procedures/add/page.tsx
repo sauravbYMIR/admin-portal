@@ -302,7 +302,6 @@ function AddHospitalProcedure({ params }: { params: { id: string } }) {
       createHospitalProcedure.isSuccess &&
       createHospitalProcedure.data?.data
     ) {
-      toast.success('Procedure added successfully');
       router.push(
         `/hospitals/add/${params.id}/procedures/${createHospitalProcedure.data.data}`,
       );

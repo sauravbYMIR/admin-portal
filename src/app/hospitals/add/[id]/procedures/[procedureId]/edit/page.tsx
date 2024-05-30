@@ -21,10 +21,10 @@ import {
   PlusIcon,
   WithAuth,
 } from '@/components';
+import type { HospitalProcedureImageType } from '@/hooks/useHospitalProcedure';
 import {
   useEditHospitalProcedure,
   useGetHospitalProcedureById,
-  useRemoveHospitalProcedureGallery,
   useUpdateHospitalProcedureGallery,
 } from '@/hooks/useHospitalProcedure';
 import type { LanguagesType } from '@/types/components';
@@ -79,6 +79,12 @@ function EditHospitalProcedure({
 }: {
   params: { id: string; procedureId: string };
 }) {
+  const [hospitalProcedureImages, setHospitalProcedureImages] = React.useState<
+    Array<HospitalProcedureImageType>
+  >([]);
+  const [hospitalImageRemoveIds, setHospitalImageRemoveIds] = React.useState<
+    Array<string>
+  >([]);
   const galleryRef = React.useRef<HTMLInputElement>(null);
   const editHospitalProcedure = useEditHospitalProcedure();
   const hospitalProcedureDetails = useGetHospitalProcedureById({
@@ -130,6 +136,7 @@ function EditHospitalProcedure({
         currency: 'EUR',
       },
       hospitalProcedureId: params.procedureId,
+      removeImageIds: hospitalImageRemoveIds,
     });
   };
   React.useEffect(() => {
@@ -139,6 +146,16 @@ function EditHospitalProcedure({
       hospitalProcedureDetails.data &&
       hospitalProcedureDetails.data.success
     ) {
+      if (
+        Array.isArray(
+          hospitalProcedureDetails.data.data.hospitalProcedureImages,
+        ) &&
+        hospitalProcedureDetails.data.data.hospitalProcedureImages.length > 0
+      ) {
+        setHospitalProcedureImages(
+          hospitalProcedureDetails.data.data.hospitalProcedureImages,
+        );
+      }
       setValue(
         'departmentName',
         hospitalProcedureDetails.data.data.procedure.category.name.en,
@@ -209,9 +226,9 @@ function EditHospitalProcedure({
     isShow: boolean;
   }>({ id: '', isShow: false });
   const gallery = watch('gallery');
-  const removeHospitalProcedureGallery = useRemoveHospitalProcedureGallery({
-    id: params.procedureId,
-  });
+  // const removeHospitalProcedureGallery = useRemoveHospitalProcedureGallery({
+  //   id: params.procedureId,
+  // });
   return (
     <div>
       <Header />
@@ -443,54 +460,61 @@ function EditHospitalProcedure({
             hospitalProcedureDetails.data.data.hospitalProcedureImages.length >
               0 ? (
               <div className="flex w-full flex-wrap items-center gap-4">
-                {hospitalProcedureDetails.data.data.hospitalProcedureImages.map(
-                  (file) => {
-                    return (
-                      <div
-                        onMouseEnter={() =>
-                          setIsShowRemoveImgBtn(() => ({
-                            id: file.id,
-                            isShow: true,
-                          }))
-                        }
-                        onMouseLeave={() =>
-                          setIsShowRemoveImgBtn(() => ({
-                            id: file.id,
-                            isShow: false,
-                          }))
-                        }
+                {hospitalProcedureImages.map((file) => {
+                  return (
+                    <div
+                      onMouseEnter={() =>
+                        setIsShowRemoveImgBtn(() => ({
+                          id: file.id,
+                          isShow: true,
+                        }))
+                      }
+                      onMouseLeave={() =>
+                        setIsShowRemoveImgBtn(() => ({
+                          id: file.id,
+                          isShow: false,
+                        }))
+                      }
+                      key={file.id}
+                      className="relative"
+                    >
+                      {isShowRemoveImgBtn.id === file.id &&
+                        isShowRemoveImgBtn.isShow && (
+                          <button
+                            type="button"
+                            className="absolute right-4 top-4 z-10"
+                            onClick={() => {
+                              setHospitalProcedureImages((prevState) =>
+                                prevState.length > 0
+                                  ? prevState.filter(
+                                      (hospitalProcedureImage) =>
+                                        hospitalProcedureImage.id !== file.id,
+                                    )
+                                  : [],
+                              );
+                              setHospitalImageRemoveIds((prevState) => [
+                                ...prevState,
+                                file.id,
+                              ]);
+                            }}
+                          >
+                            <CloseIcon
+                              className="mb-2 size-6"
+                              strokeWidth={1.7}
+                            />
+                          </button>
+                        )}
+                      <Image
                         key={file.id}
-                        className="relative"
-                      >
-                        {isShowRemoveImgBtn.id === file.id &&
-                          isShowRemoveImgBtn.isShow && (
-                            <button
-                              type="button"
-                              className="absolute right-4 top-4 z-10"
-                              onClick={() => {
-                                removeHospitalProcedureGallery.mutate({
-                                  id: file.id,
-                                });
-                              }}
-                            >
-                              <CloseIcon
-                                className="mb-2 size-6"
-                                strokeWidth={1.7}
-                              />
-                            </button>
-                          )}
-                        <Image
-                          key={file.id}
-                          src={`${file.imageUrl}?version=${new Date().getTime()}`}
-                          width={64}
-                          height={64}
-                          alt="hospital-gallery"
-                          className="h-[250px] w-[264px] rounded-lg"
-                        />
-                      </div>
-                    );
-                  },
-                )}
+                        src={`${file.imageUrl}?version=${new Date().getTime()}`}
+                        width={64}
+                        height={64}
+                        alt="hospital-gallery"
+                        className="h-[250px] w-[264px] rounded-lg"
+                      />
+                    </div>
+                  );
+                })}
               </div>
             ) : (
               <div className="flex w-full flex-wrap items-center gap-x-6 gap-y-2">

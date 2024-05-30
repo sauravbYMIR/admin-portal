@@ -1,12 +1,32 @@
 import '@/styles/global.css';
 
+import type { Metadata } from 'next';
 import { Toaster } from 'sonner';
 
 import Providers from '@/utils/providers';
 
+export const metadata: Metadata = {
+  title: 'Drfasttrack',
+  icons: [
+    {
+      rel: 'icon',
+      type: 'image/png',
+      sizes: '32x32',
+      url: '/drfasttrackfavicon.ico',
+    },
+  ],
+};
+
 export default function RootLayout(props: { children: React.ReactNode }) {
   return (
     <html lang="en">
+      <head>
+        <link
+          rel="icon"
+          href="../../public/assets/drfasttrackfavicon.ico"
+          sizes="any"
+        />
+      </head>
       <body>
         <Toaster position="top-center" richColors closeButton />
         <Providers>{props.children}</Providers>

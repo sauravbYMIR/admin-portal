@@ -32,7 +32,7 @@ function TeamMemberCard({
       <div className={style.cardHeader}>
         {profile && typeof profile === 'string' ? (
           <Image
-            src={profile}
+            src={`${profile}?version=${new Date().getTime()}`}
             width={32}
             height={32}
             className="size-8 rounded-full object-cover"

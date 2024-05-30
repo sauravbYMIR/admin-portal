@@ -48,7 +48,7 @@ const createTeamMemberFormSchema = z.object({
   positionSv: z
     .string()
     .min(1, { message: 'Fill in details in all the languages' }),
-  profile: z.instanceof(File, { message: 'Profile picture required' }),
+  profile: z.instanceof(File).optional(),
 });
 export type CreateHospitalTeamMemberFormFields = z.infer<
   typeof createTeamMemberFormSchema
@@ -60,18 +60,6 @@ function CreateHospitalTeamMemberModal({
   hospitalId,
   memberId,
 }: ModalProps) {
-  const [showLogoOverlay, setShowLogoOverlay] = React.useState<boolean>(false);
-  const profileRef = React.useRef<HTMLInputElement>(null);
-  const editHospitalMember = useEditHospitalMember();
-  const memberByIdDetails = useGetHospitalTeamMemberById({ id: memberId });
-  const [isAnotherMemberChecked, setIsAnotherMemberChecked] =
-    React.useState<boolean>(false);
-  const hospitalMember = useCreateHospitalMember({
-    closeModal: !isAnotherMemberChecked ? onClose : null,
-  });
-  const updateHospitalProfile = useUpdateHospitalProfile();
-  const [activeLanguageTab, setActiveLanguageTab] =
-    React.useState<LanguagesType>('English');
   const {
     register,
     handleSubmit,
@@ -84,6 +72,19 @@ function CreateHospitalTeamMemberModal({
   } = useForm<CreateHospitalTeamMemberFormFields>({
     resolver: zodResolver(createTeamMemberFormSchema),
   });
+  const [showLogoOverlay, setShowLogoOverlay] = React.useState<boolean>(false);
+  const profileRef = React.useRef<HTMLInputElement>(null);
+  const editHospitalMember = useEditHospitalMember({ onClose });
+  const memberByIdDetails = useGetHospitalTeamMemberById({ id: memberId });
+  const [isAnotherMemberChecked, setIsAnotherMemberChecked] =
+    React.useState<boolean>(false);
+  const createHospitalMember = useCreateHospitalMember({
+    closeModal: !isAnotherMemberChecked ? onClose : null,
+  });
+  const updateHospitalProfile = useUpdateHospitalProfile();
+  const [activeLanguageTab, setActiveLanguageTab] =
+    React.useState<LanguagesType>('English');
+
   const hospitalObj = {
     English: 'positionEn',
     Norwegian: 'positionNb',
@@ -110,7 +111,7 @@ function CreateHospitalTeamMemberModal({
         hospitalMemberId: memberId,
       });
     } else {
-      hospitalMember.mutate({
+      createHospitalMember.mutate({
         name: data.name,
         position: {
           en: data.positionEn,
@@ -125,11 +126,7 @@ function CreateHospitalTeamMemberModal({
     setActiveLanguageTab('English');
   };
   React.useEffect(() => {
-    if (
-      editHospitalMember.isSuccess &&
-      editHospitalMember.data &&
-      editHospitalMember.data.data
-    ) {
+    if (editHospitalMember.data && editHospitalMember.data.data) {
       const profile = getValues('profile');
       if (profile) {
         const formData = new FormData();
@@ -140,43 +137,42 @@ function CreateHospitalTeamMemberModal({
         });
       }
     }
+    reset();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [
+    memberId,
     hospitalId,
-    hospitalMember.data,
-    hospitalMember.isSuccess,
+    createHospitalMember.data,
+    createHospitalMember.isSuccess,
     isAnotherMemberChecked,
     editHospitalMember?.data?.data,
   ]);
   React.useEffect(() => {
     if (
-      hospitalMember.isSuccess &&
-      hospitalMember.data &&
-      hospitalMember.data.data.id
+      !memberId &&
+      createHospitalMember.data &&
+      createHospitalMember.data.data.id
     ) {
       const profile = getValues('profile');
       if (profile) {
         const formData = new FormData();
         formData.append('profile', profile as Blob);
         updateHospitalProfile.mutate({
-          memberId: hospitalMember.data.data.id,
+          memberId: createHospitalMember.data.data.id,
           formData,
         });
       }
     }
+    reset();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [
+    memberId,
     hospitalId,
-    hospitalMember.data,
-    hospitalMember.isSuccess,
+    createHospitalMember.data,
+    createHospitalMember.isSuccess,
     isAnotherMemberChecked,
     editHospitalMember?.data?.data,
   ]);
-  React.useEffect(() => {
-    if (hospitalMember.isSuccess || editHospitalMember.isSuccess) {
-      reset();
-    }
-  }, [hospitalMember.isSuccess, editHospitalMember.isSuccess, reset]);
   React.useEffect(() => {
     if (
       memberId &&
@@ -209,7 +205,11 @@ function CreateHospitalTeamMemberModal({
           >
             <div className="fixed flex w-[660px] items-start justify-between bg-white pt-8">
               <h2 className="font-poppins text-[32px] font-semibold text-neutral-1">
-                Create a team member
+                {memberId ? (
+                  <span>Edit a team member</span>
+                ) : (
+                  <span>Create a team member</span>
+                )}
               </h2>
               <button
                 type="button"
@@ -385,14 +385,47 @@ function CreateHospitalTeamMemberModal({
                         className="inline-block rounded-lg"
                       />
                     ) : (
-                      <>
-                        <p className="mt-3 font-poppins text-sm font-medium text-darkgray">
-                          Click to upload a image
-                        </p>
-                        <p className="font-lexend text-sm font-normal text-neutral-3">
-                          PNG, JPG (max. 10 MB)
-                        </p>
-                      </>
+                      <div>
+                        {memberByIdDetails.data &&
+                        memberByIdDetails.data.data &&
+                        typeof memberByIdDetails.data.data.profile ===
+                          'string' ? (
+                          <>
+                            <Image
+                              src={`${memberByIdDetails.data.data.profile}?version=${new Date().getTime()}`}
+                              alt="team-member-profile-from-server"
+                              key={`${memberByIdDetails.data.data.id}`}
+                              fill
+                              priority
+                              unoptimized
+                              style={{ backgroundImage: 'contain' }}
+                              className="inline-block rounded-lg"
+                            />
+                            <div className="absolute left-0 top-0 flex size-full flex-col items-center justify-center gap-y-4 rounded-lg bg-black/25">
+                              <p className="mt-3 font-poppins text-sm font-medium text-white">
+                                Replace image
+                              </p>
+                              <FileUploadIcon
+                                stroke="#fff"
+                                className="size-12 rounded-full border border-white p-2"
+                              />
+
+                              <p className="font-lexend text-sm font-normal text-white">
+                                PNG, JPG (max. 10 MB)
+                              </p>
+                            </div>
+                          </>
+                        ) : (
+                          <>
+                            <p className="mt-3 font-poppins text-sm font-medium text-darkgray">
+                              Click to upload a image
+                            </p>
+                            <p className="font-lexend text-sm font-normal text-neutral-3">
+                              PNG, JPG (max. 10 MB)
+                            </p>
+                          </>
+                        )}
+                      </div>
                     )}
                   </button>
                 )}
@@ -427,13 +460,15 @@ function CreateHospitalTeamMemberModal({
               )}
 
               <button
-                className={`${hospitalMember.isPending || editHospitalMember.isPending ? 'cursor-not-allowed bg-darkteal/60' : 'cursor-pointer bg-darkteal'} mt-7 flex w-[280px] items-center justify-center rounded-lg px-4 py-[15px]`}
+                className={`${createHospitalMember.isPending || editHospitalMember.isPending ? 'cursor-not-allowed bg-darkteal/60' : 'cursor-pointer bg-darkteal'} mt-7 flex w-[280px] items-center justify-center rounded-lg px-4 py-[15px]`}
                 type="submit"
               >
-                {hospitalMember.isPending || editHospitalMember.isPending ? (
+                {createHospitalMember.isPending ||
+                editHospitalMember.isPending ? (
                   <ClipLoader
                     loading={
-                      hospitalMember.isPending || editHospitalMember.isPending
+                      createHospitalMember.isPending ||
+                      editHospitalMember.isPending
                     }
                     color="#fff"
                     size={20}

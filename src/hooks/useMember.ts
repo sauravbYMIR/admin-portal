@@ -190,7 +190,11 @@ export const editHospitalMember = async ({
   };
 };
 
-export const useEditHospitalMember = () => {
+export const useEditHospitalMember = ({
+  onClose,
+}: {
+  onClose: (() => void) | null;
+}) => {
   const queryClient = useQueryClient();
   return useMutation({
     mutationFn: editHospitalMember,
@@ -198,6 +202,10 @@ export const useEditHospitalMember = () => {
       queryClient.invalidateQueries({
         queryKey: [`hospital`],
       });
+      toast.success('Hospital member updated successfully!');
+      if (onClose) {
+        onClose();
+      }
     },
     onError: (error) => {
       toast(`Something went wrong: ${error.message}`);

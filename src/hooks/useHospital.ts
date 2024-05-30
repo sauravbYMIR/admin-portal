@@ -298,7 +298,8 @@ export const useUpdateHospitalLogo = () => {
   return useMutation({
     mutationFn: updateHospitalLogo,
     onSuccess: () => {
-      return queryClient.invalidateQueries({ queryKey: ['hospital'] });
+      queryClient.invalidateQueries({ queryKey: ['hospital'] });
+      toast.success('Hospital updated successfully!');
     },
   });
 };

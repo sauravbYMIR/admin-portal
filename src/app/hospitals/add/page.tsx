@@ -165,7 +165,7 @@ function AddHospital() {
         });
         reset();
       }
-      router.push(`/hospitals`);
+      router.push(`/hospitals/add/${createHospital.data.data.id}`);
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [
@@ -563,7 +563,7 @@ function AddHospital() {
                         fill
                         priority
                         unoptimized
-                        objectFit="contain"
+                        className="object-contain"
                       />
                     </div>
                   ))}
@@ -592,6 +592,16 @@ function AddHospital() {
                         onBlur={onBlur}
                         onChange={(e) => {
                           if (e.target.files) {
+                            if (
+                              gallery &&
+                              Array.isArray(gallery) &&
+                              gallery.length > 0
+                            ) {
+                              let files = Array.from(e.target.files);
+                              files = [...files, ...gallery];
+                              onChange(files);
+                              return;
+                            }
                             const files = Array.from(e.target.files);
                             onChange(files);
                           }

@@ -12,6 +12,7 @@ import { Controller, useForm } from 'react-hook-form';
 import Select from 'react-select';
 import countryList from 'react-select-country-list';
 import { ClipLoader } from 'react-spinners';
+import { toast } from 'sonner';
 import { z } from 'zod';
 
 import {
@@ -23,10 +24,10 @@ import {
   PlusIcon,
   WithAuth,
 } from '@/components';
+import type { HospitalImageType } from '@/hooks';
 import {
   useEditHospital,
   useGetHospitalById,
-  useRemoveGallery,
   useUpdateHospitalGallery,
   useUpdateHospitalLogo,
 } from '@/hooks';
@@ -71,8 +72,8 @@ const editHospitalFormSchema = z.object({
   logo: z.instanceof(File, { message: 'A file is required' }).optional(),
   gallery: z
     .array(z.instanceof(File))
-    .min(1, 'At least one image is required')
-    .max(3, 'You can upload up to 3 images')
+    // .min(3, 'At least one image is required')
+    .max(10, 'You can upload up to 10 images')
     .optional(),
 });
 export type EditHospitalFormFields = z.infer<typeof editHospitalFormSchema>;
@@ -112,6 +113,12 @@ function EditHospital({ params: { id } }: { params: { id: string } }) {
   } = useForm<EditHospitalFormFields>({
     resolver: zodResolver(editHospitalFormSchema),
   });
+  const [hospitalImages, setHospitalImages] = React.useState<
+    Array<HospitalImageType>
+  >([]);
+  const [hospitalImageRemoveIds, setHospitalImageRemoveIds] = React.useState<
+    Array<string>
+  >([]);
   const logo = watch('logo');
   const gallery = watch('gallery');
   const hospitalObj = {
@@ -124,9 +131,29 @@ function EditHospital({ params: { id } }: { params: { id: string } }) {
     const lang = hospitalObj[c.language] as HospitalFormSchemaType;
     return errors[lang] && errors[lang]?.message;
   });
+  const handleCheckIsNoOfImagesValid = (galleryImg: File[] | undefined) => {
+    if (hospitalImages) {
+      const noOfGalleryImage =
+        Array.isArray(galleryImg) && galleryImg.length > 0
+          ? galleryImg.length
+          : 0;
+      const noOfHospitalImage = hospitalImages.length;
+      const totalImages = noOfHospitalImage + noOfGalleryImage;
+      if (totalImages < 3) {
+        toast.error('Minimum of 3 hospital image need to be uploaded');
+        return false;
+      }
+      return true;
+    }
+    return false;
+  };
   const onFormSubmit: SubmitHandler<EditHospitalFormFields> = (
     data: EditHospitalFormFields,
   ) => {
+    const isValidNoOfImages = handleCheckIsNoOfImagesValid(data.gallery);
+    if (!isValidNoOfImages) {
+      return;
+    }
     editHospital.mutate({
       name: data.hospitalName,
       description: {
@@ -141,6 +168,7 @@ function EditHospital({ params: { id } }: { params: { id: string } }) {
       country: data.country.label,
       zipcode: data.zipCode,
       hospitalId: id,
+      removeImageIds: hospitalImageRemoveIds,
     });
   };
   React.useEffect(() => {
@@ -150,6 +178,12 @@ function EditHospital({ params: { id } }: { params: { id: string } }) {
       reqdHospital.data &&
       reqdHospital.data.success
     ) {
+      if (
+        Array.isArray(reqdHospital.data.data.hospitalImages) &&
+        reqdHospital.data.data.hospitalImages.length > 0
+      ) {
+        setHospitalImages(reqdHospital.data.data.hospitalImages);
+      }
       setValue('hospitalName', reqdHospital.data.data.name);
       setValue('hospitalDescEn', reqdHospital.data.data.description.en);
       setValue('hospitalDescNb', reqdHospital.data.data.description.nb);
@@ -195,7 +229,6 @@ function EditHospital({ params: { id } }: { params: { id: string } }) {
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [editHospital.data, editHospital.isSuccess]);
-  const removeGallery = useRemoveGallery({ id });
   const countryOptions = React.useMemo(() => countryList().getData(), []);
   return (
     <div>
@@ -260,7 +293,7 @@ function EditHospital({ params: { id } }: { params: { id: string } }) {
                       ref={logoRef}
                       name={name}
                       onBlur={onBlur}
-                      accept="image/*"
+                      // accept="image/*"
                       onChange={(e) => {
                         const file = e.target.files?.[0];
                         onChange(file);
@@ -413,7 +446,9 @@ function EditHospital({ params: { id } }: { params: { id: string } }) {
                       }
                       className="px-3 py-2"
                       type="button"
-                      onClick={() => setActiveLanguageTab(data.language)}
+                      onClick={() => {
+                        setActiveLanguageTab(data.language);
+                      }}
                     >
                       <span className="font-poppins text-sm font-medium text-darkteal">
                         {data.language}
@@ -587,64 +622,62 @@ function EditHospital({ params: { id } }: { params: { id: string } }) {
                 Upload a minimum of 3 media items and maximum 10 media items
               </p>
             </div>
-            {gallery && gallery.length > 0 && (
-              <div className="flex w-full flex-wrap items-center gap-4">
-                {gallery.map((image) => (
-                  <div
-                    className="relative size-[180px] cursor-pointer rounded-lg border border-neutral-4"
-                    key={image.size}
-                    onMouseEnter={() =>
-                      setIsShowRemoveImgBtn(() => ({
-                        lastModified: image.lastModified,
-                        isShow: true,
-                      }))
-                    }
-                    onMouseLeave={() =>
-                      setIsShowRemoveImgBtn(() => ({
-                        lastModified: image.lastModified,
-                        isShow: false,
-                      }))
-                    }
-                  >
-                    {isShowRemoveImgBtn.lastModified === image.lastModified &&
-                      isShowRemoveImgBtn.isShow && (
-                        <button
-                          type="button"
-                          className="absolute right-4 top-4 z-10"
-                          onClick={() => {
-                            const updatedGallery = gallery.filter(
-                              (f) =>
-                                f.lastModified !==
-                                isShowRemoveImgBtn.lastModified,
-                            );
-                            setValue('gallery', updatedGallery);
-                          }}
-                        >
-                          <CloseIcon
-                            className="mb-2 size-6"
-                            strokeWidth={1.7}
-                          />
-                        </button>
-                      )}
-                    <Image
+            <div className="flex w-full flex-wrap items-center gap-x-6 gap-y-8">
+              {gallery && gallery.length > 0 && (
+                <>
+                  {gallery.map((image) => (
+                    <div
+                      className="relative size-[180px] cursor-pointer rounded-lg border border-neutral-4"
                       key={image.size}
-                      src={`${URL.createObjectURL(image)}`}
-                      width={200}
-                      height={200}
-                      alt="hospital-gallery"
-                      className="h-[250px] w-[264px] rounded-lg"
-                    />
-                  </div>
-                ))}
-              </div>
-            )}
-            {!gallery &&
-              reqdHospital.data &&
-              reqdHospital.data.data &&
-              Array.isArray(reqdHospital.data.data.hospitalImages) &&
-              reqdHospital.data.data.hospitalImages.length > 0 && (
-                <div className=" flex w-full flex-wrap items-center gap-4">
-                  {reqdHospital.data.data.hospitalImages.map((image) => (
+                      onMouseEnter={() =>
+                        setIsShowRemoveImgBtn(() => ({
+                          lastModified: image.lastModified,
+                          isShow: true,
+                        }))
+                      }
+                      onMouseLeave={() =>
+                        setIsShowRemoveImgBtn(() => ({
+                          lastModified: image.lastModified,
+                          isShow: false,
+                        }))
+                      }
+                    >
+                      {isShowRemoveImgBtn.lastModified === image.lastModified &&
+                        isShowRemoveImgBtn.isShow && (
+                          <button
+                            type="button"
+                            className="absolute right-4 top-4 z-10"
+                            onClick={(e) => {
+                              e.preventDefault();
+                              const updatedGallery = gallery.filter(
+                                (f) =>
+                                  f.lastModified !==
+                                  isShowRemoveImgBtn.lastModified,
+                              );
+                              setValue('gallery', updatedGallery);
+                            }}
+                          >
+                            <CloseIcon
+                              className="mb-2 size-6"
+                              strokeWidth={1.7}
+                            />
+                          </button>
+                        )}
+                      <Image
+                        key={image.size}
+                        src={`${URL.createObjectURL(image)}`}
+                        width={200}
+                        height={180}
+                        alt="hospital-gallery"
+                        className="h-[180px] w-[200px] rounded-lg object-contain"
+                      />
+                    </div>
+                  ))}
+                </>
+              )}
+              {hospitalImages.length > 0 && (
+                <>
+                  {hospitalImages.map((image) => (
                     <div className="relative" key={image.id}>
                       <Image
                         key={image.id}
@@ -659,14 +692,34 @@ function EditHospital({ params: { id } }: { params: { id: string } }) {
                       <button
                         type="button"
                         className="absolute right-2 top-2"
-                        onClick={() => removeGallery.mutate({ id: image.id })}
+                        onClick={(e) => {
+                          e.preventDefault();
+                          const isValidNoOfImages =
+                            handleCheckIsNoOfImagesValid(gallery);
+                          if (!isValidNoOfImages) {
+                            return;
+                          }
+                          setHospitalImages((prevState) =>
+                            prevState.length > 0
+                              ? prevState.filter(
+                                  (hospitalImage) =>
+                                    hospitalImage.id !== image.id,
+                                )
+                              : [],
+                          );
+                          setHospitalImageRemoveIds((prevState) => [
+                            ...prevState,
+                            image.id,
+                          ]);
+                        }}
                       >
                         <CloseIcon />
                       </button>
                     </div>
                   ))}
-                </div>
+                </>
               )}
+            </div>
             <button
               className="mt-6 flex cursor-pointer gap-x-4 border-b-2 border-darkteal pb-1"
               type="button"
@@ -689,6 +742,16 @@ function EditHospital({ params: { id } }: { params: { id: string } }) {
                     onBlur={onBlur}
                     onChange={(e) => {
                       if (e.target.files) {
+                        if (
+                          gallery &&
+                          Array.isArray(gallery) &&
+                          gallery.length > 0
+                        ) {
+                          let files = Array.from(e.target.files);
+                          files = [...files, ...gallery];
+                          onChange(files);
+                          return;
+                        }
                         const files = Array.from(e.target.files);
                         onChange(files);
                       }

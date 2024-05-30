@@ -59,6 +59,9 @@ input[type=number] {
   min-height: 48px !important;
   border-radius: 10.67px !important;
 }
+.css-1fdsijx-ValueContainer{
+  padding: 2px 0px !important;
+}
 
 /* AG GRID */
 .ag-header-cell-text {

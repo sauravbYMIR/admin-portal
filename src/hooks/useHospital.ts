@@ -72,6 +72,17 @@ export type EditHospitalAxios = {
   status: number;
   data: { id: string };
 };
+
+export type HospitalImageType = {
+  id: string;
+  hospitalId: string;
+  fileName: string;
+  originalFileName: string;
+  createdAt: string;
+  updatedAt: string;
+  deletedAt: null | string;
+  imageUrl: string;
+};
 export type EditHospitalResponse = {
   success: boolean;
   status: number;
@@ -82,16 +93,7 @@ export type GetHospitalById = {
   status: number;
   data: HospitalByIdType & {
     logo: boolean | string;
-    hospitalImages: Array<{
-      id: string;
-      hospitalId: string;
-      fileName: string;
-      originalFileName: string;
-      createdAt: string;
-      updatedAt: string;
-      deletedAt: null | string;
-      imageUrl: string;
-    }>;
+    hospitalImages: Array<HospitalImageType>;
   };
 };
 export type GetHospitalTeamMembersByHospitalId = {
@@ -226,6 +228,7 @@ export const editHospital = async ({
   country,
   zipcode,
   hospitalId,
+  removeImageIds,
 }: {
   name: string;
   description: NameJSONType;
@@ -235,6 +238,7 @@ export const editHospital = async ({
   country: string;
   zipcode: string;
   hospitalId: string;
+  removeImageIds: Array<string>;
 }): Promise<EditHospitalResponse> => {
   const response = await axiosInstance.patch<EditHospitalAxios>(
     `${process.env.BASE_URL}/hospital/${hospitalId}`,
@@ -246,6 +250,7 @@ export const editHospital = async ({
       city,
       country,
       zipcode,
+      removeImageIds,
     },
   );
   return {
@@ -263,6 +268,7 @@ export const useEditHospital = () => {
       queryClient.invalidateQueries({
         queryKey: [`hospital`],
       });
+      toast.success('Hospital updated successfully!');
     },
     onError: (error) => {
       toast(`Something went wrong: ${error.message}`);
@@ -406,14 +412,11 @@ export const removeGallery = async ({
   };
 };
 
-export const useRemoveGallery = ({ id }: { id: string }) => {
-  const queryClient = useQueryClient();
+export const useRemoveGallery = () => {
   return useMutation({
     mutationFn: removeGallery,
     onSuccess: () => {
-      queryClient.invalidateQueries({
-        queryKey: [`hospital`, id],
-      });
+      toast.error('Hospital gallery removed successfully');
     },
     onError: (error) => {
       toast(`Something went wrong: ${error.message}`);

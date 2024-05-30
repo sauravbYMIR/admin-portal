@@ -35,9 +35,8 @@ function TeamMemberCard({
             src={profile}
             width={32}
             height={32}
-            className="size-8 rounded-full"
+            className="size-8 rounded-full object-cover"
             alt="sample profile image"
-            objectFit="cover"
             priority
             unoptimized
           />

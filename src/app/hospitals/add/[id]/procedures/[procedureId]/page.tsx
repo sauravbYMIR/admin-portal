@@ -121,11 +121,7 @@ function HospitalDetailsPage({
                       <div className={style.breadcrumb}>
                         <Link href={`/hospitals/add/${params.id}/procedures`}>
                           <span className="font-lexend text-base font-normal text-neutral-3">
-                            {
-                              hospitalProcedureId.data.data.procedure.category
-                                .name.en
-                            }{' '}
-                            department
+                            procedure list
                           </span>
                         </Link>
                         <span>/</span>

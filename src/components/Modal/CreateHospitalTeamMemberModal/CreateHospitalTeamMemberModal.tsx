@@ -48,7 +48,7 @@ const createTeamMemberFormSchema = z.object({
   positionSv: z
     .string()
     .min(1, { message: 'Fill in details in all the languages' }),
-  profile: z.instanceof(File).optional(),
+  profile: z.instanceof(File, { message: 'Please upload profile image' }),
 });
 export type CreateHospitalTeamMemberFormFields = z.infer<
   typeof createTeamMemberFormSchema
@@ -135,8 +135,8 @@ function CreateHospitalTeamMemberModal({
           memberId: editHospitalMember.data.data,
           formData,
         });
+        reset();
       }
-      reset();
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [
@@ -161,8 +161,8 @@ function CreateHospitalTeamMemberModal({
           memberId: createHospitalMember.data.data.id,
           formData,
         });
+        reset();
       }
-      reset();
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [
@@ -216,6 +216,7 @@ function CreateHospitalTeamMemberModal({
                 onClick={() => {
                   onClose();
                   setActiveLanguageTab('English');
+                  reset();
                 }}
                 className="absolute right-2 top-10"
               >

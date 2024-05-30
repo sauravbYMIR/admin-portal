@@ -389,6 +389,84 @@ function EditHospital({ params: { id } }: { params: { id: string } }) {
                 </div>
               )}
 
+            {!logo &&
+              !(
+                reqdHospital.data &&
+                reqdHospital.data.data.logo &&
+                typeof reqdHospital.data.data.logo === 'string'
+              ) && (
+                <Controller
+                  name="logo"
+                  control={control}
+                  render={({ field: { name, onBlur, onChange } }) => (
+                    <button
+                      type="button"
+                      className="relative flex size-[220px] flex-col items-center justify-center rounded-full border border-neutral-4"
+                      onClick={() => logoRef.current?.click()}
+                      onMouseEnter={() => setShowLogoOverlay(true)}
+                      onMouseLeave={() => setShowLogoOverlay(false)}
+                    >
+                      {showLogoOverlay && logo && (
+                        <div
+                          className="absolute left-0 top-0 z-10 flex size-[220px] flex-col items-center justify-center rounded-full"
+                          style={{
+                            backgroundColor: 'rgba(0, 0, 0, 0.4)',
+                          }}
+                        >
+                          <div className="flex size-10 items-center justify-center rounded-full border border-white p-2">
+                            <FileUploadIcon stroke="#fff" />
+                          </div>
+                          <p className="mt-3 font-poppins text-sm font-medium text-white">
+                            Replace image
+                          </p>
+                          <p className="font-lexend text-sm font-normal text-white">
+                            PNG, JPG (max. 10 MB)
+                          </p>
+                        </div>
+                      )}
+                      {!getValues('logo') && (
+                        <div className="flex size-10 items-center justify-center rounded-full border border-darkgray p-2">
+                          <FileUploadIcon />
+                        </div>
+                      )}
+                      <input
+                        type="file"
+                        ref={logoRef}
+                        name={name}
+                        onBlur={onBlur}
+                        // accept="image/*"
+                        onChange={(e) => {
+                          const file = e.target.files?.[0];
+                          onChange(file);
+                        }}
+                        className="invisible absolute"
+                      />
+                      {logo ? (
+                        <Image
+                          src={`${URL.createObjectURL(logo)}`}
+                          alt="hospitalLogo"
+                          key={`${logo}`}
+                          fill
+                          priority
+                          unoptimized
+                          style={{ backgroundImage: 'contain' }}
+                          className="inline-block rounded-full"
+                        />
+                      ) : (
+                        <>
+                          <p className="mt-3 font-poppins text-sm font-medium text-darkgray">
+                            click to upload an image
+                          </p>
+                          <p className="font-lexend text-sm font-normal text-neutral-3">
+                            PNG, JPG (max. 10 MB)
+                          </p>
+                        </>
+                      )}
+                    </button>
+                  )}
+                />
+              )}
+
             <label
               style={{ marginBottom: '8px' }}
               className="mt-3 font-poppins text-base font-normal text-neutral-2"

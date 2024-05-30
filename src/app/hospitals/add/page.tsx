@@ -163,8 +163,8 @@ function AddHospital() {
           hospitalId: `${createHospital.data.data.id}`,
           formData,
         });
-        reset();
       }
+      reset();
       router.push(`/hospitals/add/${createHospital.data.data.id}`);
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps

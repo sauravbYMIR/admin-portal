@@ -299,7 +299,6 @@ export const useUpdateHospitalLogo = () => {
     mutationFn: updateHospitalLogo,
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['hospital'] });
-      toast.success('Hospital updated successfully!');
     },
   });
 };

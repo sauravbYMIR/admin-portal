@@ -1,5 +1,8 @@
+import { useQuery } from '@tanstack/react-query';
 import type { AxiosError } from 'axios';
 import axios from 'axios';
+
+import { axiosInstance } from '@/utils/axiosInstance';
 
 export type ResendOtpResponse = {
   success: boolean;
@@ -116,4 +119,29 @@ export const verifyOTP = async ({
     }
     throw new Error('otp-verify-failed');
   }
+};
+export const getAdminDetails = async (): Promise<{
+  id: string;
+  email: string;
+  role: string;
+}> => {
+  const response = await axiosInstance.get<{
+    data: {
+      id: string;
+      email: string;
+      role: string;
+    };
+    success: boolean;
+    status: number;
+  }>(`${process.env.BASE_URL}/admin/admin-details`);
+  return response.data.data;
+};
+
+export const useGetAdminDetails = () => {
+  return useQuery({
+    queryKey: [`admin-details`],
+    queryFn: () => getAdminDetails(),
+    refetchOnWindowFocus: false,
+    retry: 1,
+  });
 };

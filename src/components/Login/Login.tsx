@@ -108,17 +108,19 @@ function LoginWithMail({
         onSubmit={handleSubmit(onFormSubmit)}
         className="flex w-full flex-col"
       >
-        <label className="flex flex-col items-center" htmlFor="email">
+        <label className="flex flex-col items-start" htmlFor="email">
           <input
             placeholder="Enter your email"
             className="w-full rounded-lg px-4 py-[19px] placeholder:font-poppins placeholder:text-sm placeholder:font-normal placeholder:text-placeholdertextcolor"
             style={{ border: '1px solid rgba(17, 17, 17, 0.2)' }}
             id="email"
             type="text"
-            {...register('email')}
+            {...register('email', {
+              setValueAs: (value: string) => value.trim(),
+            })}
           />
           {errors.email && (
-            <div className="text-center font-lexend text-base font-normal text-error">
+            <div className="mt-2 text-center font-lexend text-base font-normal text-error">
               {errors.email.message}
             </div>
           )}

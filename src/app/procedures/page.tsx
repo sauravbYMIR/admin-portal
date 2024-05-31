@@ -51,7 +51,10 @@ function ReimbursementWrapper({
               availableCountriesByCountryCode[
                 name as keyof typeof availableCountriesByCountryCode
               ].currency,
-            locale: name,
+            locale:
+              availableCountriesByCountryCode[
+                name as keyof typeof availableCountriesByCountryCode
+              ].locale,
           })}
         </p>
       )}

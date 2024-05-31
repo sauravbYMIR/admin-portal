@@ -224,6 +224,8 @@ function HospitalDetailsPage({
                                 src={`${file.imageUrl}?version=${new Date().getTime()}`}
                                 width={220}
                                 height={220}
+                                priority
+                                unoptimized
                                 alt="hospital-gallery"
                                 className="size-[220px] rounded-lg object-contain"
                               />

@@ -301,10 +301,13 @@ function ProceduresList() {
                                       (key) => {
                                         const reimbursementKey =
                                           key as LangType;
+                                        const countryName = countryData.find(
+                                          (c) => c.countryCode === key,
+                                        )?.name;
                                         return (
                                           <ReimbursementWrapper
                                             key={reimbursementKey}
-                                            name={reimbursementKey}
+                                            name={countryName}
                                             value={
                                               procedure.reimbursement[
                                                 reimbursementKey

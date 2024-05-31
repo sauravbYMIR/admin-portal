@@ -8,7 +8,7 @@ import { useRouter } from 'next/navigation';
 import React from 'react';
 
 import { Login } from '@/components';
-import landingPageBanner from '@/public/sassets/images/landingPageBanner.png';
+import landingPageBanner from '@/public/assets/images/landingPageBanner.png';
 import { handleGetLocalStorage } from '@/utils/global';
 
 import style from './page.module.scss';

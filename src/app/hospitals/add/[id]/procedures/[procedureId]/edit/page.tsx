@@ -221,14 +221,7 @@ function EditHospitalProcedure({
     // updateHospitalLogo,
     // updateHospitalGallery,
   ]);
-  const [isShowRemoveImgBtn, setIsShowRemoveImgBtn] = React.useState<{
-    id: string;
-    isShow: boolean;
-  }>({ id: '', isShow: false });
   const gallery = watch('gallery');
-  // const removeHospitalProcedureGallery = useRemoveHospitalProcedureGallery({
-  //   id: params.procedureId,
-  // });
   return (
     <div>
       <Header />
@@ -454,67 +447,91 @@ function EditHospitalProcedure({
             <h3 className="mb-7 font-poppins text-lg font-normal text-neutral-1">
               Procedure related images
             </h3>
+
             {hospitalProcedureDetails.data &&
             hospitalProcedureDetails.data.data &&
             hospitalProcedureDetails.data.data.hospitalProcedureImages &&
             hospitalProcedureDetails.data.data.hospitalProcedureImages.length >
               0 ? (
-              <div className="flex w-full flex-wrap items-center gap-4">
-                {hospitalProcedureImages.map((file) => {
-                  return (
-                    <div
-                      onMouseEnter={() =>
-                        setIsShowRemoveImgBtn(() => ({
-                          id: file.id,
-                          isShow: true,
-                        }))
-                      }
-                      onMouseLeave={() =>
-                        setIsShowRemoveImgBtn(() => ({
-                          id: file.id,
-                          isShow: false,
-                        }))
-                      }
-                      key={file.id}
-                      className="relative"
-                    >
-                      {isShowRemoveImgBtn.id === file.id &&
-                        isShowRemoveImgBtn.isShow && (
-                          <button
-                            type="button"
-                            className="absolute right-4 top-4 z-10"
-                            onClick={() => {
-                              setHospitalProcedureImages((prevState) =>
-                                prevState.length > 0
-                                  ? prevState.filter(
-                                      (hospitalProcedureImage) =>
-                                        hospitalProcedureImage.id !== file.id,
-                                    )
-                                  : [],
-                              );
-                              setHospitalImageRemoveIds((prevState) => [
-                                ...prevState,
-                                file.id,
-                              ]);
-                            }}
-                          >
-                            <CloseIcon
-                              className="mb-2 size-6"
-                              strokeWidth={1.7}
-                            />
-                          </button>
-                        )}
-                      <Image
-                        key={file.id}
-                        src={`${file.imageUrl}?version=${new Date().getTime()}`}
-                        width={64}
-                        height={64}
-                        alt="hospital-gallery"
-                        className="h-[250px] w-[264px] rounded-lg"
+              <div className="flex flex-col items-start gap-y-4">
+                <div className="flex w-full flex-wrap items-center gap-4">
+                  {hospitalProcedureImages.map((file) => {
+                    return (
+                      <div key={file.id} className="relative">
+                        <button
+                          type="button"
+                          className="absolute right-4 top-4 z-10 rounded-full bg-white p-1"
+                          onClick={() => {
+                            setHospitalProcedureImages((prevState) =>
+                              prevState.length > 0
+                                ? prevState.filter(
+                                    (hospitalProcedureImage) =>
+                                      hospitalProcedureImage.id !== file.id,
+                                  )
+                                : [],
+                            );
+                            setHospitalImageRemoveIds((prevState) => [
+                              ...prevState,
+                              file.id,
+                            ]);
+                          }}
+                        >
+                          <CloseIcon className="size-4" strokeWidth={3} />
+                        </button>
+                        <Image
+                          key={file.id}
+                          src={`${file.imageUrl}?version=${new Date().getTime()}`}
+                          width={250}
+                          height={264}
+                          alt="hospital-gallery"
+                          className="aspect-square h-[250px] w-[264px] rounded-lg object-contain"
+                        />
+                      </div>
+                    );
+                  })}
+                </div>
+                <button
+                  type="button"
+                  className="mt-6 flex cursor-pointer gap-x-4 border-b-2 border-darkteal pb-1"
+                  onClick={() => galleryRef.current?.click()}
+                >
+                  <PlusIcon stroke="rgba(9, 111, 144, 1)" />
+                  <span className="font-poppins text-base font-medium text-darkteal">
+                    Add media
+                  </span>
+                  <Controller
+                    name="gallery"
+                    control={control}
+                    render={({ field: { name, onBlur, onChange } }) => (
+                      <input
+                        type="file"
+                        ref={galleryRef}
+                        accept="image/*"
+                        multiple
+                        name={name}
+                        onBlur={onBlur}
+                        onChange={(e) => {
+                          if (e.target.files) {
+                            const files = Array.from(e.target.files);
+                            const updatedFiles = files.filter(
+                              (file, index, self) =>
+                                index ===
+                                self.findIndex(
+                                  (f) =>
+                                    f.size === file.size &&
+                                    f.name === file.name &&
+                                    f.type === file.type &&
+                                    f.lastModified === file.lastModified,
+                                ),
+                            );
+                            onChange(updatedFiles);
+                          }
+                        }}
+                        className="invisible absolute"
                       />
-                    </div>
-                  );
-                })}
+                    )}
+                  />
+                </button>
               </div>
             ) : (
               <div className="flex w-full flex-wrap items-center gap-x-6 gap-y-2">
@@ -538,6 +555,7 @@ function EditHospitalProcedure({
                     ))}
                   </div>
                 )}
+
                 {gallery ? (
                   <button
                     className="mt-6 flex cursor-pointer gap-x-4 border-b-2 border-darkteal pb-1"
@@ -545,9 +563,6 @@ function EditHospitalProcedure({
                     onClick={() => galleryRef.current?.click()}
                   >
                     <PlusIcon stroke="rgba(9, 111, 144, 1)" />
-                    <span className="font-poppins text-base font-medium text-darkteal">
-                      Add media
-                    </span>
                     <Controller
                       name="gallery"
                       control={control}
@@ -561,7 +576,44 @@ function EditHospitalProcedure({
                           onBlur={onBlur}
                           onChange={(e) => {
                             if (e.target.files) {
-                              const files = Array.from(e.target.files);
+                              if (
+                                gallery &&
+                                Array.isArray(gallery) &&
+                                gallery.length > 0
+                              ) {
+                                let totalImageFiles = Array.from(
+                                  e.target.files,
+                                );
+                                totalImageFiles = [
+                                  ...totalImageFiles,
+                                  ...gallery,
+                                ];
+                                totalImageFiles = totalImageFiles.filter(
+                                  (file, index, self) =>
+                                    index ===
+                                    self.findIndex(
+                                      (f) =>
+                                        f.size === file.size &&
+                                        f.name === file.name &&
+                                        f.type === file.type &&
+                                        f.lastModified === file.lastModified,
+                                    ),
+                                );
+                                onChange(totalImageFiles);
+                                return;
+                              }
+                              let files = Array.from(e.target.files);
+                              files = files.filter(
+                                (file, index, self) =>
+                                  index ===
+                                  self.findIndex(
+                                    (f) =>
+                                      f.size === file.size &&
+                                      f.name === file.name &&
+                                      f.type === file.type &&
+                                      f.lastModified === file.lastModified,
+                                  ),
+                              );
                               onChange(files);
                             }
                           }}
@@ -576,6 +628,9 @@ function EditHospitalProcedure({
                     className="flex size-[220px] flex-col items-center justify-center rounded-lg border border-neutral-4"
                     onClick={() => galleryRef.current?.click()}
                   >
+                    <span className="font-poppins text-base font-medium text-darkteal">
+                      Add media
+                    </span>
                     {!gallery && (
                       <div className="flex size-10 items-center justify-center rounded-full border border-darkgray p-2">
                         <FileUploadIcon />
@@ -595,7 +650,18 @@ function EditHospitalProcedure({
                           onChange={(e) => {
                             if (e.target.files) {
                               const files = Array.from(e.target.files);
-                              onChange(files);
+                              const updatedFiles = files.filter(
+                                (file, index, self) =>
+                                  index ===
+                                  self.findIndex(
+                                    (f) =>
+                                      f.size === file.size &&
+                                      f.name === file.name &&
+                                      f.type === file.type &&
+                                      f.lastModified === file.lastModified,
+                                  ),
+                              );
+                              onChange(updatedFiles);
                             }
                           }}
                           className="invisible absolute"

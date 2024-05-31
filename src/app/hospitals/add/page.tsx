@@ -83,10 +83,6 @@ function AddHospital() {
   const createHospital = useCreateHospital();
   const [activeLanguageTab, setActiveLanguageTab] =
     React.useState<LanguagesType>('English');
-  const [isShowRemoveImgBtn, setIsShowRemoveImgBtn] = React.useState<{
-    lastModified: number;
-    isShow: boolean;
-  }>({ lastModified: 0, isShow: false });
   const [selectedCountry, setSelectedCountry] = React.useState<{
     label: string;
     value: string;
@@ -530,41 +526,21 @@ function AddHospital() {
                 <div className="flex w-full flex-wrap items-center gap-x-4 gap-y-2">
                   {gallery.map((file) => (
                     <div
-                      onMouseEnter={() =>
-                        setIsShowRemoveImgBtn(() => ({
-                          lastModified: file.lastModified,
-                          isShow: true,
-                        }))
-                      }
-                      onMouseLeave={() =>
-                        setIsShowRemoveImgBtn(() => ({
-                          lastModified: file.lastModified,
-                          isShow: false,
-                        }))
-                      }
                       className="relative size-[180px] cursor-pointer rounded-lg border border-neutral-4"
                       key={file.size}
                     >
-                      {isShowRemoveImgBtn.lastModified === file.lastModified &&
-                        isShowRemoveImgBtn.isShow && (
-                          <button
-                            type="button"
-                            className="absolute right-4 top-4 z-10"
-                            onClick={() => {
-                              const updatedGallery = gallery.filter(
-                                (f) =>
-                                  f.lastModified !==
-                                  isShowRemoveImgBtn.lastModified,
-                              );
-                              setValue('gallery', updatedGallery);
-                            }}
-                          >
-                            <CloseIcon
-                              className="mb-2 size-6"
-                              strokeWidth={1.7}
-                            />
-                          </button>
-                        )}
+                      <button
+                        type="button"
+                        className="absolute right-4 top-4 z-10"
+                        onClick={() => {
+                          const updatedGallery = gallery.filter(
+                            (f) => f.lastModified !== file.lastModified,
+                          );
+                          setValue('gallery', updatedGallery);
+                        }}
+                      >
+                        <CloseIcon className="mb-2 size-6" strokeWidth={1.7} />
+                      </button>
                       <Image
                         src={`${URL.createObjectURL(file)}`}
                         alt={`hospitalGallery-${file.size}`}
@@ -606,12 +582,37 @@ function AddHospital() {
                               Array.isArray(gallery) &&
                               gallery.length > 0
                             ) {
-                              let files = Array.from(e.target.files);
-                              files = [...files, ...gallery];
-                              onChange(files);
+                              let totalImageFiles = Array.from(e.target.files);
+                              totalImageFiles = [
+                                ...totalImageFiles,
+                                ...gallery,
+                              ];
+                              totalImageFiles = totalImageFiles.filter(
+                                (file, index, self) =>
+                                  index ===
+                                  self.findIndex(
+                                    (f) =>
+                                      f.size === file.size &&
+                                      f.name === file.name &&
+                                      f.type === file.type &&
+                                      f.lastModified === file.lastModified,
+                                  ),
+                              );
+                              onChange(totalImageFiles);
                               return;
                             }
-                            const files = Array.from(e.target.files);
+                            let files = Array.from(e.target.files);
+                            files = files.filter(
+                              (file, index, self) =>
+                                index ===
+                                self.findIndex(
+                                  (f) =>
+                                    f.size === file.size &&
+                                    f.name === file.name &&
+                                    f.type === file.type &&
+                                    f.lastModified === file.lastModified,
+                                ),
+                            );
                             onChange(files);
                           }
                         }}
@@ -644,7 +645,18 @@ function AddHospital() {
                         onBlur={onBlur}
                         onChange={(e) => {
                           if (e.target.files) {
-                            const files = Array.from(e.target.files);
+                            let files = Array.from(e.target.files);
+                            files = files.filter(
+                              (file, index, self) =>
+                                index ===
+                                self.findIndex(
+                                  (f) =>
+                                    f.size === file.size &&
+                                    f.name === file.name &&
+                                    f.type === file.type &&
+                                    f.lastModified === file.lastModified,
+                                ),
+                            );
                             onChange(files);
                           }
                         }}

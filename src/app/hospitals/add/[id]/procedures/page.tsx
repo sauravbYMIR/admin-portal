@@ -15,6 +15,7 @@ import {
 import ShowDataTable from '@/components/Table/PatientsTable/PatientsTable';
 import { useGetAllHospitalProcedure } from '@/hooks/useHospitalProcedure';
 import emptyState from '@/public/assets/images/emptyState.svg';
+import { convertToValidCurrency } from '@/utils/global';
 
 const CustomStatusEditComponent = (props: CustomCellRendererProps) => {
   const router = useRouter();
@@ -152,10 +153,17 @@ function HospitalProcedureManagement() {
               <ShowDataTable
                 // onCellClicked={onCellClicked}
                 rowData={procedureByHospitalId.data.data.map((r) => ({
-                  name: `${r.procedure.name.en} - ${r.procedure.category.name.en}`,
-                  department: r.procedure.category.name.en,
+                  name: `${r.procedure.name.en}`,
+                  department: `${r.procedure.category.parentCategory.name.en} - ${r.procedure.category.name.en}`,
                   waitTime: r.waitingTime,
-                  cost: r.cost.price,
+                  cost:
+                    r.cost.price && typeof r.cost.price === 'number'
+                      ? convertToValidCurrency({
+                          price: r.cost.price,
+                          locale: 'en',
+                          currency: r.cost.currency,
+                        })
+                      : '---',
                   id: r.id,
                   stayInHospital: r.stayInHospital,
                   stayInCity: r.stayInCity,
@@ -168,7 +176,7 @@ function HospitalProcedureManagement() {
                 }))}
                 colDefs={[
                   {
-                    headerName: 'Procedure / Procedure + sub-category',
+                    headerName: 'Procedure',
                     field: 'name',
                     filter: true,
                     floatingFilter: true,

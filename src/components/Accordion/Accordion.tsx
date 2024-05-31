@@ -28,7 +28,6 @@ function Accordion({
   const toggleAccordion = () => {
     setIsOpen(!isOpen);
   };
-
   return (
     <div className={accordionStyles.accordionContainer}>
       <div
@@ -57,41 +56,37 @@ function Accordion({
             {isOpen ? (
               <div>
                 {type === 'PROCEDURE' ? (
-                  <MinusIcon
-                    className="size-[11.67px]"
-                    stroke="rgba(9, 111, 144, 1)"
-                    strokeWidth={4}
-                  />
+                  <MinusIcon className="size-4" stroke="#333" strokeWidth={3} />
                 ) : (
                   <Image
                     src={collapseIcon}
                     alt="collapse accordion icon"
-                    width={13.34}
-                    height={13.34}
+                    width={20}
+                    height={20}
                   />
                 )}
               </div>
             ) : (
               <div>
                 {type === 'PROCEDURE' ? (
-                  <PlusIcon
-                    className="size-[11.67px]"
-                    stroke="rgba(9, 111, 144, 1)"
-                    strokeWidth={4}
-                  />
+                  <PlusIcon className="size-4" stroke="#333" strokeWidth={3} />
                 ) : (
                   <Image
                     onClick={toggleAccordion}
                     src={expandIcon}
                     alt="expand accordion icon"
-                    width={13.34}
-                    height={13.34}
+                    width={20}
+                    height={20}
                   />
                 )}
               </div>
             )}
           </div>
-          <p className="font-poppins text-base text-black18">{title}</p>
+          <p
+            className={`font-poppins ${type === 'PROCEDURE' ? 'text-base' : 'text-xl'} font-normal text-neutral-1`}
+          >
+            {title}
+          </p>
         </button>
         <button type="button" className="cursor-pointer">
           <Image

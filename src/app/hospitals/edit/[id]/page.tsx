@@ -32,7 +32,7 @@ import {
   useUpdateHospitalLogo,
 } from '@/hooks';
 import type { LanguagesType } from '@/types/components';
-import { countryData } from '@/utils/global';
+import { availableCountries, countryData } from '@/utils/global';
 
 import addHospitalStyle from '../../add/style.module.scss';
 
@@ -90,10 +90,6 @@ function EditHospital({ params: { id } }: { params: { id: string } }) {
     React.useState<LanguagesType>('English');
   const [isActiveCancelModal, setIsActiveCancelModal] =
     React.useState<boolean>(false);
-  const [isShowRemoveImgBtn, setIsShowRemoveImgBtn] = React.useState<{
-    lastModified: number;
-    isShow: boolean;
-  }>({ lastModified: 0, isShow: false });
   const [selectedCountry, setSelectedCountry] = React.useState<{
     label: string;
     value: string;
@@ -232,7 +228,18 @@ function EditHospital({ params: { id } }: { params: { id: string } }) {
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [editHospital.data, editHospital.isSuccess]);
-  const countryOptions = React.useMemo(() => countryList().getData(), []);
+  const countryOptions = React.useMemo(
+    () =>
+      countryList()
+        .getData()
+        .filter(
+          (country) =>
+            availableCountries[
+              country.label as keyof typeof availableCountries
+            ],
+        ),
+    [],
+  );
   return (
     <div>
       <Header />
@@ -296,7 +303,7 @@ function EditHospital({ params: { id } }: { params: { id: string } }) {
                       ref={logoRef}
                       name={name}
                       onBlur={onBlur}
-                      // accept="image/*"
+                      accept="image/*"
                       onChange={(e) => {
                         const file = e.target.files?.[0];
                         onChange(file);
@@ -434,7 +441,7 @@ function EditHospital({ params: { id } }: { params: { id: string } }) {
                         ref={logoRef}
                         name={name}
                         onBlur={onBlur}
-                        // accept="image/*"
+                        accept="image/*"
                         onChange={(e) => {
                           const file = e.target.files?.[0];
                           onChange(file);
@@ -482,7 +489,7 @@ function EditHospital({ params: { id } }: { params: { id: string } }) {
           </div>
 
           <div className="mt-[60px] w-[920px] rounded-xl bg-neutral-7 px-[60px] py-8">
-            <div className="flex flex-col">
+            <div className="mb-3 flex flex-col">
               <label
                 className="mb-3 font-poppins text-base font-normal text-neutral-2"
                 htmlFor="hospital-name"
@@ -505,7 +512,7 @@ function EditHospital({ params: { id } }: { params: { id: string } }) {
 
             <div className="flex flex-col">
               <label
-                className="mb-3 font-poppins text-base font-normal text-neutral-2"
+                className="mt-3 font-poppins text-base font-normal text-neutral-2"
                 htmlFor="hospital-description"
               >
                 Hospital Description
@@ -713,45 +720,25 @@ function EditHospital({ params: { id } }: { params: { id: string } }) {
                     <div
                       className="relative size-[180px] cursor-pointer rounded-lg border border-neutral-4"
                       key={image.size}
-                      onMouseEnter={() =>
-                        setIsShowRemoveImgBtn(() => ({
-                          lastModified: image.lastModified,
-                          isShow: true,
-                        }))
-                      }
-                      onMouseLeave={() =>
-                        setIsShowRemoveImgBtn(() => ({
-                          lastModified: image.lastModified,
-                          isShow: false,
-                        }))
-                      }
                     >
-                      {isShowRemoveImgBtn.lastModified === image.lastModified &&
-                        isShowRemoveImgBtn.isShow && (
-                          <button
-                            type="button"
-                            className="absolute right-4 top-4 z-10"
-                            onClick={(e) => {
-                              e.preventDefault();
-                              const isValidNoOfImages =
-                                handleCheckIsNoOfImagesValid(gallery, 4);
-                              if (!isValidNoOfImages) {
-                                return;
-                              }
-                              const updatedGallery = gallery.filter(
-                                (f) =>
-                                  f.lastModified !==
-                                  isShowRemoveImgBtn.lastModified,
-                              );
-                              setValue('gallery', updatedGallery);
-                            }}
-                          >
-                            <CloseIcon
-                              className="mb-2 size-6"
-                              strokeWidth={1.7}
-                            />
-                          </button>
-                        )}
+                      <button
+                        type="button"
+                        className="absolute right-4 top-4 z-10"
+                        onClick={(e) => {
+                          e.preventDefault();
+                          const isValidNoOfImages =
+                            handleCheckIsNoOfImagesValid(gallery, 4);
+                          if (!isValidNoOfImages) {
+                            return;
+                          }
+                          const updatedGallery = gallery.filter(
+                            (f) => f.lastModified !== image.lastModified,
+                          );
+                          setValue('gallery', updatedGallery);
+                        }}
+                      >
+                        <CloseIcon className="mb-2 size-6" strokeWidth={1.7} />
+                      </button>
                       <Image
                         key={image.size}
                         src={`${URL.createObjectURL(image)}`}
@@ -780,7 +767,7 @@ function EditHospital({ params: { id } }: { params: { id: string } }) {
                       />
                       <button
                         type="button"
-                        className="absolute right-2 top-2"
+                        className="absolute right-4 top-4 z-10 rounded-full bg-white p-1"
                         onClick={(e) => {
                           e.preventDefault();
                           const isValidNoOfImages =
@@ -836,12 +823,34 @@ function EditHospital({ params: { id } }: { params: { id: string } }) {
                           Array.isArray(gallery) &&
                           gallery.length > 0
                         ) {
-                          let files = Array.from(e.target.files);
-                          files = [...files, ...gallery];
-                          onChange(files);
+                          let totalImageFiles = Array.from(e.target.files);
+                          totalImageFiles = [...totalImageFiles, ...gallery];
+                          totalImageFiles = totalImageFiles.filter(
+                            (file, index, self) =>
+                              index ===
+                              self.findIndex(
+                                (f) =>
+                                  f.size === file.size &&
+                                  f.name === file.name &&
+                                  f.type === file.type &&
+                                  f.lastModified === file.lastModified,
+                              ),
+                          );
+                          onChange(totalImageFiles);
                           return;
                         }
-                        const files = Array.from(e.target.files);
+                        let files = Array.from(e.target.files);
+                        files = files.filter(
+                          (file, index, self) =>
+                            index ===
+                            self.findIndex(
+                              (f) =>
+                                f.size === file.size &&
+                                f.name === file.name &&
+                                f.type === file.type &&
+                                f.lastModified === file.lastModified,
+                            ),
+                        );
                         onChange(files);
                       }
                     }}

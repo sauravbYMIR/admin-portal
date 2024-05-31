@@ -23,6 +23,7 @@ import { AddTeamMemberAPI } from '@/components/Modal/AddTeamMemberAPI/AddTeamMem
 import type { NameJSONType } from '@/hooks/useDepartment';
 import { useGetHospitalProcedureById } from '@/hooks/useHospitalProcedure';
 import emptyTeamMember from '@/public/assets/images/emptyTeamMember.svg';
+import { convertToValidCurrency } from '@/utils/global';
 
 import style from '../../hospitalDetailPage.module.scss';
 
@@ -168,9 +169,15 @@ function HospitalDetailsPage({
                   <p className="font-lexend text-lg font-normal text-neutral-2">
                     Cost of procedure
                   </p>
-                  <p className="font-lexend text-base font-light text-neutral-2">
-                    € {hospitalProcedureId.data.data.cost.price}
-                  </p>
+                  {hospitalProcedureId.data.data.cost.price && (
+                    <p className="font-lexend text-base font-light text-neutral-2">
+                      {convertToValidCurrency({
+                        price: hospitalProcedureId.data.data.cost.price,
+                        currency: hospitalProcedureId.data.data.cost.currency,
+                        locale: 'en',
+                      })}
+                    </p>
+                  )}
                 </div>
                 <div className="flex flex-col items-start justify-start">
                   <p className="font-lexend text-lg font-normal text-neutral-2">
@@ -251,6 +258,7 @@ function HospitalDetailsPage({
                         alt="empty-team-member-list"
                         width={160}
                         height={160}
+                        className="size-[160px]"
                       />
                       <p className="mb-7 mt-3 font-poppins text-base font-normal text-neutral-2">
                         No team member have been added yet!

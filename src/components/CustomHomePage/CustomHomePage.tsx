@@ -13,9 +13,9 @@ function CustomHomePage({
         <h2 className="font-poppins text-4xl font-medium text-darkslategray">
           {heading}
         </h2>
-        <p className="font-poppins text-base font-normal text-neutral-2">
+        <div className="font-poppins text-base font-normal text-neutral-2">
           {subHeading}
-        </p>
+        </div>
       </div>
       {children}
     </div>

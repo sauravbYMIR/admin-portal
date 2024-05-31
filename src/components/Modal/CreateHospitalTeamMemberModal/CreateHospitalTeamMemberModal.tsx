@@ -74,7 +74,7 @@ function CreateHospitalTeamMemberModal({
   });
   const [showLogoOverlay, setShowLogoOverlay] = React.useState<boolean>(false);
   const profileRef = React.useRef<HTMLInputElement>(null);
-  const editHospitalMember = useEditHospitalMember({ onClose });
+  const editHospitalMember = useEditHospitalMember({ onClose, reset });
   const memberByIdDetails = useGetHospitalTeamMemberById({ id: memberId });
   const [isAnotherMemberChecked, setIsAnotherMemberChecked] =
     React.useState<boolean>(false);

@@ -1,3 +1,5 @@
+/* eslint-disable jsx-a11y/no-static-element-interactions */
+/* eslint-disable jsx-a11y/click-events-have-key-events */
 /* eslint-disable no-nested-ternary */
 /* eslint-disable unused-imports/no-unused-vars */
 /* eslint-disable @typescript-eslint/naming-convention */
@@ -20,7 +22,11 @@ import { useGetAllDepartmentWithProcedure } from '@/hooks/useDepartment';
 import editIcon from '@/public/assets/icons/edit.svg';
 import emptyState from '@/public/assets/images/emptyState.svg';
 import type { LangType } from '@/types/global';
-import { countryData } from '@/utils/global';
+import {
+  availableCountriesByCountryCode,
+  convertToValidCurrency,
+  countryData,
+} from '@/utils/global';
 
 import proceduresStyle from './procedures.module.scss';
 
@@ -31,12 +37,24 @@ function ReimbursementWrapper({
   name?: string;
   value: number;
 }) {
+  const countryName = countryData.find((c) => c.countryCode === name)?.name;
   return (
     <div key={name} className="w-1/2 p-3">
       <p className="font-lexend text-xl font-normal text-neutral-2">
-        Reimbursement for {name}
+        Reimbursement for {countryName}
       </p>
-      <p className="font-lexend text-base font-light">{value}</p>
+      {value && name && (
+        <p className="font-lexend text-base font-light">
+          {convertToValidCurrency({
+            price: value,
+            currency:
+              availableCountriesByCountryCode[
+                name as keyof typeof availableCountriesByCountryCode
+              ].currency,
+            locale: name,
+          })}
+        </p>
+      )}
     </div>
   );
 }
@@ -88,6 +106,13 @@ function ProceduresList() {
   const [updateId, setUpdateId] = React.useState<string>('');
   const [isEditData, setIsEditData] = React.useState<boolean>(false);
   const departmentProcedureList = useGetAllDepartmentWithProcedure();
+  const [isOpen, setIsOpen] = React.useState<{
+    id: string;
+    isVisible: boolean;
+  }>({
+    id: '',
+    isVisible: false,
+  });
   return (
     <>
       {editDepartmentModalOpen && (
@@ -186,9 +211,16 @@ function ProceduresList() {
                             (subCategoryData) => {
                               return (
                                 <ul key={subCategoryData.id}>
-                                  <li className="flex items-center justify-between px-4 py-2">
-                                    <p className="font-poppins text-sm font-medium text-darkteal">
-                                      {/* <span className="mr-1">{index + 1}.</span> */}
+                                  <div
+                                    className="my-2 flex cursor-pointer items-center justify-between rounded-lg bg-neutral-6 px-4 py-[14px]"
+                                    onClick={() =>
+                                      setIsOpen((prevState) => ({
+                                        id: subCategoryData.id,
+                                        isVisible: !prevState.isVisible,
+                                      }))
+                                    }
+                                  >
+                                    <p className="font-poppins text-base font-normal text-neutral-1">
                                       <span>{subCategoryData.name.en}</span>
                                     </p>
                                     <button
@@ -211,67 +243,75 @@ function ProceduresList() {
                                         alt="sub category edit icon"
                                       />
                                     </button>
-                                  </li>
+                                  </div>
 
-                                  {subCategoryData.procedures.length > 0 && (
-                                    <div
-                                      className={
-                                        proceduresStyle.subCategoryAccordionContainer
-                                      }
-                                      style={{
-                                        marginLeft: '1.5rem',
-                                      }}
-                                    >
-                                      {subCategoryData.procedures.map(
-                                        (procedure) => {
-                                          return (
-                                            <Accordion
-                                              key={procedure.id}
-                                              title={procedure.name.en}
-                                              editClickHandler={() => {
-                                                setUpdateId(procedure.id);
-                                                setIsEditData(true);
-                                                setEditProcedureModalOpen(true);
-                                                setIsEditSubCategory(false);
-                                                setEditSubCategoryModalOpen(
-                                                  false,
+                                  {isOpen.id === subCategoryData.id &&
+                                    isOpen.isVisible && (
+                                      <div>
+                                        {subCategoryData.procedures.length >
+                                          0 && (
+                                          <div
+                                            className={
+                                              proceduresStyle.subCategoryAccordionContainer
+                                            }
+                                            style={{
+                                              marginLeft: '1.5rem',
+                                            }}
+                                          >
+                                            {subCategoryData.procedures.map(
+                                              (procedure) => {
+                                                return (
+                                                  <Accordion
+                                                    key={procedure.id}
+                                                    title={procedure.name.en}
+                                                    editClickHandler={() => {
+                                                      setUpdateId(procedure.id);
+                                                      setIsEditData(true);
+                                                      setEditProcedureModalOpen(
+                                                        true,
+                                                      );
+                                                      setIsEditSubCategory(
+                                                        false,
+                                                      );
+                                                      setEditSubCategoryModalOpen(
+                                                        false,
+                                                      );
+                                                      setEditDepartmentModalOpen(
+                                                        false,
+                                                      );
+                                                    }}
+                                                    type="PROCEDURE"
+                                                  >
+                                                    <div className="flex flex-wrap items-center">
+                                                      {Object.keys(
+                                                        procedure.reimbursement,
+                                                      ).map((key) => {
+                                                        const reimbursementKey =
+                                                          key as LangType;
+                                                        return (
+                                                          <ReimbursementWrapper
+                                                            key={
+                                                              reimbursementKey
+                                                            }
+                                                            name={key}
+                                                            value={
+                                                              procedure
+                                                                .reimbursement[
+                                                                reimbursementKey
+                                                              ]
+                                                            }
+                                                          />
+                                                        );
+                                                      })}
+                                                    </div>
+                                                  </Accordion>
                                                 );
-                                                setEditDepartmentModalOpen(
-                                                  false,
-                                                );
-                                              }}
-                                              type="PROCEDURE"
-                                            >
-                                              <div className="flex flex-wrap items-center">
-                                                {Object.keys(
-                                                  procedure.reimbursement,
-                                                ).map((key) => {
-                                                  const reimbursementKey =
-                                                    key as LangType;
-                                                  const countryName =
-                                                    countryData.find(
-                                                      (c) =>
-                                                        c.countryCode === key,
-                                                    )?.name;
-                                                  return (
-                                                    <ReimbursementWrapper
-                                                      key={reimbursementKey}
-                                                      name={countryName}
-                                                      value={
-                                                        procedure.reimbursement[
-                                                          reimbursementKey
-                                                        ]
-                                                      }
-                                                    />
-                                                  );
-                                                })}
-                                              </div>
-                                            </Accordion>
-                                          );
-                                        },
-                                      )}
-                                    </div>
-                                  )}
+                                              },
+                                            )}
+                                          </div>
+                                        )}
+                                      </div>
+                                    )}
                                 </ul>
                               );
                             },
@@ -301,13 +341,10 @@ function ProceduresList() {
                                       (key) => {
                                         const reimbursementKey =
                                           key as LangType;
-                                        const countryName = countryData.find(
-                                          (c) => c.countryCode === key,
-                                        )?.name;
                                         return (
                                           <ReimbursementWrapper
                                             key={reimbursementKey}
-                                            name={countryName}
+                                            name={key}
                                             value={
                                               procedure.reimbursement[
                                                 reimbursementKey

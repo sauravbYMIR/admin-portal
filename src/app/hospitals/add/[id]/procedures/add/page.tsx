@@ -133,10 +133,6 @@ const hospitalProcedureObj = {
 function AddHospitalProcedure({ params }: { params: { id: string } }) {
   const updateHospitalProcedureGallery = useUpdateHospitalProcedureGallery();
   const galleryRef = React.useRef<HTMLInputElement>(null);
-  const [isShowRemoveImgBtn, setIsShowRemoveImgBtn] = React.useState<{
-    lastModified: number;
-    isShow: boolean;
-  }>({ lastModified: 0, isShow: false });
   const [isCreateHospitalTeamModal, setIsCreateHospitalTeamModal] =
     React.useState<boolean>(false);
   const createHospitalProcedure = useCreateHospitalProcedure();
@@ -591,50 +587,29 @@ function AddHospitalProcedure({ params }: { params: { id: string } }) {
               {gallery && gallery.length > 0 && (
                 <div className="flex w-full flex-wrap items-center gap-x-4 gap-y-2">
                   {gallery.map((file) => (
-                    <div
-                      onMouseEnter={() =>
-                        setIsShowRemoveImgBtn(() => ({
-                          lastModified: file.lastModified,
-                          isShow: true,
-                        }))
-                      }
-                      onMouseLeave={() =>
-                        setIsShowRemoveImgBtn(() => ({
-                          lastModified: file.lastModified,
-                          isShow: false,
-                        }))
-                      }
-                      className="relative size-[180px] cursor-pointer rounded-lg border border-neutral-4"
-                      key={file.size}
-                    >
-                      {isShowRemoveImgBtn.lastModified === file.lastModified &&
-                        isShowRemoveImgBtn.isShow && (
-                          <button
-                            type="button"
-                            className="absolute right-4 top-4 z-10"
-                            onClick={() => {
-                              const updatedGallery = gallery.filter(
-                                (f) =>
-                                  f.lastModified !==
-                                  isShowRemoveImgBtn.lastModified,
-                              );
-                              setValue('gallery', updatedGallery);
-                            }}
-                          >
-                            <CloseIcon
-                              className="mb-2 size-6"
-                              strokeWidth={1.7}
-                            />
-                          </button>
-                        )}
-                      <Image
-                        src={`${URL.createObjectURL(file)}`}
-                        alt={`hospitalGallery-${file.size}`}
-                        key={`hospitalGallery-${file.size}`}
-                        fill
-                        priority
-                        unoptimized
-                      />
+                    <div className="relative" key={file.size}>
+                      <div className="size-[180px] cursor-pointer rounded-lg border border-neutral-4">
+                        <Image
+                          src={`${URL.createObjectURL(file)}`}
+                          alt={`hospitalGallery-${file.size}`}
+                          key={`hospitalGallery-${file.size}`}
+                          fill
+                          priority
+                          unoptimized
+                        />
+                      </div>
+                      <button
+                        type="button"
+                        className="absolute right-4 top-4 z-10 rounded-full bg-white p-1"
+                        onClick={() => {
+                          const updatedGallery = gallery.filter(
+                            (f) => f.lastModified !== file.lastModified,
+                          );
+                          setValue('gallery', updatedGallery);
+                        }}
+                      >
+                        <CloseIcon className="size-4" strokeWidth={3} />
+                      </button>
                     </div>
                   ))}
                 </div>
@@ -667,12 +642,37 @@ function AddHospitalProcedure({ params }: { params: { id: string } }) {
                               Array.isArray(gallery) &&
                               gallery.length > 0
                             ) {
-                              let files = Array.from(e.target.files);
-                              files = [...files, ...gallery];
-                              onChange(files);
+                              let totalImageFiles = Array.from(e.target.files);
+                              totalImageFiles = [
+                                ...totalImageFiles,
+                                ...gallery,
+                              ];
+                              totalImageFiles = totalImageFiles.filter(
+                                (file, index, self) =>
+                                  index ===
+                                  self.findIndex(
+                                    (f) =>
+                                      f.size === file.size &&
+                                      f.name === file.name &&
+                                      f.type === file.type &&
+                                      f.lastModified === file.lastModified,
+                                  ),
+                              );
+                              onChange(totalImageFiles);
                               return;
                             }
-                            const files = Array.from(e.target.files);
+                            let files = Array.from(e.target.files);
+                            files = files.filter(
+                              (file, index, self) =>
+                                index ===
+                                self.findIndex(
+                                  (f) =>
+                                    f.size === file.size &&
+                                    f.name === file.name &&
+                                    f.type === file.type &&
+                                    f.lastModified === file.lastModified,
+                                ),
+                            );
                             onChange(files);
                           }
                         }}
@@ -706,7 +706,18 @@ function AddHospitalProcedure({ params }: { params: { id: string } }) {
                         onChange={(e) => {
                           if (e.target.files) {
                             const files = Array.from(e.target.files);
-                            onChange(files);
+                            const updatedFiles = files.filter(
+                              (file, index, self) =>
+                                index ===
+                                self.findIndex(
+                                  (f) =>
+                                    f.size === file.size &&
+                                    f.name === file.name &&
+                                    f.type === file.type &&
+                                    f.lastModified === file.lastModified,
+                                ),
+                            );
+                            onChange(updatedFiles);
                           }
                         }}
                         className="invisible absolute"
@@ -772,6 +783,7 @@ function AddHospitalProcedure({ params }: { params: { id: string } }) {
                   alt="empty-team-member-list"
                   width={160}
                   height={160}
+                  className="size-[160px]"
                 />
                 <p className="mb-7 mt-3 font-poppins text-base font-normal text-neutral-2">
                   No team member have been added yet!

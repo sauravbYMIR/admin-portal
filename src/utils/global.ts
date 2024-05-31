@@ -50,6 +50,36 @@ export const availableCountries = {
     flagIcon: swedenFlag,
   },
 };
+export const availableCountriesByCountryCode = {
+  ie: {
+    language: 'English',
+    locale: 'en',
+    currency: 'EUR',
+    countryCode: 'ie',
+    flagIcon: irelandFlag,
+  },
+  no: {
+    language: 'Norwegian',
+    locale: 'nb',
+    currency: 'NOK',
+    countryCode: 'no',
+    flagIcon: norwayFlag,
+  },
+  dk: {
+    language: 'Danish',
+    locale: 'da',
+    currency: 'DKK',
+    countryCode: 'dk',
+    flagIcon: denmarkFlag,
+  },
+  se: {
+    language: 'Swedish',
+    locale: 'sv',
+    currency: 'SEK',
+    countryCode: 'se',
+    flagIcon: swedenFlag,
+  },
+};
 
 const countryData: CountryData[] = [
   {
@@ -137,9 +167,20 @@ const SERVER_ERROR_MESSAGE = {
   'Hospital-procedure-already-present': 'Hospital procedure already present',
 };
 
+const convertToValidCurrency = ({
+  locale,
+  price,
+  currency,
+}: {
+  locale: string;
+  price: number;
+  currency: string;
+}) => price.toLocaleString(locale, { style: 'currency', currency });
+
 export {
   ACCEPT,
   ACCEPTED,
+  convertToValidCurrency,
   countryData,
   handleGetLocalStorage,
   handleRemoveFromLocalStorage,

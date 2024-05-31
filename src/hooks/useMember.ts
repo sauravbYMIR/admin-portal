@@ -192,8 +192,10 @@ export const editHospitalMember = async ({
 
 export const useEditHospitalMember = ({
   onClose,
+  reset,
 }: {
   onClose: (() => void) | null;
+  reset: (() => void) | null;
 }) => {
   const queryClient = useQueryClient();
   return useMutation({
@@ -205,6 +207,9 @@ export const useEditHospitalMember = ({
       toast.success('Hospital member updated successfully!');
       if (onClose) {
         onClose();
+      }
+      if (reset) {
+        reset();
       }
     },
     onError: (error) => {

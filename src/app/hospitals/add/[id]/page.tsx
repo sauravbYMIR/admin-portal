@@ -218,9 +218,6 @@ function HospitalDetailsPage({ params: { id } }: { params: { id: string } }) {
               <>
                 {hospitalById.data.data.members.length === 0 ? (
                   <div className="mb-12 flex w-full flex-col items-start">
-                    {/* <h3 className="my-8 font-poppins text-lg font-medium text-neutral-1">
-                      Team members
-                    </h3> */}
                     <div
                       className="flex w-full flex-col items-center justify-center rounded-xl border py-10"
                       style={{
@@ -232,6 +229,7 @@ function HospitalDetailsPage({ params: { id } }: { params: { id: string } }) {
                         alt="empty-team-member-list"
                         width={160}
                         height={160}
+                        className="size-[160px]"
                       />
                       <p className="mb-7 mt-3 font-poppins text-base font-normal text-neutral-2">
                         No team member have been added yet!
@@ -338,7 +336,7 @@ function HospitalDetailsPage({ params: { id } }: { params: { id: string } }) {
             <CreateHospitalTeamMemberModal
               isOpen={isCreateHospitalTeamModal}
               onClose={() => {
-                setIsEditTeamMember(false);
+                // setIsEditTeamMember(false);
                 setTeamMemberId('');
                 setIsCreateHospitalTeamModal(false);
               }}

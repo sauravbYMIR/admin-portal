@@ -24,6 +24,14 @@ export type HospitalProcedureType = {
     category: {
       id: string;
       name: NameJSONType;
+      parentCategory: {
+        id: string;
+        name: NameJSONType;
+        parentCategoryId: null;
+        createdAt: string;
+        updatedAt: string;
+        deletedAt: null | string;
+      };
     };
     id: string;
     name: NameJSONType;

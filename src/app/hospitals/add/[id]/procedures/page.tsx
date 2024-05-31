@@ -154,7 +154,7 @@ function HospitalProcedureManagement() {
                 // onCellClicked={onCellClicked}
                 rowData={procedureByHospitalId.data.data.map((r) => ({
                   name: `${r.procedure.name.en}`,
-                  department: `${r.procedure.category.parentCategory.name.en} - ${r.procedure.category.name.en}`,
+                  department: `${r.procedure.category?.parentCategory?.name ? `${r.procedure.category?.parentCategory?.name.en} - ${r.procedure?.category?.name?.en}` : `${r.procedure?.category?.name?.en}`}`,
                   waitTime: r.waitingTime,
                   cost:
                     r.cost.price && typeof r.cost.price === 'number'

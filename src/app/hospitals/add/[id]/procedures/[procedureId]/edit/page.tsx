@@ -547,8 +547,29 @@ function EditHospitalProcedure({
                       onBlur={onBlur}
                       onChange={(e) => {
                         if (e.target.files) {
-                          const files = Array.from(e.target.files);
-                          const updatedFiles = files.filter(
+                          if (
+                            gallery &&
+                            Array.isArray(gallery) &&
+                            gallery.length > 0
+                          ) {
+                            let totalImageFiles = Array.from(e.target.files);
+                            totalImageFiles = [...totalImageFiles, ...gallery];
+                            totalImageFiles = totalImageFiles.filter(
+                              (file, index, self) =>
+                                index ===
+                                self.findIndex(
+                                  (f) =>
+                                    f.size === file.size &&
+                                    f.name === file.name &&
+                                    f.type === file.type &&
+                                    f.lastModified === file.lastModified,
+                                ),
+                            );
+                            onChange(totalImageFiles);
+                            return;
+                          }
+                          let files = Array.from(e.target.files);
+                          files = files.filter(
                             (file, index, self) =>
                               index ===
                               self.findIndex(
@@ -559,7 +580,7 @@ function EditHospitalProcedure({
                                   f.lastModified === file.lastModified,
                               ),
                           );
-                          onChange(updatedFiles);
+                          onChange(files);
                         }
                       }}
                       className="invisible absolute"

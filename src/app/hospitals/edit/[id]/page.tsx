@@ -723,7 +723,7 @@ function EditHospital({ params: { id } }: { params: { id: string } }) {
                     >
                       <button
                         type="button"
-                        className="absolute right-4 top-4 z-10"
+                        className="absolute right-4 top-4 z-10 rounded-full bg-white p-1"
                         onClick={(e) => {
                           e.preventDefault();
                           const isValidNoOfImages =
@@ -737,7 +737,7 @@ function EditHospital({ params: { id } }: { params: { id: string } }) {
                           setValue('gallery', updatedGallery);
                         }}
                       >
-                        <CloseIcon className="mb-2 size-6" strokeWidth={1.7} />
+                        <CloseIcon className="size-4" strokeWidth={3} />
                       </button>
                       <Image
                         key={image.size}
@@ -789,7 +789,7 @@ function EditHospital({ params: { id } }: { params: { id: string } }) {
                           ]);
                         }}
                       >
-                        <CloseIcon />
+                        <CloseIcon className="size-4" strokeWidth={3} />
                       </button>
                     </div>
                   ))}

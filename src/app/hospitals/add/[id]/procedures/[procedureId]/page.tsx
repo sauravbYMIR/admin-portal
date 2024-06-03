@@ -164,7 +164,7 @@ function HospitalDetailsPage({
             )}
 
             {hospitalProcedureId.isSuccess && hospitalProcedureId.data.data && (
-              <div className="flex w-[520px] flex-wrap items-center gap-x-20 gap-y-10">
+              <div className="grid w-[520px] grid-cols-2 gap-x-20 gap-y-10">
                 <div className="flex flex-col items-start justify-start">
                   <p className="font-lexend text-lg font-normal text-neutral-2">
                     Cost of procedure
@@ -203,40 +203,43 @@ function HospitalDetailsPage({
                     {hospitalProcedureId.data.data.stayInHospital}
                   </p>
                 </div>
-                {hospitalProcedureId.data &&
-                  hospitalProcedureId.data.data &&
-                  hospitalProcedureId.data.data.hospitalProcedureImages &&
-                  Array.isArray(
-                    hospitalProcedureId.data.data.hospitalProcedureImages,
-                  ) &&
-                  hospitalProcedureId.data.data.hospitalProcedureImages.length >
-                    0 && (
-                    <div className="flex w-full flex-col items-start">
-                      <h3 className="mb-7 font-poppins text-lg font-normal text-neutral-1">
-                        Procedure related images
-                      </h3>
-                      <div className="flex w-full flex-row flex-wrap items-center gap-8">
-                        {hospitalProcedureId.data.data.hospitalProcedureImages.map(
-                          (file) => {
-                            return (
-                              <Image
-                                key={file.id}
-                                src={`${file.imageUrl}?version=${new Date().getTime()}`}
-                                width={220}
-                                height={220}
-                                priority
-                                unoptimized
-                                alt="hospital-gallery"
-                                className="size-[220px] rounded-lg object-contain"
-                              />
-                            );
-                          },
-                        )}
-                      </div>
-                    </div>
-                  )}
               </div>
             )}
+
+            {hospitalProcedureId.isSuccess &&
+              hospitalProcedureId.data.data &&
+              hospitalProcedureId.data &&
+              hospitalProcedureId.data.data &&
+              hospitalProcedureId.data.data.hospitalProcedureImages &&
+              Array.isArray(
+                hospitalProcedureId.data.data.hospitalProcedureImages,
+              ) &&
+              hospitalProcedureId.data.data.hospitalProcedureImages.length >
+                0 && (
+                <div className="mt-12 flex w-full flex-col items-start">
+                  <h3 className="mb-7 font-poppins text-lg font-normal text-neutral-1">
+                    Procedure related images
+                  </h3>
+                  <div className="flex w-full flex-row flex-wrap items-center gap-8">
+                    {hospitalProcedureId.data.data.hospitalProcedureImages.map(
+                      (file) => {
+                        return (
+                          <Image
+                            key={file.id}
+                            src={`${file.imageUrl}?version=${new Date().getTime()}`}
+                            width={220}
+                            height={220}
+                            priority
+                            unoptimized
+                            alt="hospital-gallery"
+                            className="size-[220px] rounded-lg object-contain"
+                          />
+                        );
+                      },
+                    )}
+                  </div>
+                </div>
+              )}
 
             <h3 className={style.subTitle} style={{ marginTop: '40px' }}>
               Team members

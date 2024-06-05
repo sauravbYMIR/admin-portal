@@ -13,7 +13,6 @@ import { useGetAllBookings, useUpdateBookingStatus } from '@/hooks/useBooking';
 import emptyState from '@/public/assets/images/emptyState.svg';
 import { ACCEPT, ACCEPTED, REJECT, REJECTED, REQUESTED } from '@/utils/global';
 
-import patientsTableStyle from '../../components/Table/PatientsTable/patientsTable.module.scss';
 import patientsStyle from './patients.module.scss';
 
 const EmptyBookingsPage = () => {
@@ -28,18 +27,6 @@ const EmptyBookingsPage = () => {
       <p className="mb-7 mt-3 font-poppins text-base font-normal text-neutral-2">
         No bookings have been created yet!
       </p>
-      {/* <button
-        type="button"
-        className="flex cursor-pointer items-center gap-3 rounded-lg bg-darkteal px-6 py-[14px]"
-        onClick={() =>
-          router.push(`/hospitals/add/${hospitalId}/procedures/add`)
-        }
-      >
-        <PlusIcon className="size-5" stroke="#fff" />
-        <p className="font-poppins text-base font-semibold text-primary-6">
-          Add procedures
-        </p>
-      </button> */}
     </div>
   );
 };
@@ -59,12 +46,12 @@ const CustomStatusEditComponent = (props: CustomCellRendererProps) => {
     }
   }, [updateBookingStatus.isSuccess]);
   return (
-    <div className={patientsTableStyle.patientsTableBtnContainer}>
+    <div className="flex items-center gap-x-8">
       {props.data.status === REQUESTED && (
         <>
           <button
             type="button"
-            className={patientsTableStyle.patientsTableAcceptBtn}
+            className="flex h-[41px] items-center justify-center rounded-[6.4px] bg-darkteal px-5 py-[10px]"
             onClick={() => {
               setLoadingType(ACCEPT);
               updateBookingStatus.mutate({
@@ -82,12 +69,14 @@ const CustomStatusEditComponent = (props: CustomCellRendererProps) => {
                 data-testid="loader"
               />
             ) : (
-              <span>Accept</span>
+              <span className="font-poppins text-sm font-semibold text-white">
+                Accept
+              </span>
             )}
           </button>
           <button
             type="button"
-            className={patientsTableStyle.patientsTableRejectBtn}
+            className="flex h-[41px] items-center justify-center rounded-[6.4px] border-2 border-darkteal px-5 py-[10px]"
             onClick={() => {
               setLoadingType(REJECT);
               updateBookingStatus.mutate({
@@ -105,7 +94,9 @@ const CustomStatusEditComponent = (props: CustomCellRendererProps) => {
                 data-testid="loader"
               />
             ) : (
-              <span>Reject</span>
+              <span className="font-poppins text-sm font-semibold text-darkteal">
+                Reject
+              </span>
             )}
           </button>
         </>
@@ -115,39 +106,13 @@ const CustomStatusEditComponent = (props: CustomCellRendererProps) => {
         className="cursor-pointer border-none underline decoration-darkteal decoration-2 underline-offset-[5px]"
         onClick={handleClickInfoLink}
       >
-        <span className="text-darkteal">View more</span>
+        <span className="text-darkteal">View</span>
       </button>
     </div>
   );
 };
 function PatientsPage() {
   const allBookings = useGetAllBookings();
-  // const onCellClicked = async (params: any) => {
-  //   // if (params.type === 'cellEditingStopped') {
-  //   //   try {
-  //   //     const r = await editHospital({
-  //   //       name: params.data.hospital_name,
-  //   //       description: {
-  //   //         en: params.data.description.en,
-  //   //         sv: params.data.description.sv,
-  //   //         da: params.data.description.da,
-  //   //         nb: params.data.description.nb,
-  //   //       },
-  //   //       streetName: params.data.streetName,
-  //   //       streetNumber: params.data.streetNumber,
-  //   //       city: params.data.city,
-  //   //       country: params.data.location,
-  //   //       zipcode: params.data.zipCode,
-  //   //       hospitalId: params.data.hospital_id,
-  //   //     });
-  //   //     if (r.success) {
-  //   //       toast.success('Changes updated successfully');
-  //   //     }
-  //   //   } catch (e) {
-  //   //     toast.error('error while updated hospital procedure');
-  //   //   }
-  //   // }
-  // };
   return (
     <div>
       <Header />
@@ -164,7 +129,6 @@ function PatientsPage() {
         Array.isArray(allBookings.data.data) &&
         allBookings.data.data.length > 0 ? (
           <ShowDataTable
-            // onCellClicked={onCellClicked}
             rowData={allBookings.data.data.map((r) => ({
               procedure: r.procedureName.en,
               hospital: r.hospitalName,

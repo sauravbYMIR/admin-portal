@@ -11,12 +11,12 @@ import { z } from 'zod';
 
 import departmentModalStyle from '@/components/Modal/DepartmentModal/departmentModal.module.scss';
 import procedureModalStyle from '@/components/Modal/ProcedureModal/procedureModal.module.scss';
+import type {
+  NameJSONType,
+  ReimbursementJSONType,
+} from '@/hooks/useDepartment';
 import { useGetAllDepartment } from '@/hooks/useDepartment';
-import {
-  useCreateProcedure,
-  useEditProcedure,
-  useGetProcedureById,
-} from '@/hooks/useProcedure';
+import { useCreateProcedure, useEditProcedure } from '@/hooks/useProcedure';
 import type { LanguagesType } from '@/types/components';
 import { countryData } from '@/utils/global';
 
@@ -24,6 +24,15 @@ interface CreateProcedureFormPropType {
   isEdit: boolean;
   updateId: string;
   onClose: () => void;
+  selectedData: null | {
+    id: string;
+    name: NameJSONType;
+    reimbursement: ReimbursementJSONType;
+    category: {
+      id: string;
+      name: NameJSONType;
+    };
+  };
 }
 
 export type ProcedureFormSchemaType =
@@ -91,12 +100,12 @@ function CreateProcedureForm({
   isEdit,
   updateId,
   onClose,
+  selectedData,
 }: CreateProcedureFormPropType) {
   const [selectedOption, setSelectedOption] = React.useState<{
     label: string;
     value: string;
   } | null>(null);
-  const reqProcedure = useGetProcedureById({ id: updateId });
   const editProcedure = useEditProcedure({ onClose });
   const allDepartment = useGetAllDepartment();
   const [activeLanguageTab, setActiveLanguageTab] =
@@ -195,59 +204,41 @@ function CreateProcedureForm({
   };
 
   React.useEffect(() => {
-    if (
-      updateId &&
-      reqProcedure.isSuccess &&
-      reqProcedure.data &&
-      reqProcedure.data.success &&
-      reqProcedure.data.data.id
-    ) {
+    if (selectedData && selectedData.id && selectedData?.category) {
       setSelectedOption({
         value:
-          reqProcedure.data.data.category.name.en ||
-          reqProcedure.data.data.category.name.da ||
-          reqProcedure.data.data.category.name.sv ||
-          reqProcedure.data.data.category.name.nb,
-        label: reqProcedure.data.data.category.id,
+          selectedData.category.name.en ||
+          selectedData.category.name.da ||
+          selectedData.category.name.sv ||
+          selectedData.category.name.nb,
+        label: selectedData.category.id,
       });
       setValue(
         'department.label',
-        reqProcedure.data.data.category.name.en ||
-          reqProcedure.data.data.category.name.nb ||
-          reqProcedure.data.data.category.name.da ||
-          reqProcedure.data.data.category.name.sv,
+        selectedData.category.name.en ||
+          selectedData.category.name.nb ||
+          selectedData.category.name.da ||
+          selectedData.category.name.sv,
       );
-      setValue('department.value', reqProcedure.data.data.category.id);
-      setValue('procedureEn', reqProcedure.data.data.name.en);
-      setValue('procedureDa', reqProcedure.data.data.name.da);
-      setValue('procedureSv', reqProcedure.data.data.name.sv);
-      setValue('procedureNb', reqProcedure.data.data.name.nb);
-      if (reqProcedure.data.data.reimbursement?.ie) {
-        setValue(
-          'reimbursementIe',
-          reqProcedure.data.data.reimbursement.ie.toString(),
-        );
+      setValue('department.value', selectedData.category.id);
+      setValue('procedureEn', selectedData.name.en);
+      setValue('procedureDa', selectedData.name.da);
+      setValue('procedureSv', selectedData.name.sv);
+      setValue('procedureNb', selectedData.name.nb);
+      if (selectedData.reimbursement?.ie) {
+        setValue('reimbursementIe', selectedData.reimbursement.ie.toString());
       }
-      if (reqProcedure.data.data.reimbursement?.no) {
-        setValue(
-          'reimbursementNo',
-          reqProcedure.data.data.reimbursement.no.toString(),
-        );
+      if (selectedData.reimbursement?.no) {
+        setValue('reimbursementNo', selectedData.reimbursement.no.toString());
       }
-      if (reqProcedure.data.data.reimbursement?.se) {
-        setValue(
-          'reimbursementSe',
-          reqProcedure.data.data.reimbursement.se.toString(),
-        );
+      if (selectedData.reimbursement?.se) {
+        setValue('reimbursementSe', selectedData.reimbursement.se.toString());
       }
-      if (reqProcedure.data.data.reimbursement?.dk) {
-        setValue(
-          'reimbursementDk',
-          reqProcedure.data.data.reimbursement.dk.toString(),
-        );
+      if (selectedData.reimbursement?.dk) {
+        setValue('reimbursementDk', selectedData.reimbursement.dk.toString());
       }
     }
-  }, [reqProcedure.data, reqProcedure.isSuccess, setValue, updateId]);
+  }, [setValue, selectedData]);
 
   const onFormSubmit: SubmitHandler<ProcedureFormFields> = (
     data: ProcedureFormFields,

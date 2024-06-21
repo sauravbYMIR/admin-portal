@@ -11,11 +11,8 @@ import { ClipLoader } from 'react-spinners';
 import { z } from 'zod';
 
 import { CloseIcon } from '@/components/Icons/Icons';
-import {
-  useCreateDepartment,
-  useEditDepartment,
-  useGetDepartmentById,
-} from '@/hooks/useDepartment';
+import type { NameJSONType } from '@/hooks/useDepartment';
+import { useCreateDepartment, useEditDepartment } from '@/hooks/useDepartment';
 import type { LanguagesType } from '@/types/components';
 import { countryData } from '@/utils/global';
 
@@ -56,6 +53,10 @@ interface DepartmentModalProps {
   onClose: () => void;
   isEdit: boolean;
   updateId: string;
+  selectedDepartment: {
+    id: string;
+    name: NameJSONType;
+  } | null;
 }
 
 function DepartmentModal({
@@ -63,6 +64,7 @@ function DepartmentModal({
   onClose,
   isEdit,
   updateId,
+  selectedDepartment,
 }: DepartmentModalProps) {
   const deptObj = {
     English: 'nameEn',
@@ -81,7 +83,6 @@ function DepartmentModal({
   });
 
   const editDept = useEditDepartment({ isSubCat: false, onClose });
-  const reqdDept = useGetDepartmentById({ id: updateId });
   const [activeLanguageTab, setActiveLanguageTab] =
     useState<LanguagesType>('English');
   const [isChecked, setIsChecked] = useState<boolean>(false);
@@ -120,18 +121,13 @@ function DepartmentModal({
     }
   };
   React.useEffect(() => {
-    if (
-      updateId &&
-      reqdDept.isSuccess &&
-      reqdDept.data &&
-      reqdDept.data.success
-    ) {
-      setValue('nameEn', reqdDept.data.data.name.en);
-      setValue('nameDa', reqdDept.data.data.name.da);
-      setValue('nameSv', reqdDept.data.data.name.sv);
-      setValue('nameNb', reqdDept.data.data.name.nb);
+    if (selectedDepartment && selectedDepartment?.id) {
+      setValue('nameEn', selectedDepartment.name.en);
+      setValue('nameDa', selectedDepartment.name.da);
+      setValue('nameSv', selectedDepartment.name.sv);
+      setValue('nameNb', selectedDepartment.name.nb);
     }
-  }, [reqdDept.data, reqdDept.isSuccess, setValue, updateId]);
+  }, [selectedDepartment, setValue]);
 
   return (
     <div>

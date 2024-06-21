@@ -10,11 +10,11 @@ import { z } from 'zod';
 
 import departmentModalStyle from '@/components/Modal/DepartmentModal/departmentModal.module.scss';
 import procedureModalStyle from '@/components/Modal/ProcedureModal/procedureModal.module.scss';
+import type { NameJSONType } from '@/hooks/useDepartment';
 import {
   useCreateDepartment,
   useEditDepartment,
   useGetAllDepartment,
-  useGetDepartmentById,
 } from '@/hooks/useDepartment';
 import type { LanguagesType } from '@/types/components';
 import { countryData } from '@/utils/global';
@@ -26,6 +26,11 @@ interface CreateSubCategoryFormPropType {
   isEdit: boolean;
   updateId: string;
   onClose: () => void;
+  selectedData: null | {
+    id: string;
+    name: NameJSONType;
+    category: { id: string; name: NameJSONType };
+  };
 }
 
 export type SubCategoryFormSchemaType =
@@ -56,12 +61,12 @@ function CreateSubCategoryForm({
   isEdit,
   updateId,
   onClose,
+  selectedData,
 }: CreateSubCategoryFormPropType) {
   const [selectedOption, setSelectedOption] = React.useState<{
     label: string;
     value: string;
   } | null>(null);
-  const reqdDept = useGetDepartmentById({ id: updateId });
   const editDepartment = useEditDepartment({ isSubCat: true, onClose });
 
   const allDepartment = useGetAllDepartment();
@@ -140,35 +145,29 @@ function CreateSubCategoryForm({
   };
 
   React.useEffect(() => {
-    if (
-      updateId &&
-      reqdDept.isSuccess &&
-      reqdDept.data &&
-      reqdDept.data.success &&
-      reqdDept.data.data.id
-    ) {
+    if (selectedData && selectedData?.id && selectedData?.category) {
       setValue(
         'department.label',
-        reqdDept.data.data.parentCategory.name.en ||
-          reqdDept.data.data.parentCategory.name.da ||
-          reqdDept.data.data.parentCategory.name.nb ||
-          reqdDept.data.data.parentCategory.name.sv,
+        selectedData.category.name.en ||
+          selectedData.category.name.da ||
+          selectedData.category.name.nb ||
+          selectedData.category.name.sv,
       );
       setSelectedOption(() => ({
         label:
-          reqdDept.data.data.parentCategory.name.en ||
-          reqdDept.data.data.parentCategory.name.da ||
-          reqdDept.data.data.parentCategory.name.nb ||
-          reqdDept.data.data.parentCategory.name.sv,
-        value: reqdDept.data.data.parentCategory.id,
+          selectedData.category.name.en ||
+          selectedData.category.name.da ||
+          selectedData.category.name.nb ||
+          selectedData.category.name.sv,
+        value: selectedData.category.id,
       }));
-      setValue('department.value', reqdDept.data.data.parentCategory.id);
-      setValue('subCategoryEn', reqdDept.data.data.name.en);
-      setValue('subCategoryDa', reqdDept.data.data.name.da);
-      setValue('subCategorySv', reqdDept.data.data.name.sv);
-      setValue('subCategoryNb', reqdDept.data.data.name.nb);
+      setValue('department.value', selectedData.category.id);
+      setValue('subCategoryEn', selectedData.name.en);
+      setValue('subCategoryDa', selectedData.name.da);
+      setValue('subCategorySv', selectedData.name.sv);
+      setValue('subCategoryNb', selectedData.name.nb);
     }
-  }, [reqdDept.data, reqdDept.isSuccess, setValue, updateId]);
+  }, [selectedData, setValue]);
 
   const onFormSubmit: SubmitHandler<SubCategoryFormFields> = (
     data: SubCategoryFormFields,

@@ -11,6 +11,10 @@ import { useEffect, useState } from 'react';
 import CreateProcedureForm from '@/app/procedures/CreateProcedureForm/CreateProcedureForm';
 import CreateSubCategoryForm from '@/app/procedures/CreateProcedureForm/CreateSubCategoryForm';
 import { CloseIcon } from '@/components/Icons/Icons';
+import type {
+  NameJSONType,
+  ReimbursementJSONType,
+} from '@/hooks/useDepartment';
 
 import procedureModalStyle from './procedureModal.module.scss';
 
@@ -23,6 +27,25 @@ interface DepartmentModalProps {
   isEdit: boolean;
   editSubCategory?: boolean;
   updateId: string;
+  selectedData:
+    | null
+    | {
+        id: string;
+        name: NameJSONType;
+        category: {
+          id: string;
+          name: NameJSONType;
+        };
+      }
+    | {
+        id: string;
+        name: NameJSONType;
+        reimbursement: ReimbursementJSONType;
+        category: {
+          id: string;
+          name: NameJSONType;
+        };
+      };
 }
 
 function ProcedureModal({
@@ -31,6 +54,7 @@ function ProcedureModal({
   isEdit,
   editSubCategory,
   updateId,
+  selectedData,
 }: DepartmentModalProps) {
   const [radioType, setRadioType] = useState<'SUBCAT' | 'PROC' | ''>(PROC);
 
@@ -51,13 +75,13 @@ function ProcedureModal({
           <div className={procedureModalStyle.modal}>
             <div className={procedureModalStyle.modalHeader}>
               <h2 className="font-poppins text-lg font-semibold text-neutral-1">
-                {!isEdit
-                  ? radioType === PROC
-                    ? 'Create a procedure'
-                    : 'Create a sub category'
-                  : editSubCategory
+                {isEdit
+                  ? editSubCategory
                     ? 'Edit sub category'
-                    : 'Edit procedure'}
+                    : 'Edit procedure'
+                  : radioType === PROC
+                    ? 'Create a procedure'
+                    : 'Create a sub category'}
               </h2>
 
               <button
@@ -104,6 +128,7 @@ function ProcedureModal({
               {radioType === SUBCAT && (
                 <CreateSubCategoryForm
                   isEdit={isEdit}
+                  selectedData={selectedData}
                   updateId={updateId}
                   onClose={onClose}
                 />
@@ -111,6 +136,17 @@ function ProcedureModal({
               {radioType === PROC && (
                 <CreateProcedureForm
                   isEdit={isEdit}
+                  selectedData={
+                    selectedData as {
+                      id: string;
+                      name: NameJSONType;
+                      reimbursement: ReimbursementJSONType;
+                      category: {
+                        id: string;
+                        name: NameJSONType;
+                      };
+                    }
+                  }
                   updateId={updateId}
                   onClose={onClose}
                 />

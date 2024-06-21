@@ -18,6 +18,10 @@ import {
   TaskList,
   WithAuth,
 } from '@/components';
+import type {
+  NameJSONType,
+  ReimbursementJSONType,
+} from '@/hooks/useDepartment';
 import { useGetAllDepartmentWithProcedure } from '@/hooks/useDepartment';
 import editIcon from '@/public/assets/icons/edit.svg';
 import emptyState from '@/public/assets/images/emptyState.svg';
@@ -108,6 +112,27 @@ function ProceduresList() {
     React.useState<boolean>(false);
   const [updateId, setUpdateId] = React.useState<string>('');
   const [isEditData, setIsEditData] = React.useState<boolean>(false);
+  const [selectedSubCategory, setSelectedSubCategory] = React.useState<{
+    id: string;
+    name: NameJSONType;
+    category: {
+      id: string;
+      name: NameJSONType;
+    };
+  } | null>(null);
+  const [selectedProcedure, setSelectedProcedure] = React.useState<{
+    id: string;
+    name: NameJSONType;
+    reimbursement: ReimbursementJSONType;
+    category: {
+      id: string;
+      name: NameJSONType;
+    };
+  } | null>(null);
+  const [selectedDepartment, setSelectedDepartment] = React.useState<{
+    id: string;
+    name: NameJSONType;
+  } | null>(null);
   const departmentProcedureList = useGetAllDepartmentWithProcedure();
   const [isOpen, setIsOpen] = React.useState<{
     id: string;
@@ -125,6 +150,7 @@ function ProceduresList() {
             setUpdateId('');
             setEditDepartmentModalOpen(false);
           }}
+          selectedDepartment={selectedDepartment}
           isEdit={isEditData}
           updateId={updateId}
         />
@@ -138,6 +164,7 @@ function ProceduresList() {
           }}
           isEdit={isEditData}
           editSubCategory={isEditSubCategory}
+          selectedData={selectedSubCategory}
           updateId={updateId}
         />
       )}
@@ -151,6 +178,7 @@ function ProceduresList() {
           isEdit={isEditData}
           editSubCategory={isEditSubCategory}
           updateId={updateId}
+          selectedData={selectedProcedure}
         />
       )}
       <CustomHomePage
@@ -201,6 +229,10 @@ function ProceduresList() {
                           setUpdateId(procedureData.id);
                           setIsEditData(true);
                           setEditDepartmentModalOpen(true);
+                          setSelectedDepartment(() => ({
+                            id: procedureData.id,
+                            name: procedureData.name,
+                          }));
                           setIsEditData(true);
                           setEditProcedureModalOpen(false);
                           setIsEditSubCategory(false);
@@ -233,6 +265,14 @@ function ProceduresList() {
                                         setUpdateId(subCategoryData.id);
                                         setIsEditData(true);
                                         setIsEditSubCategory(true);
+                                        setSelectedSubCategory(() => ({
+                                          id: subCategoryData.id,
+                                          name: subCategoryData.name,
+                                          category: {
+                                            id: procedureData.id,
+                                            name: procedureData.name,
+                                          },
+                                        }));
                                         setEditSubCategoryModalOpen(true);
                                       }}
                                     >
@@ -281,6 +321,18 @@ function ProceduresList() {
                                                       );
                                                       setEditDepartmentModalOpen(
                                                         false,
+                                                      );
+                                                      setSelectedProcedure(
+                                                        () => ({
+                                                          id: procedure.id,
+                                                          name: procedure.name,
+                                                          reimbursement:
+                                                            procedure.reimbursement,
+                                                          category: {
+                                                            id: procedure.categoryId,
+                                                            name: subCategoryData.name,
+                                                          },
+                                                        }),
                                                       );
                                                     }}
                                                     type="PROCEDURE"
@@ -334,6 +386,15 @@ function ProceduresList() {
                                     setEditProcedureModalOpen(true);
                                     setIsEditSubCategory(false);
                                     setEditSubCategoryModalOpen(false);
+                                    setSelectedProcedure(() => ({
+                                      id: procedure.id,
+                                      name: procedure.name,
+                                      reimbursement: procedure.reimbursement,
+                                      category: {
+                                        id: procedure.categoryId,
+                                        name: procedureData.name,
+                                      },
+                                    }));
                                   }}
                                   key={procedure.id}
                                   title={procedure.name.en}

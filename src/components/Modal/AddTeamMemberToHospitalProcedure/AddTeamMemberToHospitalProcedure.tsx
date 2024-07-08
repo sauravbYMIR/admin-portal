@@ -107,7 +107,7 @@ export function AddTeamMemberToHospitalProcedure({
           .map((teamMember) => ({
             value: teamMember.id,
             name: `${teamMember.name}`,
-            label: `${teamMember.name} - ${teamMember.position.en} - ${teamMember.qualification}`,
+            label: `${teamMember.name} - ${teamMember.position.en} - ${teamMember.qualification?.en}`,
             role: teamMember.position,
           })),
       );

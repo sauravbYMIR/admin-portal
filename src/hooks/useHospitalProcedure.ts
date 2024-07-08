@@ -81,7 +81,7 @@ export type HospitalProcedureByIdType = {
     position: NameJSONType;
     profile: string;
     profilePictureUploaded: boolean;
-    qualification: string;
+    qualification: NameJSONType;
     role: null | NameJSONType;
     updatedAt: string;
   }>;

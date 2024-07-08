@@ -80,13 +80,18 @@ function HospitalDetailsPage({
     id: string;
     position: NameJSONType;
     name: string;
-    qualification: string;
+    qualification: NameJSONType;
   }>({
     role: { en: '', nb: '', da: '', sv: '' },
     position: { en: '', nb: '', da: '', sv: '' },
     id: '',
     name: '',
-    qualification: '',
+    qualification: {
+      en: '',
+      nb: '',
+      da: '',
+      sv: '',
+    },
   });
 
   const router = useRouter();
@@ -437,7 +442,12 @@ function HospitalDetailsPage({
                   },
                   id: '',
                   name: '',
-                  qualification: '',
+                  qualification: {
+                    en: '',
+                    nb: '',
+                    da: '',
+                    sv: '',
+                  },
                 });
                 setIsEditTeamMember(false);
                 setIsCreateHospitalTeamModal(false);

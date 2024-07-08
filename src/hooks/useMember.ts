@@ -10,7 +10,7 @@ export type HospitalMemberType = {
   id: string;
   position: NameJSONType;
   name: string;
-  qualification: string;
+  qualification: NameJSONType;
   hospitalId: string;
   createdAt: string | null;
   updatedAt: string | null;
@@ -85,7 +85,7 @@ export type HospitalMember = {
   id: string;
   position: NameJSONType;
   name: string;
-  qualification: string;
+  qualification: NameJSONType;
   profilePictureUploaded: boolean;
   profile: string;
   hospitalId: string;
@@ -121,7 +121,7 @@ export const createHospitalMember = async ({
 }: {
   name: string;
   position: NameJSONType;
-  qualification: string;
+  qualification: NameJSONType;
   hospitalId: string;
 }): Promise<{ success: boolean; status: number; data: { id: string } }> => {
   const response = await axiosInstance.post<{
@@ -172,7 +172,7 @@ export const editHospitalMember = async ({
 }: {
   name: string;
   position: NameJSONType;
-  qualification: string;
+  qualification: NameJSONType;
   hospitalMemberId: string;
 }): Promise<EditHospitalMemberResponse> => {
   const response = await axiosInstance.patch<EditHospitalMemberAxios>(
@@ -298,7 +298,7 @@ export const getHospitalTeamMemberById = async (
     name: string;
     position: NameJSONType;
     profile: string | boolean;
-    qualification: string;
+    qualification: NameJSONType;
     updatedAt: string | null;
   };
 }> => {
@@ -313,7 +313,7 @@ export const getHospitalTeamMemberById = async (
       name: string;
       position: NameJSONType;
       profile: string | boolean;
-      qualification: string;
+      qualification: NameJSONType;
       updatedAt: string | null;
     };
   }>(`${process.env.BASE_URL}/hospital-member/${id}`);

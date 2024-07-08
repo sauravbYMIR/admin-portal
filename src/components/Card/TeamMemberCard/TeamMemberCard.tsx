@@ -3,6 +3,7 @@ import React from 'react';
 import { ClipLoader } from 'react-spinners';
 
 import { ProfileIcon } from '@/components/Icons/Icons';
+import type { NameJSONType } from '@/hooks/useDepartment';
 import { useDeleteTeamMember } from '@/hooks/useMember';
 
 import style from './style.module.scss';
@@ -20,7 +21,7 @@ function TeamMemberCard({
   teamMemberId: string;
   name: string;
   role: string;
-  qualification: string;
+  qualification: NameJSONType;
   isEdit: boolean;
   onOpen: () => void;
   profile: string | false;
@@ -49,7 +50,7 @@ function TeamMemberCard({
       </div>
       <p className="font-lexend text-base font-light text-neutral-2">{role}</p>
       <p className="font-lexend text-base font-light text-neutral-2">
-        {qualification}
+        {qualification?.en}
       </p>
       {isEdit && (
         <div className="mt-[10px] flex items-center justify-between">

@@ -138,7 +138,7 @@ export type HospitalMember = {
   id: string;
   position: NameJSONType;
   name: string;
-  qualification: string;
+  qualification: NameJSONType;
   profilePictureUploaded: boolean;
   profile: string;
   hospitalId: string;

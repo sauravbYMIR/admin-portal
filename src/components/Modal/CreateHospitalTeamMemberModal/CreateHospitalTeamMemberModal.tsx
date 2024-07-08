@@ -33,9 +33,26 @@ export type HospitalFormSchemaType =
   | 'positionDa'
   | 'positionSv';
 
+export type HospitalQualificationFormSchemaType =
+  | 'qualificationEn'
+  | 'qualificationNb'
+  | 'qualificationDa'
+  | 'qualificationSv';
+
 const createTeamMemberFormSchema = z.object({
   name: z.string().min(1, { message: 'Name is required' }),
-  qualification: z.string().min(1, { message: 'Qualification is required' }),
+  qualificationEn: z
+    .string()
+    .min(1, { message: 'Fill in details in all the languages' }),
+  qualificationNb: z
+    .string()
+    .min(1, { message: 'Fill in details in all the languages' }),
+  qualificationDa: z
+    .string()
+    .min(1, { message: 'Fill in details in all the languages' }),
+  qualificationSv: z
+    .string()
+    .min(1, { message: 'Fill in details in all the languages' }),
   positionEn: z
     .string()
     .min(1, { message: 'Fill in details in all the languages' }),
@@ -84,6 +101,8 @@ function CreateHospitalTeamMemberModal({
   const updateHospitalProfile = useUpdateHospitalProfile();
   const [activeLanguageTab, setActiveLanguageTab] =
     React.useState<LanguagesType>('English');
+  const [activeLanguageQualificationTab, setActiveLanguageQualificationTab] =
+    React.useState<LanguagesType>('English');
 
   const hospitalObj = {
     English: 'positionEn',
@@ -91,8 +110,20 @@ function CreateHospitalTeamMemberModal({
     Danish: 'positionDa',
     Swedish: 'positionSv',
   };
+
+  const hospitalQualificationObj = {
+    English: 'qualificationEn',
+    Norwegian: 'qualificationNb',
+    Danish: 'qualificationDa',
+    Swedish: 'qualificationSv',
+  };
+
   const shouldRenderError = countryData.some((c) => {
     const lang = hospitalObj[c.language] as HospitalFormSchemaType;
+    return errors[lang] && errors[lang]?.message;
+  });
+  const shouldRenderQualificationError = countryData.some((c) => {
+    const lang = hospitalQualificationObj[c.language] as HospitalFormSchemaType;
     return errors[lang] && errors[lang]?.message;
   });
   const onFormSubmit: SubmitHandler<CreateHospitalTeamMemberFormFields> = (
@@ -107,7 +138,12 @@ function CreateHospitalTeamMemberModal({
           nb: data.positionNb,
           sv: data.positionSv,
         },
-        qualification: data.qualification,
+        qualification: {
+          en: data.qualificationEn,
+          da: data.qualificationDa,
+          nb: data.qualificationNb,
+          sv: data.qualificationSv,
+        },
         hospitalMemberId: memberId,
       });
     } else {
@@ -119,7 +155,12 @@ function CreateHospitalTeamMemberModal({
           da: data.positionDa,
           sv: data.positionSv,
         },
-        qualification: data.qualification,
+        qualification: {
+          en: data.qualificationEn,
+          nb: data.qualificationNb,
+          da: data.qualificationDa,
+          sv: data.qualificationSv,
+        },
         hospitalId,
       });
     }
@@ -185,13 +226,22 @@ function CreateHospitalTeamMemberModal({
       setValue('positionEn', memberByIdDetails.data.data.position.en);
       setValue('positionNb', memberByIdDetails.data.data.position.nb);
       setValue('positionSv', memberByIdDetails.data.data.position.sv);
-      setValue('qualification', memberByIdDetails.data.data.qualification);
-      // if (
-      //   memberByIdDetails.data.data.profile &&
-      //   typeof memberByIdDetails.data.data.profile === 'string'
-      // ) {
-      //   setValue('profile', memberByIdDetails.data.data.profile);
-      // }
+      setValue(
+        'qualificationDa',
+        memberByIdDetails.data.data.qualification?.da,
+      );
+      setValue(
+        'qualificationEn',
+        memberByIdDetails.data.data.qualification?.en,
+      );
+      setValue(
+        'qualificationNb',
+        memberByIdDetails.data.data.qualification?.nb,
+      );
+      setValue(
+        'qualificationSv',
+        memberByIdDetails.data.data.qualification?.sv,
+      );
     }
   }, [memberByIdDetails.data, memberByIdDetails.isSuccess, setValue, memberId]);
   const profile = watch('profile');
@@ -318,15 +368,57 @@ function CreateHospitalTeamMemberModal({
                 >
                   Qualification
                 </label>
-                <input
-                  id="qualification"
-                  className="w-full rounded-lg border-2 border-lightsilver px-4 py-3"
-                  type="text"
-                  {...register('qualification')}
-                />
-                {errors.qualification && (
-                  <small className="mt-1 text-start font-lexend text-base font-normal text-error">
-                    {errors.qualification.message}
+                <div className={modalStyle.languageTabContainer}>
+                  {countryData.map((data) => {
+                    const lang = hospitalQualificationObj[
+                      data.language
+                    ] as HospitalQualificationFormSchemaType;
+                    return (
+                      <button
+                        key={data.locale}
+                        type="button"
+                        style={
+                          data.language === activeLanguageQualificationTab
+                            ? {
+                                border: '2px solid rgba(9, 111, 144, 1)',
+                                color: 'rgba(9, 111, 144, 1)',
+                                backgroundColor: 'rgba(242, 250, 252, 1)',
+                              }
+                            : {}
+                        }
+                        onClick={() =>
+                          setActiveLanguageQualificationTab(data.language)
+                        }
+                        className={`${errors[lang] && errors[lang]?.message ? '!border-2 !border-error !text-error' : ''}`}
+                      >
+                        {data.language}
+                      </button>
+                    );
+                  })}
+                </div>
+                {countryData.map((c) => {
+                  const lang = hospitalQualificationObj[
+                    c.language
+                  ] as HospitalQualificationFormSchemaType;
+                  return (
+                    <div key={c.countryCode} className="w-full">
+                      {c.language === activeLanguageQualificationTab && (
+                        <input
+                          // eslint-disable-next-line jsx-a11y/no-autofocus
+                          autoFocus
+                          className="w-full rounded-lg border-2 border-lightsilver px-4 py-3"
+                          type="text"
+                          id="qualification"
+                          {...register(lang)}
+                        />
+                      )}
+                    </div>
+                  );
+                })}
+
+                {shouldRenderQualificationError && (
+                  <small className="mb-5 mt-1 text-start font-lexend text-base font-normal text-error">
+                    Fill in details in all the languages
                   </small>
                 )}
               </div>

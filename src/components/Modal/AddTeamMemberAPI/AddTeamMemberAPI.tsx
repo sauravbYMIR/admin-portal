@@ -74,7 +74,7 @@ export function AddTeamMemberAPI({
     id: string;
     position: NameJSONType;
     name: string;
-    qualification: string;
+    qualification: NameJSONType;
   };
   procedureMembers: Array<string>;
 }) {
@@ -104,7 +104,7 @@ export function AddTeamMemberAPI({
           .map((teamMember) => ({
             value: teamMember.id,
             name: `${teamMember.name}`,
-            label: `${teamMember.name} - ${teamMember.position.en} - ${teamMember.qualification}`,
+            label: `${teamMember.name} - ${teamMember.position.en} - ${teamMember.qualification?.en}`,
             role: teamMember.position,
           })),
       );

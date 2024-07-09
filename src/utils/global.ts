@@ -57,6 +57,7 @@ export const availableCountriesByCountryCode = {
     currency: 'EUR',
     countryCode: 'ie',
     flagIcon: irelandFlag,
+    name: 'Ireland',
   },
   no: {
     language: 'Norwegian',
@@ -64,6 +65,7 @@ export const availableCountriesByCountryCode = {
     currency: 'NOK',
     countryCode: 'no',
     flagIcon: norwayFlag,
+    name: 'Norway',
   },
   dk: {
     language: 'Danish',
@@ -71,6 +73,7 @@ export const availableCountriesByCountryCode = {
     currency: 'DKK',
     countryCode: 'dk',
     flagIcon: denmarkFlag,
+    name: 'Denmark',
   },
   se: {
     language: 'Swedish',
@@ -78,6 +81,7 @@ export const availableCountriesByCountryCode = {
     currency: 'SEK',
     countryCode: 'se',
     flagIcon: swedenFlag,
+    name: 'Sweden',
   },
 };
 

@@ -1,11 +1,14 @@
 'use client';
 
-import Image from 'next/image';
 import { useRouter } from 'next/navigation';
 
-import { Header, WithAuth } from '@/components';
+import { BackArrowIcon, Header, WithAuth } from '@/components';
+import ArticleSkeleton from '@/components/SkeletonLoader/ArticleSkeleton';
 import { useGetBookingDetail } from '@/hooks/useBooking';
-import backArrow from '@/public/assets/icons/backArrow.svg';
+import {
+  availableCountriesByCountryCode,
+  convertToValidCurrency,
+} from '@/utils/global';
 
 import patientBookingStyle from './patientBooking.module.scss';
 
@@ -40,11 +43,31 @@ const PatientBooking = ({ params }: { params: { id: string } }) => {
           { label: 'Estimated wait', value: bookingDetail.data.data.waitTime },
           {
             label: 'Cost of procedure',
-            value: bookingDetail.data.data.costOfProcedure.ie,
+            value: convertToValidCurrency({
+              price: bookingDetail.data.data.costOfProcedure.price,
+              locale: bookingDetail.data.data.preferredLanguage,
+              currency: bookingDetail.data.data.costOfProcedure.currency,
+            }),
           },
           {
             label: 'Reimbursement offered',
-            value: bookingDetail.data.data.reimbursementCost.ie,
+            value: convertToValidCurrency({
+              price:
+                bookingDetail.data.data.reimbursementCost[
+                  bookingDetail.data.data
+                    .claimCountry as keyof typeof bookingDetail.data.data.reimbursementCost
+                ],
+              currency:
+                availableCountriesByCountryCode[
+                  bookingDetail.data.data
+                    .claimCountry as keyof typeof availableCountriesByCountryCode
+                ].currency,
+              locale:
+                availableCountriesByCountryCode[
+                  bookingDetail.data.data
+                    .claimCountry as keyof typeof availableCountriesByCountryCode
+                ].locale,
+            }),
           },
         ]
       : [
@@ -65,11 +88,18 @@ const PatientBooking = ({ params }: { params: { id: string } }) => {
     bookingDetail.data.data &&
     bookingDetail.data.data.id
       ? [
-          { label: 'Patient name', value: 'John Doe' },
+          {
+            label: 'Patient name',
+            value: `${bookingDetail.data.data.user.firstName} ${bookingDetail.data.data.user.lastName}`,
+          },
           { label: 'Gender', value: bookingDetail.data.data.gender },
           {
             label: 'Country of claim ',
-            value: bookingDetail.data.data.claimCountry,
+            value:
+              availableCountriesByCountryCode[
+                bookingDetail.data.data
+                  .claimCountry as keyof typeof availableCountriesByCountryCode
+              ].name,
           },
           {
             label: 'Preferred language',
@@ -94,74 +124,75 @@ const PatientBooking = ({ params }: { params: { id: string } }) => {
       bookingDetail.data.data &&
       bookingDetail.data.data.id ? (
         <div className={patientBookingStyle.patientBookingContentContainer}>
-          <button
-            type="button"
-            className="cursor-pointer border-none bg-transparent"
-            onClick={() => router.push('/patients')}
-          >
-            <Image
-              className={patientBookingStyle.backIcon}
-              src={backArrow}
-              alt="back arrow"
-            />
-          </button>
+          <div className="mb-20 flex items-center gap-x-14">
+            <button
+              type="button"
+              onClick={() => router.push('/patients')}
+              className="flex size-10 cursor-pointer items-center justify-center rounded-full border-none bg-rgba244"
+            >
+              <BackArrowIcon strokeWidth="2" stroke="rgba(17, 17, 17, 0.8)" />
+              <p className="hidden">text</p>
+            </button>
+            <h2 className="font-poppins text-3xl font-medium text-darkslategray">
+              Booking details
+            </h2>
+          </div>
 
-          <h2 className={patientBookingStyle.title}>Booking details</h2>
+          <div className="px-20">
+            <div className={patientBookingStyle.firstSectionContentContainer}>
+              <div className={patientBookingStyle.patientTagContainer}>
+                <p className={patientBookingStyle.patientIdTag}>
+                  Electronic ID verified
+                </p>
 
-          <div className={patientBookingStyle.firstSectionContentContainer}>
-            <div className={patientBookingStyle.patientTagContainer}>
-              <p className={patientBookingStyle.patientIdTag}>
-                Electronic ID verified
-              </p>
+                <p className={patientBookingStyle.patientStatusTag}>
+                  {bookingDetail.data.data.applicationStatus}
+                </p>
+              </div>
 
-              <p className={patientBookingStyle.patientStatusTag}>
-                {bookingDetail.data.data.applicationStatus}
-              </p>
+              <div className="grid grid-cols-3 gap-4">
+                {patientBookingData.map((data) => {
+                  return (
+                    <div
+                      className={patientBookingStyle.patientInfoContainer}
+                      key={data.label}
+                    >
+                      <p className="font-lexend text-sm font-light text-neutral-2">
+                        {data.label}
+                      </p>
+                      <p className="font-poppins text-base font-medium text-black">
+                        {data.label === 'Application date'
+                          ? `${new Date(data.value).getDate()}/${new Date(data.value).getMonth()}/${new Date(data.value).getFullYear()}`
+                          : data.value}
+                      </p>
+                    </div>
+                  );
+                })}
+              </div>
             </div>
 
-            <div className={patientBookingStyle.patientsInfoContainer}>
-              {patientBookingData.map((data) => {
+            <div className="mt-16 grid w-4/5 grid-cols-2 gap-y-16">
+              {patientBookingAdditionalData.map((data) => {
                 return (
-                  <div
-                    className={patientBookingStyle.patientInfoContainer}
-                    key={data.label}
-                  >
-                    <p className={patientBookingStyle.infoLabel}>
-                      {data.label}
+                  <div key={data.label}>
+                    <p className="font-lexend text-sm font-light text-neutral-2">
+                      {' '}
+                      {data.label}{' '}
                     </p>
-                    <p className={patientBookingStyle.infoValue}>
-                      {data.label === 'Application date'
-                        ? `${new Date(data.value).getDate()}/${new Date(data.value).getMonth()}/${new Date(data.value).getFullYear()}`
-                        : data.value}
+                    <p className="font-poppins text-base font-medium text-black">
+                      {' '}
+                      {data.value}{' '}
                     </p>
                   </div>
                 );
               })}
             </div>
           </div>
-
-          <div className={patientBookingStyle.secondSectionContentContainer}>
-            {patientBookingAdditionalData.map((data) => {
-              return (
-                <div
-                  className={patientBookingStyle.patientInfoContainer}
-                  key={data.label}
-                >
-                  <p className={patientBookingStyle.infoLabel}>
-                    {' '}
-                    {data.label}{' '}
-                  </p>
-                  <p className={patientBookingStyle.infoValue}>
-                    {' '}
-                    {data.value}{' '}
-                  </p>
-                </div>
-              );
-            })}
-          </div>
         </div>
       ) : (
-        <>loading...</>
+        <div className="flex h-screen w-screen items-start justify-center">
+          <ArticleSkeleton />
+        </div>
       )}
     </div>
   );

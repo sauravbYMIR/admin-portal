@@ -52,14 +52,21 @@ export type BookingDetailType = {
   patientPreferredStartDate: string;
   patientPreferredEndDate: string;
   applicationDate: string;
-
+  user: {
+    firstName: string;
+    lastName: string;
+    email: string;
+  };
   preferredLanguage: string;
   procedureName: NameJSONType;
   applicationStatus: string;
   hospitalName: string;
   hospitalStay: string;
   waitTime: string;
-  costOfProcedure: ReimbursementJSONType;
+  costOfProcedure: {
+    price: number;
+    currency: string;
+  };
   reimbursementCost: ReimbursementJSONType;
 };
 

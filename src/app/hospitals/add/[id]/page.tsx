@@ -5,7 +5,7 @@
 
 import Image from 'next/image';
 import { usePathname, useRouter } from 'next/navigation';
-import { useState } from 'react';
+import React, { useState } from 'react';
 import { z } from 'zod';
 
 import {
@@ -22,6 +22,7 @@ import { useGetHospitalById } from '@/hooks';
 import arrowForward from '@/public/assets/icons/arrowForward.svg';
 import hospitalLogo from '@/public/assets/icons/sampleLogo.svg';
 import emptyTeamMember from '@/public/assets/images/emptyTeamMember.svg';
+import { handleSetLocalStorage } from '@/utils/global';
 
 import style from './hospitalDetailPage.module.scss';
 
@@ -65,6 +66,15 @@ function HospitalDetailsPage({ params: { id } }: { params: { id: string } }) {
   const [teamMemberId, setTeamMemberId] = useState<string>('');
 
   const router = useRouter();
+  React.useEffect(() => {
+    if (hospitalById?.data?.data.country) {
+      handleSetLocalStorage({
+        tokenKey: 'hospital_country',
+        tokenValue: hospitalById.data.data.country,
+      });
+    }
+  }, [hospitalById?.data?.data.country]);
+
   return (
     <div>
       <Header />

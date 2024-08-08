@@ -20,6 +20,9 @@ interface IntialLanguagesDataType {
   Swedish: string;
 }
 
+export const availableCurrency = ['EUR', 'NOK', 'DKK', 'SEK', ''] as const;
+export type AvailableCurrencyType = 'EUR' | 'NOK' | 'DKK' | 'SEK';
+
 export const availableCountries = {
   Ireland: {
     language: 'English',

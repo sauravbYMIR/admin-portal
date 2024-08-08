@@ -23,7 +23,7 @@ import { AddTeamMemberAPI } from '@/components/Modal/AddTeamMemberAPI/AddTeamMem
 import type { NameJSONType } from '@/hooks/useDepartment';
 import { useGetHospitalProcedureById } from '@/hooks/useHospitalProcedure';
 import emptyTeamMember from '@/public/assets/images/emptyTeamMember.svg';
-import { convertToValidCurrency } from '@/utils/global';
+import { convertToValidCurrency, countryData } from '@/utils/global';
 
 import style from '../../hospitalDetailPage.module.scss';
 
@@ -179,7 +179,12 @@ function HospitalDetailsPage({
                       {convertToValidCurrency({
                         price: hospitalProcedureId.data.data.cost.price,
                         currency: hospitalProcedureId.data.data.cost.currency,
-                        locale: 'en',
+                        locale:
+                          countryData.find(
+                            (d) =>
+                              d.currency ===
+                              hospitalProcedureId.data.data.cost.currency,
+                          )?.locale ?? 'en',
                       })}
                     </p>
                   )}

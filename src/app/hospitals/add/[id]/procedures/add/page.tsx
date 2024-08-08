@@ -1,3 +1,4 @@
+/* eslint-disable no-nested-ternary */
 /* eslint-disable jsx-a11y/control-has-associated-label */
 
 'use client';
@@ -39,7 +40,13 @@ import {
 import { useGetAllProcedureByDeptId } from '@/hooks/useProcedure';
 import emptyTeamMember from '@/public/assets/images/emptyTeamMember.svg';
 import type { LanguagesType } from '@/types/components';
-import { countryData } from '@/utils/global';
+import type { AvailableCurrencyType } from '@/utils/global';
+import {
+  availableCountries,
+  availableCurrency,
+  countryData,
+  handleGetLocalStorage,
+} from '@/utils/global';
 
 import addHospitalStyle from '../../../style.module.scss';
 import type { HospitalProcedureFormSchemaType } from '../[procedureId]/edit/page';
@@ -62,6 +69,10 @@ const createHospitalProcedureFormSchema = z.object({
   cost: z.number({
     required_error: 'Cost in all language is required',
     invalid_type_error: 'Cost must be a number',
+  }),
+  costType: z.object({
+    label: z.string().min(1, { message: 'Please select valid currency' }),
+    value: z.enum(availableCurrency),
   }),
   waitingTime: z.string().min(1, { message: 'Waiting time is required' }),
   stayInHospital: z
@@ -193,6 +204,10 @@ function AddHospitalProcedure({ params }: { params: { id: string } }) {
       toast.info('Please add team member to proceed');
       return;
     }
+    if (!data.costType) {
+      toast.success('Please select valid cost type');
+      return;
+    }
     createHospitalProcedure.mutate({
       procedureId: data.procedure.value,
       hospitalId: params.id,
@@ -202,10 +217,9 @@ function AddHospitalProcedure({ params }: { params: { id: string } }) {
         nb: data.procedureDescNb,
         sv: data.procedureDescSv,
       },
-      // TODO: Change currency
       cost: {
         price: data.cost,
-        currency: 'EUR',
+        currency: data.costType.value,
       },
       waitingTime: data.waitingTime,
       stayInCity: data.stayInCity,
@@ -309,6 +323,16 @@ function AddHospitalProcedure({ params }: { params: { id: string } }) {
     createHospitalProcedure.data?.data,
     params.id,
   ]);
+  const currencyOption = React.useMemo(
+    () =>
+      countryData.map((data) => ({
+        value: data.currency as AvailableCurrencyType,
+        label: data.currency,
+      })),
+    [],
+  );
+  const hospitalCountry =
+    handleGetLocalStorage({ tokenKey: 'hospital_country' }) ?? '';
   const gallery = watch('gallery');
   return (
     <div>
@@ -467,23 +491,53 @@ function AddHospitalProcedure({ params }: { params: { id: string } }) {
           <div className="grid w-full grid-cols-2 gap-x-10 gap-y-4">
             <div className="relative my-4 flex w-full flex-col items-start">
               <label
-                className="mb-3 font-poppins text-base font-normal text-neutral-2"
+                className="font-poppins text-base font-normal text-neutral-2"
                 htmlFor="cost-of-procedure"
               >
                 Expected cost of procedure
               </label>
-
-              <div className="absolute top-[37px]">
-                <div className="rounded-md border-2 border-neutral-4 bg-neutral-6 px-5 py-[7px]">
-                  <span className="font-poppins text-sm font-normal text-neutral-2">
-                    EUR
-                  </span>
-                </div>
-              </div>
-
+              <Controller
+                name="costType"
+                control={control}
+                defaultValue={
+                  hospitalCountry &&
+                  availableCountries[
+                    hospitalCountry as keyof typeof availableCountries
+                  ]
+                    ? {
+                        label:
+                          availableCountries[
+                            hospitalCountry as keyof typeof availableCountries
+                          ].currency,
+                        value: availableCountries[
+                          hospitalCountry as keyof typeof availableCountries
+                        ].currency as AvailableCurrencyType,
+                      }
+                    : { label: '', value: '' }
+                }
+                render={({ field }) => (
+                  <Select
+                    {...field}
+                    className="absolute top-[14px] w-32"
+                    styles={{
+                      control: (baseStyles) => ({
+                        ...baseStyles,
+                        borderRadius: '0.5rem',
+                        padding: '0.165rem 1rem',
+                      }),
+                    }}
+                    options={currencyOption}
+                    onChange={(value) => {
+                      if (value) {
+                        field.onChange(value);
+                      }
+                    }}
+                  />
+                )}
+              />
               <input
-                className="w-full rounded-lg border-2 border-lightsilver px-4 py-2 placeholder:text-sm placeholder:font-normal placeholder:text-neutral-3"
-                style={{ paddingLeft: '75px' }}
+                className="mt-[-30px] w-full rounded-lg border-2 border-lightsilver px-4 py-2 placeholder:text-sm placeholder:font-normal placeholder:text-neutral-3"
+                style={{ paddingLeft: '135px' }}
                 placeholder="Enter cost of procedure"
                 id="cost-of-procedure"
                 {...register('cost', { valueAsNumber: true })}

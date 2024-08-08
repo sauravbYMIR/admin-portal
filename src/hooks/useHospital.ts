@@ -47,6 +47,7 @@ export type HospitalByIdType = {
   deletedAt: string | null;
   members: Array<HospitalMember>;
   procedures: Array<HospitalProcedure>;
+  externalLink: string | null;
 };
 
 export type CreateHospitalResponse = {
@@ -174,6 +175,7 @@ export const createHospital = async ({
   city,
   country,
   zipcode,
+  externalLink,
 }: {
   name: string;
   description: NameJSONType;
@@ -182,6 +184,7 @@ export const createHospital = async ({
   city: string;
   country: string;
   zipcode: string;
+  externalLink: string;
 }): Promise<{ success: boolean; status: number; data: { id: string } }> => {
   const response = await axiosInstance.post<{
     success: boolean;
@@ -195,6 +198,7 @@ export const createHospital = async ({
     city,
     country,
     zipcode,
+    externalLink,
   });
   return {
     success: response.data.success,
@@ -229,6 +233,7 @@ export const editHospital = async ({
   zipcode,
   hospitalId,
   removeImageIds,
+  externalLink,
 }: {
   name: string;
   description: NameJSONType;
@@ -239,6 +244,7 @@ export const editHospital = async ({
   zipcode: string;
   hospitalId: string;
   removeImageIds: Array<string>;
+  externalLink: string;
 }): Promise<EditHospitalResponse> => {
   const response = await axiosInstance.patch<EditHospitalAxios>(
     `${process.env.BASE_URL}/hospital/${hospitalId}`,
@@ -251,6 +257,7 @@ export const editHospital = async ({
       country,
       zipcode,
       removeImageIds,
+      externalLink,
     },
   );
   return {

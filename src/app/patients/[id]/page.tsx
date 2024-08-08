@@ -6,6 +6,7 @@ import { BackArrowIcon, Header, WithAuth } from '@/components';
 import ArticleSkeleton from '@/components/SkeletonLoader/ArticleSkeleton';
 import { useGetBookingDetail } from '@/hooks/useBooking';
 import {
+  availableCountries,
   availableCountriesByCountryCode,
   convertToValidCurrency,
 } from '@/utils/global';
@@ -26,7 +27,7 @@ const PatientBooking = ({ params }: { params: { id: string } }) => {
           },
           {
             label: 'Patients preferred dates',
-            value: `${bookingDetail.data.data.patientPreferredStartDate} - ${bookingDetail.data.data.patientPreferredEndDate}`,
+            value: `${bookingDetail.data.data.patientPreferredStartDate} to ${bookingDetail.data.data.patientPreferredEndDate}`,
           },
           {
             label: 'Application status',
@@ -103,7 +104,11 @@ const PatientBooking = ({ params }: { params: { id: string } }) => {
           },
           {
             label: 'Preferred language',
-            value: bookingDetail.data.data.preferredLanguage,
+            value:
+              Object.values(availableCountries).find(
+                (data) =>
+                  data.locale === bookingDetail.data.data.preferredLanguage,
+              )?.language ?? '',
           },
           {
             label: 'Application date',

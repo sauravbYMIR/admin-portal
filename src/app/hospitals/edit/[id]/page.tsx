@@ -62,6 +62,19 @@ const editHospitalFormSchema = z.object({
     .min(1, { message: 'Fill in details in all the languages' }),
   streetName: z.string().min(1, { message: 'Street name is required' }),
   city: z.string().min(1, { message: 'City is required' }),
+  externalLink: z
+    .string()
+    .optional()
+    .refine(
+      (value) =>
+        !value ||
+        /^(https?:\/\/)?([\da-z.-]+)\.([a-z.]{2,6})(\/[\w.-]*)*\/?$/.test(
+          value,
+        ),
+      {
+        message: 'Please provide a valid URL',
+      },
+    ),
   streetNumber: z.string().refine((val) => !Number.isNaN(parseInt(val, 10)), {
     message: 'Street number is required',
   }),
@@ -168,6 +181,7 @@ function EditHospital({ params: { id } }: { params: { id: string } }) {
       zipcode: data.zipCode,
       hospitalId: id,
       removeImageIds: hospitalImageRemoveIds,
+      externalLink: data.externalLink ?? '',
     });
   };
   React.useEffect(() => {
@@ -192,6 +206,7 @@ function EditHospital({ params: { id } }: { params: { id: string } }) {
       setValue('city', reqdHospital.data.data.city);
       setValue('streetNumber', reqdHospital.data.data.streetNumber);
       setValue('zipCode', reqdHospital.data.data.zipcode);
+      setValue('externalLink', reqdHospital.data.data.externalLink ?? '');
       setValue('country', {
         value:
           countryList()
@@ -697,6 +712,26 @@ function EditHospital({ params: { id } }: { params: { id: string } }) {
                   {errors.zipCode && (
                     <small className="mt-1 text-start font-lexend text-sm font-normal text-error">
                       {errors.zipCode.message}
+                    </small>
+                  )}
+                </div>
+                <div className="flex flex-col items-start">
+                  <label
+                    className="mb-3 font-poppins text-base font-normal text-neutral-2"
+                    htmlFor="externalLink"
+                  >
+                    External link
+                  </label>
+                  <input
+                    className="w-full rounded-lg border-2 border-lightsilver px-4 py-2 placeholder:text-sm placeholder:font-normal placeholder:text-neutral-3"
+                    type="text"
+                    placeholder="Enter external link"
+                    id="externalLink"
+                    {...register('externalLink')}
+                  />
+                  {errors.externalLink && (
+                    <small className="mt-1 text-start font-lexend text-sm font-normal text-error">
+                      {errors.externalLink.message}
                     </small>
                   )}
                 </div>

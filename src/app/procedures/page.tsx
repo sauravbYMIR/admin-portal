@@ -238,7 +238,7 @@ function ProceduresList() {
                           setIsEditSubCategory(false);
                           setEditSubCategoryModalOpen(false);
                         }}
-                        title={procedureData.name.en}
+                        title={procedureData.name.en ?? ''}
                         type="SUB-CATEGORY"
                       >
                         {procedureData.subCategoryWithProcedures.length > 0 &&
@@ -306,7 +306,9 @@ function ProceduresList() {
                                                 return (
                                                   <Accordion
                                                     key={procedure.id}
-                                                    title={procedure.name.en}
+                                                    title={
+                                                      procedure.name.en ?? ''
+                                                    }
                                                     editClickHandler={() => {
                                                       setUpdateId(procedure.id);
                                                       setIsEditData(true);
@@ -353,7 +355,7 @@ function ProceduresList() {
                                                               procedure
                                                                 .reimbursement[
                                                                 reimbursementKey
-                                                              ]
+                                                              ] ?? 0
                                                             }
                                                           />
                                                         );
@@ -397,7 +399,7 @@ function ProceduresList() {
                                     }));
                                   }}
                                   key={procedure.id}
-                                  title={procedure.name.en}
+                                  title={procedure.name.en ?? ''}
                                   type="PROCEDURE"
                                 >
                                   <div className="flex flex-wrap items-center">
@@ -412,7 +414,7 @@ function ProceduresList() {
                                             value={
                                               procedure.reimbursement[
                                                 reimbursementKey
-                                              ]
+                                              ] ?? 0
                                             }
                                           />
                                         );

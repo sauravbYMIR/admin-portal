@@ -16,8 +16,15 @@ import {
   useUpdateHospitalProfile,
 } from '@/hooks/useMember';
 import type { LanguagesType } from '@/types/components';
-import { countryData } from '@/utils/global';
+import {
+  countryData,
+  positionObj,
+  PositionSchema,
+  qualificationObj,
+  QualificationSchema,
+} from '@/utils/global';
 
+import type { Locale } from '../DepartmentModal/DepartmentModal';
 import modalStyle from './style.module.scss';
 
 interface ModalProps {
@@ -27,44 +34,20 @@ interface ModalProps {
   memberId: string;
 }
 
-export type HospitalFormSchemaType =
-  | 'positionEn'
-  | 'positionNb'
-  | 'positionDa'
-  | 'positionSv';
-
+export type PositionFormSchemaType = `position${Capitalize<Locale>}`;
 export type HospitalQualificationFormSchemaType =
-  | 'qualificationEn'
-  | 'qualificationNb'
-  | 'qualificationDa'
-  | 'qualificationSv';
+  `qualification${Capitalize<Locale>}`;
+
+type FormErrors = {
+  [key in PositionFormSchemaType]?: { message?: string };
+} & {
+  [key in HospitalQualificationFormSchemaType]?: { message?: string };
+};
 
 const createTeamMemberFormSchema = z.object({
   name: z.string().min(1, { message: 'Name is required' }),
-  qualificationEn: z
-    .string()
-    .min(1, { message: 'Fill in details in all the languages' }),
-  qualificationNb: z
-    .string()
-    .min(1, { message: 'Fill in details in all the languages' }),
-  qualificationDa: z
-    .string()
-    .min(1, { message: 'Fill in details in all the languages' }),
-  qualificationSv: z
-    .string()
-    .min(1, { message: 'Fill in details in all the languages' }),
-  positionEn: z
-    .string()
-    .min(1, { message: 'Fill in details in all the languages' }),
-  positionNb: z
-    .string()
-    .min(1, { message: 'Fill in details in all the languages' }),
-  positionDa: z
-    .string()
-    .min(1, { message: 'Fill in details in all the languages' }),
-  positionSv: z
-    .string()
-    .min(1, { message: 'Fill in details in all the languages' }),
+  ...QualificationSchema,
+  ...PositionSchema,
   profile: z.instanceof(File).optional(),
 });
 export type CreateHospitalTeamMemberFormFields = z.infer<
@@ -104,45 +87,59 @@ function CreateHospitalTeamMemberModal({
   const [activeLanguageQualificationTab, setActiveLanguageQualificationTab] =
     React.useState<LanguagesType>('English');
 
-  const hospitalObj = {
-    English: 'positionEn',
-    Norwegian: 'positionNb',
-    Danish: 'positionDa',
-    Swedish: 'positionSv',
-  };
-
-  const hospitalQualificationObj = {
-    English: 'qualificationEn',
-    Norwegian: 'qualificationNb',
-    Danish: 'qualificationDa',
-    Swedish: 'qualificationSv',
-  };
-
   const shouldRenderError = countryData.some((c) => {
-    const lang = hospitalObj[c.language] as HospitalFormSchemaType;
-    return errors[lang] && errors[lang]?.message;
+    const lang = positionObj[c.language] as PositionFormSchemaType;
+    return (
+      (errors as FormErrors)[lang] && (errors as FormErrors)[lang]?.message
+    );
   });
   const shouldRenderQualificationError = countryData.some((c) => {
-    const lang = hospitalQualificationObj[c.language] as HospitalFormSchemaType;
-    return errors[lang] && errors[lang]?.message;
+    const lang = qualificationObj[
+      c.language
+    ] as HospitalQualificationFormSchemaType;
+    return (
+      (errors as FormErrors)[lang] && (errors as FormErrors)[lang]?.message
+    );
   });
   const onFormSubmit: SubmitHandler<CreateHospitalTeamMemberFormFields> = (
     data: CreateHospitalTeamMemberFormFields,
   ) => {
+    const positionDataObj = Object.keys(data).reduce(
+      (acc, curr) => {
+        const value =
+          curr.split('position').length > 0
+            ? curr.split('position')[1]?.toLowerCase()
+            : '';
+        if (value) {
+          // @ts-ignore
+          acc[value] = data[curr];
+        }
+        return acc;
+      },
+      {} as Record<string, string>,
+    );
+    const qualificatonDataObj = Object.keys(data).reduce(
+      (acc, curr) => {
+        const value =
+          curr.split('qualification').length > 0
+            ? curr.split('qualification')[1]?.toLowerCase()
+            : '';
+        if (value) {
+          // @ts-ignore
+          acc[value] = data[curr];
+        }
+        return acc;
+      },
+      {} as Record<string, string>,
+    );
     if (memberId) {
       editHospitalMember.mutate({
         name: data.name,
         position: {
-          en: data.positionEn,
-          da: data.positionDa,
-          nb: data.positionNb,
-          sv: data.positionSv,
+          ...positionDataObj,
         },
         qualification: {
-          en: data.qualificationEn,
-          da: data.qualificationDa,
-          nb: data.qualificationNb,
-          sv: data.qualificationSv,
+          ...qualificatonDataObj,
         },
         hospitalMemberId: memberId,
       });
@@ -150,16 +147,10 @@ function CreateHospitalTeamMemberModal({
       createHospitalMember.mutate({
         name: data.name,
         position: {
-          en: data.positionEn,
-          nb: data.positionNb,
-          da: data.positionDa,
-          sv: data.positionSv,
+          ...positionDataObj,
         },
         qualification: {
-          en: data.qualificationEn,
-          nb: data.qualificationNb,
-          da: data.qualificationDa,
-          sv: data.qualificationSv,
+          ...qualificatonDataObj,
         },
         hospitalId,
       });
@@ -222,26 +213,25 @@ function CreateHospitalTeamMemberModal({
       memberByIdDetails.data.success
     ) {
       setValue('name', memberByIdDetails.data.data.name);
-      setValue('positionDa', memberByIdDetails.data.data.position.da);
-      setValue('positionEn', memberByIdDetails.data.data.position.en);
-      setValue('positionNb', memberByIdDetails.data.data.position.nb);
-      setValue('positionSv', memberByIdDetails.data.data.position.sv);
-      setValue(
-        'qualificationDa',
-        memberByIdDetails.data.data.qualification?.da,
-      );
-      setValue(
-        'qualificationEn',
-        memberByIdDetails.data.data.qualification?.en,
-      );
-      setValue(
-        'qualificationNb',
-        memberByIdDetails.data.data.qualification?.nb,
-      );
-      setValue(
-        'qualificationSv',
-        memberByIdDetails.data.data.qualification?.sv,
-      );
+      Object.values(positionObj).forEach((d) => {
+        const locale = d.split('position')[1]?.toLowerCase();
+        if (locale) {
+          const val = memberByIdDetails.data.data.position[locale];
+          if (val) {
+            // @ts-ignore
+            setValue(d as keyof CreateHospitalTeamMemberFormFields, val);
+          }
+        }
+      });
+      Object.values(qualificationObj).forEach((d) => {
+        const locale = d.split('qualification')[1]?.toLowerCase();
+        if (locale) {
+          const val = memberByIdDetails.data.data.qualification[locale];
+          if (val) {
+            setValue(d as keyof CreateHospitalTeamMemberFormFields, val);
+          }
+        }
+      });
     }
   }, [memberByIdDetails.data, memberByIdDetails.isSuccess, setValue, memberId]);
   const profile = watch('profile');
@@ -292,9 +282,9 @@ function CreateHospitalTeamMemberModal({
 
                 <div className={modalStyle.languageTabContainer}>
                   {countryData.map((data) => {
-                    const lang = hospitalObj[
+                    const lang = positionObj[
                       data.language
-                    ] as HospitalFormSchemaType;
+                    ] as PositionFormSchemaType;
                     return (
                       <button
                         key={data.locale}
@@ -309,7 +299,7 @@ function CreateHospitalTeamMemberModal({
                             : {}
                         }
                         onClick={() => setActiveLanguageTab(data.language)}
-                        className={`${errors[lang] && errors[lang]?.message ? '!border-2 !border-error !text-error' : ''}`}
+                        className={`${(errors as FormErrors)[lang] && (errors as FormErrors)[lang]?.message ? '!border-2 !border-error !text-error' : ''}`}
                       >
                         {data.language}
                       </button>
@@ -317,9 +307,9 @@ function CreateHospitalTeamMemberModal({
                   })}
                 </div>
                 {countryData.map((c) => {
-                  const lang = hospitalObj[
+                  const lang = positionObj[
                     c.language
-                  ] as HospitalFormSchemaType;
+                  ] as PositionFormSchemaType;
                   return (
                     <div key={c.countryCode} className="w-full">
                       {c.language === activeLanguageTab && (
@@ -329,6 +319,7 @@ function CreateHospitalTeamMemberModal({
                           className="w-full rounded-lg border-2 border-lightsilver px-4 py-3"
                           type="text"
                           id="position"
+                          // @ts-ignore
                           {...register(lang)}
                         />
                       )}
@@ -370,7 +361,7 @@ function CreateHospitalTeamMemberModal({
                 </label>
                 <div className={modalStyle.languageTabContainer}>
                   {countryData.map((data) => {
-                    const lang = hospitalQualificationObj[
+                    const lang = qualificationObj[
                       data.language
                     ] as HospitalQualificationFormSchemaType;
                     return (
@@ -389,7 +380,7 @@ function CreateHospitalTeamMemberModal({
                         onClick={() =>
                           setActiveLanguageQualificationTab(data.language)
                         }
-                        className={`${errors[lang] && errors[lang]?.message ? '!border-2 !border-error !text-error' : ''}`}
+                        className={`${(errors as FormErrors)[lang] && (errors as FormErrors)[lang]?.message ? '!border-2 !border-error !text-error' : ''}`}
                       >
                         {data.language}
                       </button>
@@ -397,7 +388,7 @@ function CreateHospitalTeamMemberModal({
                   })}
                 </div>
                 {countryData.map((c) => {
-                  const lang = hospitalQualificationObj[
+                  const lang = qualificationObj[
                     c.language
                   ] as HospitalQualificationFormSchemaType;
                   return (
@@ -409,6 +400,7 @@ function CreateHospitalTeamMemberModal({
                           className="w-full rounded-lg border-2 border-lightsilver px-4 py-3"
                           type="text"
                           id="qualification"
+                          // @ts-ignore
                           {...register(lang)}
                         />
                       )}

@@ -9,6 +9,10 @@ import Select from 'react-select';
 import { ClipLoader } from 'react-spinners';
 import { z } from 'zod';
 
+import type {
+  CountryCode,
+  Locale,
+} from '@/components/Modal/DepartmentModal/DepartmentModal';
 import departmentModalStyle from '@/components/Modal/DepartmentModal/departmentModal.module.scss';
 import procedureModalStyle from '@/components/Modal/ProcedureModal/procedureModal.module.scss';
 import type {
@@ -18,7 +22,17 @@ import type {
 import { useGetAllDepartment } from '@/hooks/useDepartment';
 import { useCreateProcedure, useEditProcedure } from '@/hooks/useProcedure';
 import type { LanguagesType } from '@/types/components';
-import { countryData } from '@/utils/global';
+import type {
+  ProcedureSchemaType,
+  ReimbusementSchemaType,
+} from '@/utils/global';
+import {
+  countryData,
+  procedureObj,
+  ProcedureSchema,
+  reimburismentObj,
+  ReimbursementSchema,
+} from '@/utils/global';
 
 interface CreateProcedureFormPropType {
   isEdit: boolean;
@@ -35,16 +49,9 @@ interface CreateProcedureFormPropType {
   };
 }
 
-export type ProcedureFormSchemaType =
-  | 'procedureEn'
-  | 'procedureNb'
-  | 'procedureDa'
-  | 'procedureSv'
-  | 'reimbursementIe'
-  | 'reimbursementNo'
-  | 'reimbursementDk'
-  | 'reimbursementSe'
-  | 'department';
+export type ProcedureFormSchemaType = `procedure${Capitalize<Locale>}` &
+  `reimbursement${Capitalize<CountryCode>}` &
+  `department`;
 
 export const departmentTypeSchema = z.object({
   label: z.string().min(1, { message: 'Please select department to proceed' }),
@@ -56,38 +63,8 @@ export const procedureTypeSchema = z.object({
 });
 
 const procedureFormSchema = z.object({
-  procedureEn: z
-    .string()
-    .min(1, { message: 'Fill in details in all the languages' }),
-  procedureNb: z
-    .string()
-    .min(1, { message: 'Fill in details in all the languages' }),
-  procedureDa: z
-    .string()
-    .min(1, { message: 'Fill in details in all the languages' }),
-  procedureSv: z
-    .string()
-    .min(1, { message: 'Fill in details in all the languages' }),
-  reimbursementIe: z
-    .string()
-    .refine((val) => !Number.isNaN(parseInt(val, 10)), {
-      message: 'Fill in all required details in correct format',
-    }),
-  reimbursementNo: z
-    .string()
-    .refine((val) => !Number.isNaN(parseInt(val, 10)), {
-      message: 'Fill in all required details in correct format',
-    }),
-  reimbursementDk: z
-    .string()
-    .refine((val) => !Number.isNaN(parseInt(val, 10)), {
-      message: 'Fill in all required details in correct format',
-    }),
-  reimbursementSe: z
-    .string()
-    .refine((val) => !Number.isNaN(parseInt(val, 10)), {
-      message: 'Fill in all required details in correct format',
-    }),
+  ...ProcedureSchema,
+  ...ReimbursementSchema,
   department: departmentTypeSchema,
 });
 export type ProcedureFormFields = z.infer<typeof procedureFormSchema>;
@@ -95,7 +72,11 @@ export type DepartmentType = {
   value: string;
   label: string;
 };
-
+type FormErrors = {
+  [key in ProcedureSchemaType]?: { message?: string };
+} & {
+  [key in ReimbusementSchemaType]?: { message?: string };
+};
 function CreateProcedureForm({
   isEdit,
   updateId,
@@ -132,20 +113,12 @@ function CreateProcedureForm({
             );
             return {
               value: department.id,
-              label:
-                `${parentCategory?.name.en} -- ${department.name.en}` ||
-                `${parentCategory?.name.nb} -- ${department.name.nb}` ||
-                `${parentCategory?.name.sv} -- ${department.name.sv}` ||
-                `${parentCategory?.name.da} -- ${department.name.da}`,
+              label: `${parentCategory?.name.en} -- ${department.name.en}`,
             };
           }
           return {
             value: department.id,
-            label:
-              department.name.en ||
-              department.name.nb ||
-              department.name.sv ||
-              department.name.da,
+            label: department.name.en ?? '',
           };
         }),
       );
@@ -164,38 +137,70 @@ function CreateProcedureForm({
   });
 
   const handleCreateProcedure = (data: ProcedureFormFields) => {
+    const procedureData = Object.keys(data).reduce(
+      (acc, currValue) => {
+        const localeName = currValue.split('procedure')[1]?.toLowerCase();
+        if (localeName) {
+          // @ts-ignore
+          acc[localeName] = data[currValue] as string;
+        }
+        return acc;
+      },
+      {} as Record<string, string>,
+    );
+    const reimbursementData = Object.keys(data).reduce(
+      (acc, currValue) => {
+        const localeName = currValue.split('reimbursement')[1]?.toLowerCase();
+        if (localeName) {
+          // @ts-ignore
+          acc[localeName] = Number(data[currValue]);
+        }
+        return acc;
+      },
+      {} as Record<string, number>,
+    );
     createProcedure.mutate({
       name: {
-        en: data.procedureEn,
-        nb: data.procedureNb,
-        da: data.procedureDa,
-        sv: data.procedureSv,
+        ...procedureData,
       },
       categoryId: data.department.value,
       reimbursement: {
-        ie: Number(data.reimbursementIe),
-        no: Number(data.reimbursementNo),
-        dk: Number(data.reimbursementDk),
-        se: Number(data.reimbursementSe),
+        ...reimbursementData,
       },
     });
     setActiveLanguageTab('English');
     reset();
   };
   const handleEditProcedure = (data: ProcedureFormFields) => {
+    const procedureData = Object.keys(data).reduce(
+      (acc, currValue) => {
+        const localeName = currValue.split('procedure')[1]?.toLowerCase();
+        if (localeName) {
+          // @ts-ignore
+          acc[localeName] = data[currValue] as string;
+        }
+        return acc;
+      },
+      {} as Record<string, string>,
+    );
+    const reimbursementData = Object.keys(data).reduce(
+      (acc, currValue) => {
+        const localeName = currValue.split('reimbursement')[1]?.toLowerCase();
+        if (localeName) {
+          // @ts-ignore
+          acc[localeName] = Number(data[currValue]);
+        }
+        return acc;
+      },
+      {} as Record<string, number>,
+    );
     editProcedure.mutate({
       procedureId: updateId,
       name: {
-        en: data.procedureEn,
-        nb: data.procedureNb,
-        da: data.procedureDa,
-        sv: data.procedureSv,
+        ...procedureData,
       },
       reimbursement: {
-        ie: Number(data.reimbursementIe),
-        no: Number(data.reimbursementNo),
-        dk: Number(data.reimbursementDk),
-        se: Number(data.reimbursementSe),
+        ...reimbursementData,
       },
     });
     setCreateAnotherProcedure(false);
@@ -204,41 +209,40 @@ function CreateProcedureForm({
   };
 
   React.useEffect(() => {
-    if (selectedData && selectedData.id && selectedData?.category) {
+    if (selectedData && selectedData.id && selectedData?.category && isEdit) {
       setSelectedOption({
-        value:
-          selectedData.category.name.en ||
-          selectedData.category.name.da ||
-          selectedData.category.name.sv ||
-          selectedData.category.name.nb,
+        value: selectedData.category.name.en ?? '',
         label: selectedData.category.id,
       });
-      setValue(
-        'department.label',
-        selectedData.category.name.en ||
-          selectedData.category.name.nb ||
-          selectedData.category.name.da ||
-          selectedData.category.name.sv,
-      );
+      setValue('department.label', selectedData.category.name.en ?? '');
       setValue('department.value', selectedData.category.id);
-      setValue('procedureEn', selectedData.name.en);
-      setValue('procedureDa', selectedData.name.da);
-      setValue('procedureSv', selectedData.name.sv);
-      setValue('procedureNb', selectedData.name.nb);
-      if (selectedData.reimbursement?.ie) {
-        setValue('reimbursementIe', selectedData.reimbursement.ie.toString());
-      }
-      if (selectedData.reimbursement?.no) {
-        setValue('reimbursementNo', selectedData.reimbursement.no.toString());
-      }
-      if (selectedData.reimbursement?.se) {
-        setValue('reimbursementSe', selectedData.reimbursement.se.toString());
-      }
-      if (selectedData.reimbursement?.dk) {
-        setValue('reimbursementDk', selectedData.reimbursement.dk.toString());
-      }
+      Object.values(procedureObj).forEach((d) => {
+        const locale = d.split('procedure')[1]?.toLowerCase();
+        if (locale) {
+          const val = selectedData.name[locale];
+          if (val) {
+            // @ts-ignore
+            setValue(d as keyof ProcedureFormFields, val);
+          }
+        }
+      });
+
+      Object.values(reimburismentObj).forEach((d) => {
+        const countryCode = d.split('reimbursement')[1]?.toLowerCase();
+        if (
+          countryCode &&
+          selectedData?.reimbursement &&
+          selectedData.reimbursement[countryCode]
+        ) {
+          const val = selectedData.reimbursement[countryCode]?.toString();
+          if (val) {
+            // @ts-ignore
+            setValue(d as keyof ProcedureFormFields, val);
+          }
+        }
+      });
     }
-  }, [setValue, selectedData]);
+  }, [setValue, selectedData, isEdit]);
 
   const onFormSubmit: SubmitHandler<ProcedureFormFields> = (
     data: ProcedureFormFields,
@@ -250,22 +254,11 @@ function CreateProcedureForm({
     }
   };
 
-  const procedureObj = {
-    English: 'procedureEn',
-    Norwegian: 'procedureNb',
-    Danish: 'procedureDa',
-    Swedish: 'procedureSv',
-  };
-  const reimburismentObj = {
-    English: 'reimbursementIe',
-    Norwegian: 'reimbursementNo',
-    Danish: 'reimbursementDk',
-    Swedish: 'reimbursementSe',
-  };
-
   const shouldRenderProcedureError = countryData.some((c) => {
     const lang = procedureObj[c.language] as ProcedureFormSchemaType;
-    return errors[lang] && errors[lang]?.message;
+    return (
+      (errors as FormErrors)[lang] && (errors as FormErrors)[lang]?.message
+    );
   });
 
   return (
@@ -328,7 +321,7 @@ function CreateProcedureForm({
               }
               className={`${
                 activeLanguageTab === data.language
-                  ? `px-3 py-2 ${procedureModalStyle.activeLanguageTab} ${errors[lang] && errors[lang]?.message ? '!border-2 !border-error !text-error' : ''}`
+                  ? `px-3 py-2 ${procedureModalStyle.activeLanguageTab} ${(errors as FormErrors)[lang] && (errors as FormErrors)[lang]?.message ? '!border-2 !border-error !text-error' : ''}`
                   : ''
               }`}
               type="button"
@@ -377,14 +370,16 @@ function CreateProcedureForm({
                 <div
                   className={procedureModalStyle.inputWrapper}
                   style={
-                    errors[lang] && errors[lang]?.message
+                    (errors as FormErrors)[lang] &&
+                    (errors as FormErrors)[lang]?.message
                       ? { border: '1.5px solid rgba(203, 0, 25, 1)' }
                       : { border: '1.5px solid rgba(217, 222, 231, 1)' }
                   }
                 >
                   <div
                     className={`${procedureModalStyle.countryCodeWrapper} ${
-                      errors[lang] && errors[lang]?.message
+                      (errors as FormErrors)[lang] &&
+                      (errors as FormErrors)[lang]?.message
                         ? 'rounded-s-lg border-y-[1.48px] border-s-[0.5px] border-error'
                         : 'rounded-lg border border-primary-6'
                     }`}
@@ -404,12 +399,12 @@ function CreateProcedureForm({
                     {...register(lang)}
                     id="reimbursement"
                     placeholder={`Reimbursement for ${data.name}`}
-                    className={`${errors[lang] && errors[lang]?.message ? '!border-2 !border-error' : '!border-2 !border-lightsilver'} w-full rounded-lg px-4 py-3 placeholder:font-lexend placeholder:text-sm placeholder:font-light placeholder:text-neutral-4`}
+                    className={`${(errors as FormErrors)[lang] && (errors as FormErrors)[lang]?.message ? '!border-2 !border-error' : '!border-2 !border-lightsilver'} w-full rounded-lg px-4 py-3 placeholder:font-lexend placeholder:text-sm placeholder:font-light placeholder:text-neutral-4`}
                   />
                 </div>
-                {errors[lang] && (
+                {(errors as FormErrors)[lang] && (
                   <div className="text-start font-lexend text-base font-normal text-error">
-                    {errors[lang]?.message}
+                    {(errors as FormErrors)[lang]?.message}
                   </div>
                 )}
               </div>

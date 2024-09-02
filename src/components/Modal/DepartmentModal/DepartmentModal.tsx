@@ -18,36 +18,35 @@ import { countryData } from '@/utils/global';
 
 import departmentModalStyle from './departmentModal.module.scss';
 
-export type DepartmentFormSchemaType =
-  | 'nameEn'
-  | 'nameNb'
-  | 'nameDa'
-  | 'nameSv';
+export type Locale = (typeof countryData)[number]['locale'];
+export type CountryCode = (typeof countryData)[number]['countryCode'];
+export type DepartmentFormSchemaType = `name${Capitalize<Locale>}`;
 
-const departmentObj = {
-  English: 'nameEn',
-  Norwegian: 'nameNb',
-  Danish: 'nameDa',
-  Swedish: 'nameSv',
-};
+const departmentObj = countryData.reduce(
+  (acc, currValue) => {
+    const name = `name${currValue.locale.charAt(0).toUpperCase()}${currValue.locale.slice(1)}`;
+    acc[currValue.language] = name;
+    return acc;
+  },
+  {} as Record<string, string>,
+);
+
+const DepartmentNameSchema = countryData.reduce(
+  (acc, currValue) => {
+    const schema = `name${currValue.locale.charAt(0).toUpperCase()}${currValue.locale.slice(1)}`;
+    acc[schema] = z
+      .string()
+      .min(1, { message: 'Fill in details in all the languages' });
+    return acc;
+  },
+  {} as Record<string, z.ZodString>,
+);
 
 const DepartmentFormSchema = z.object({
-  nameEn: z
-    .string()
-    .min(1, { message: 'Fill in details in all the languages' }),
-  nameNb: z
-    .string()
-    .min(1, { message: 'Fill in details in all the languages' }),
-  nameDa: z
-    .string()
-    .min(1, { message: 'Fill in details in all the languages' }),
-  nameSv: z
-    .string()
-    .min(1, { message: 'Fill in details in all the languages' }),
+  ...DepartmentNameSchema,
 });
 export type DepartmentFormFields = z.infer<typeof DepartmentFormSchema>;
 
-export type DeptNameFormSchemaType = 'nameEn' | 'nameDa' | 'nameSv' | 'nameNb';
 interface DepartmentModalProps {
   isOpen: boolean;
   onClose: () => void;
@@ -66,12 +65,6 @@ function DepartmentModal({
   updateId,
   selectedDepartment,
 }: DepartmentModalProps) {
-  const deptObj = {
-    English: 'nameEn',
-    Norwegian: 'nameNb',
-    Danish: 'nameDa',
-    Swedish: 'nameSv',
-  };
   const {
     register,
     handleSubmit,
@@ -96,38 +89,40 @@ function DepartmentModal({
   });
 
   const onFormSubmit = (data: DepartmentFormFields) => {
+    const nameData = Object.keys(data).reduce(
+      (acc, currValue) => {
+        const localeName = currValue.split('name')[1]?.toLowerCase();
+        if (localeName) {
+          acc[localeName] = data[currValue] as string;
+        }
+        return acc;
+      },
+      {} as Record<string, string>,
+    );
     if (isEdit) {
       editDept.mutate({
-        name: {
-          en: data.nameEn,
-          nb: data.nameNb,
-          sv: data.nameSv,
-          da: data.nameDa,
-        },
+        name: { ...nameData },
         departmentId: updateId,
       });
       reset();
-    } else {
-      createDept.mutate({
-        name: {
-          en: data.nameEn,
-          nb: data.nameNb,
-          sv: data.nameSv,
-          da: data.nameDa,
-        },
-        parentCategoryId: '',
-      });
-      reset();
     }
+    createDept.mutate({
+      name: { ...nameData },
+      parentCategoryId: '',
+    });
+    reset();
   };
   React.useEffect(() => {
-    if (selectedDepartment && selectedDepartment?.id) {
-      setValue('nameEn', selectedDepartment.name.en);
-      setValue('nameDa', selectedDepartment.name.da);
-      setValue('nameSv', selectedDepartment.name.sv);
-      setValue('nameNb', selectedDepartment.name.nb);
+    if (selectedDepartment && selectedDepartment?.id && isEdit) {
+      Object.values(departmentObj).forEach((d) => {
+        const locale = d.split('name')[1]?.toLowerCase();
+        if (locale) {
+          const val = selectedDepartment.name[locale];
+          val && setValue(d, val);
+        }
+      });
     }
-  }, [selectedDepartment, setValue]);
+  }, [selectedDepartment, setValue, isEdit]);
 
   return (
     <div>
@@ -161,7 +156,9 @@ function DepartmentModal({
 
               <div className={departmentModalStyle.languageTabContainer}>
                 {countryData.map((data) => {
-                  const lang = deptObj[data.language] as DeptNameFormSchemaType;
+                  const lang = departmentObj[
+                    data.language
+                  ] as DepartmentFormSchemaType;
                   return (
                     <button
                       key={data.locale}

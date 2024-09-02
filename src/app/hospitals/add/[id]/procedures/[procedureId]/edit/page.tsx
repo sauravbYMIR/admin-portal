@@ -22,6 +22,7 @@ import {
   PlusIcon,
   WithAuth,
 } from '@/components';
+import type { Locale } from '@/components/Modal/DepartmentModal/DepartmentModal';
 import type { HospitalProcedureImageType } from '@/hooks/useHospitalProcedure';
 import {
   useEditHospitalProcedure,
@@ -35,35 +36,31 @@ import {
   availableCurrency,
   countryData,
   handleGetLocalStorage,
+  hospitalProcedureDescObj,
+  ProcedureDescSchema,
 } from '@/utils/global';
 
 import addHospitalStyle from '../../../../style.module.scss';
 
 export type HospitalProcedureFormSchemaType =
-  | 'procedureDescEn'
-  | 'procedureDescNb'
-  | 'procedureDescDa'
-  | 'procedureDescSv';
-export type HospitalCostFormSchemaType =
-  | 'costEn'
-  | 'costNb'
-  | 'costDa'
-  | 'costSv';
+  `procedureDesc${Capitalize<Locale>}`;
+
+type FormErrors = {
+  [key in HospitalProcedureFormSchemaType]?: { message?: string };
+} & {
+  departmentName?: { message?: string };
+  procedureName?: { message?: string };
+  costType?: { message?: string };
+  cost?: { message?: string };
+  waitingTime?: { message?: string };
+  stayInHospital?: { message?: string };
+  stayInCity?: { message?: string };
+  gallery?: { message?: string };
+};
+
 const editHospitalProcedureFormSchema = z.object({
   departmentName: z.string(),
   procedureName: z.string(),
-  procedureDescEn: z
-    .string()
-    .min(1, { message: 'Fill in details in all the languages' }),
-  procedureDescNb: z
-    .string()
-    .min(1, { message: 'Fill in details in all the languages' }),
-  procedureDescDa: z
-    .string()
-    .min(1, { message: 'Fill in details in all the languages' }),
-  procedureDescSv: z
-    .string()
-    .min(1, { message: 'Fill in details in all the languages' }),
   costType: z.object({
     label: z.string().min(1, { message: 'Please select valid currency' }),
     value: z.enum(availableCurrency),
@@ -81,6 +78,7 @@ const editHospitalProcedureFormSchema = z.object({
     .array(z.instanceof(File))
     .max(10, 'You can upload up to 10 images')
     .optional(),
+  ...ProcedureDescSchema,
 });
 export type EditHospitalProcedureFormFields = z.infer<
   typeof editHospitalProcedureFormSchema
@@ -118,16 +116,14 @@ function EditHospitalProcedure({
   } = useForm<EditHospitalProcedureFormFields>({
     resolver: zodResolver(editHospitalProcedureFormSchema),
   });
-  const hospitalObj = {
-    English: 'procedureDescEn',
-    Norwegian: 'procedureDescNb',
-    Danish: 'procedureDescDa',
-    Swedish: 'procedureDescSv',
-  };
   const updateHospitalProcedureGallery = useUpdateHospitalProcedureGallery();
   const shouldRenderProcedureError = countryData.some((c) => {
-    const lang = hospitalObj[c.language] as HospitalProcedureFormSchemaType;
-    return errors[lang] && errors[lang]?.message;
+    const lang = hospitalProcedureDescObj[
+      c.language
+    ] as HospitalProcedureFormSchemaType;
+    return (
+      (errors as FormErrors)[lang] && (errors as FormErrors)[lang]?.message
+    );
   });
   const onFormSubmit: SubmitHandler<EditHospitalProcedureFormFields> = (
     data: EditHospitalProcedureFormFields,
@@ -136,16 +132,25 @@ function EditHospitalProcedure({
       toast.success('Please select valid cost type');
       return;
     }
+    const descObj = Object.keys(data).reduce(
+      (acc, curr) => {
+        const value =
+          curr.split('procedureDesc').length > 0
+            ? curr.split('procedureDesc')[1]?.toLowerCase()
+            : '';
+        if (value) {
+          // @ts-ignore
+          acc[value] = data[curr as keyof EditHospitalProcedureFormFields];
+        }
+        return acc;
+      },
+      {} as Record<HospitalProcedureFormSchemaType, string>,
+    );
     editHospitalProcedure.mutate({
       waitingTime: data.waitingTime,
       stayInHospital: data.stayInHospital,
       stayInCity: data.stayInCity,
-      description: {
-        en: data.procedureDescEn,
-        da: data.procedureDescDa,
-        nb: data.procedureDescNb,
-        sv: data.procedureDescSv,
-      },
+      description: { ...descObj },
       cost: {
         price: data.cost,
         currency: data.costType.value as AvailableCurrencyType,
@@ -171,30 +176,27 @@ function EditHospitalProcedure({
           hospitalProcedureDetails.data.data.hospitalProcedureImages,
         );
       }
-      setValue(
-        'departmentName',
-        hospitalProcedureDetails.data.data.procedure.category.name.en,
-      );
-      setValue(
-        'procedureName',
-        hospitalProcedureDetails.data.data.procedure.name.en,
-      );
-      setValue(
-        'procedureDescEn',
-        hospitalProcedureDetails.data.data.description.en,
-      );
-      setValue(
-        'procedureDescNb',
-        hospitalProcedureDetails.data.data.description.nb,
-      );
-      setValue(
-        'procedureDescDa',
-        hospitalProcedureDetails.data.data.description.da,
-      );
-      setValue(
-        'procedureDescSv',
-        hospitalProcedureDetails.data.data.description.sv,
-      );
+      if (hospitalProcedureDetails.data.data.procedure.category.name.en) {
+        setValue(
+          'departmentName',
+          hospitalProcedureDetails.data.data.procedure.category.name.en,
+        );
+      }
+      if (hospitalProcedureDetails.data.data.procedure.name.en) {
+        setValue(
+          'procedureName',
+          hospitalProcedureDetails.data.data.procedure.name.en,
+        );
+      }
+      Object.values(hospitalProcedureDescObj).forEach((d) => {
+        const locale = d.split('procedureDesc')[1]?.toLowerCase();
+        if (locale) {
+          const val = hospitalProcedureDetails.data.data.description[locale];
+          if (val) {
+            setValue(d as keyof EditHospitalProcedureFormFields, val);
+          }
+        }
+      });
       setValue('cost', hospitalProcedureDetails.data.data.cost.price);
       setValue('costType', {
         value: hospitalProcedureDetails.data.data.cost
@@ -241,14 +243,21 @@ function EditHospitalProcedure({
     // updateHospitalLogo,
     // updateHospitalGallery,
   ]);
-  const currencyOption = React.useMemo(
-    () =>
-      countryData.map((data) => ({
+  const currencyOption = React.useMemo(() => {
+    const unqiueCurrencies = new Set<string>();
+    return countryData
+      .filter((data) => {
+        if (!unqiueCurrencies.has(data.currency)) {
+          unqiueCurrencies.add(data.currency);
+          return true;
+        }
+        return false;
+      })
+      .map((data) => ({
         value: data.currency as AvailableCurrencyType,
         label: data.currency,
-      })),
-    [],
-  );
+      }));
+  }, []);
   const hospitalCountry =
     handleGetLocalStorage({ tokenKey: 'hospital_country' }) ?? '';
   const gallery = watch('gallery');
@@ -326,7 +335,7 @@ function EditHospitalProcedure({
 
             <div className={addHospitalStyle.langTabContainer}>
               {countryData.map((data) => {
-                const lang = hospitalObj[
+                const lang = hospitalProcedureDescObj[
                   data.language
                 ] as HospitalProcedureFormSchemaType;
                 return (
@@ -343,7 +352,7 @@ function EditHospitalProcedure({
                     }
                     type="button"
                     onClick={() => setActiveLanguageTab(data.language)}
-                    className={`${errors[lang] && errors[lang]?.message ? '!border-2 !border-error !text-error' : ''}`}
+                    className={`${(errors as FormErrors)[lang] && (errors as FormErrors)[lang]?.message ? '!border-2 !border-error !text-error' : ''}`}
                   >
                     {data.language}
                   </button>
@@ -352,7 +361,7 @@ function EditHospitalProcedure({
             </div>
 
             {countryData.map((c) => {
-              const lang = hospitalObj[
+              const lang = hospitalProcedureDescObj[
                 c.language
               ] as HospitalProcedureFormSchemaType;
               return (
@@ -361,10 +370,12 @@ function EditHospitalProcedure({
                     <textarea
                       // eslint-disable-next-line jsx-a11y/no-autofocus
                       autoFocus
-                      className={`${errors[lang]?.message ? 'outline-2 outline-error' : ''} h-[128px] w-full rounded-lg border-2 border-lightsilver px-4 py-2 placeholder:text-sm placeholder:font-normal placeholder:text-neutral-3`}
+                      className={`${(errors as FormErrors)[lang]?.message ? 'outline-2 outline-error' : ''} h-[128px] w-full rounded-lg border-2 border-lightsilver px-4 py-2 placeholder:text-sm placeholder:font-normal placeholder:text-neutral-3`}
                       placeholder="Type here"
                       id="hospital-procedure-description"
-                      {...register(lang)}
+                      {...register(
+                        lang as keyof EditHospitalProcedureFormFields,
+                      )}
                     />
                   )}
                 </div>
@@ -379,8 +390,8 @@ function EditHospitalProcedure({
           </div>
 
           <div className="grid w-full grid-cols-2 gap-x-10 gap-y-4">
-            <div className="relative my-4 flex w-full flex-col items-start">
-              <div className="relative my-4 flex w-full flex-col items-start">
+            <div className="relative flex w-full flex-col items-start">
+              <div className="relative flex w-full flex-col items-start">
                 <label
                   className="mb-3 font-poppins text-base font-normal text-neutral-2"
                   htmlFor="cost-of-procedure"

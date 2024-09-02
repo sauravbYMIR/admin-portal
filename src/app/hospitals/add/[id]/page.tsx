@@ -300,7 +300,7 @@ function HospitalDetailsPage({ params: { id } }: { params: { id: string } }) {
                             teamMemberId={member.id}
                             name={member.name}
                             qualification={member.qualification}
-                            role={member.position.en}
+                            role={member.position.en ?? ''}
                             key={member.id}
                             isEdit={isEditTeamMember}
                             onOpen={() => {

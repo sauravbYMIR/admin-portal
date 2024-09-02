@@ -46,26 +46,30 @@ import {
   availableCurrency,
   countryData,
   handleGetLocalStorage,
+  hospitalProcedureDescObj,
+  ProcedureDescSchema,
 } from '@/utils/global';
 
 import addHospitalStyle from '../../../style.module.scss';
 import type { HospitalProcedureFormSchemaType } from '../[procedureId]/edit/page';
 
+type FormErrors = {
+  [key in HospitalProcedureFormSchemaType]?: { message?: string };
+} & {
+  departmentName?: { message?: string };
+  procedureName?: { message?: string };
+  costType?: { message?: string };
+  cost?: { message?: string };
+  waitingTime?: { message?: string };
+  stayInHospital?: { message?: string };
+  stayInCity?: { message?: string };
+  gallery?: { message?: string };
+};
+
 const createHospitalProcedureFormSchema = z.object({
   department: departmentTypeSchema,
   procedure: procedureTypeSchema,
-  procedureDescEn: z
-    .string()
-    .min(1, { message: 'Fill in details in all the languages' }),
-  procedureDescNb: z
-    .string()
-    .min(1, { message: 'Fill in details in all the languages' }),
-  procedureDescDa: z
-    .string()
-    .min(1, { message: 'Fill in details in all the languages' }),
-  procedureDescSv: z
-    .string()
-    .min(1, { message: 'Fill in details in all the languages' }),
+  ...ProcedureDescSchema,
   cost: z.number({
     required_error: 'Cost in all language is required',
     invalid_type_error: 'Cost must be a number',
@@ -135,12 +139,6 @@ const HospitalMemberCard = ({
     </div>
   );
 };
-const hospitalProcedureObj = {
-  English: 'procedureDescEn',
-  Norwegian: 'procedureDescNb',
-  Danish: 'procedureDescDa',
-  Swedish: 'procedureDescSv',
-};
 function AddHospitalProcedure({ params }: { params: { id: string } }) {
   const updateHospitalProcedureGallery = useUpdateHospitalProcedureGallery();
   const galleryRef = React.useRef<HTMLInputElement>(null);
@@ -192,10 +190,12 @@ function AddHospitalProcedure({ params }: { params: { id: string } }) {
     resolver: zodResolver(createHospitalProcedureFormSchema),
   });
   const shouldRenderProcedureError = countryData.some((c) => {
-    const lang = hospitalProcedureObj[
+    const lang = hospitalProcedureDescObj[
       c.language
     ] as HospitalProcedureFormSchemaType;
-    return errors[lang] && errors[lang]?.message;
+    return (
+      (errors as FormErrors)[lang] && (errors as FormErrors)[lang]?.message
+    );
   });
   const onFormSubmit: SubmitHandler<CreateHospitalProcedureFormFields> = (
     data: CreateHospitalProcedureFormFields,
@@ -208,15 +208,24 @@ function AddHospitalProcedure({ params }: { params: { id: string } }) {
       toast.success('Please select valid cost type');
       return;
     }
+    const descObj = Object.keys(data).reduce(
+      (acc, curr) => {
+        const value =
+          curr.split('procedureDesc').length > 0
+            ? curr.split('procedureDesc')[1]?.toLowerCase()
+            : '';
+        if (value) {
+          // @ts-ignore
+          acc[value] = data[curr as keyof EditHospitalProcedureFormFields];
+        }
+        return acc;
+      },
+      {} as Record<HospitalProcedureFormSchemaType, string>,
+    );
     createHospitalProcedure.mutate({
       procedureId: data.procedure.value,
       hospitalId: params.id,
-      description: {
-        en: data.procedureDescEn,
-        da: data.procedureDescDa,
-        nb: data.procedureDescNb,
-        sv: data.procedureDescSv,
-      },
+      description: { ...descObj },
       cost: {
         price: data.cost,
         currency: data.costType.value,
@@ -268,20 +277,12 @@ function AddHospitalProcedure({ params }: { params: { id: string } }) {
             );
             return {
               value: department.id,
-              label:
-                `${parentCategory?.name.en} -- ${department.name.en}` ||
-                `${parentCategory?.name.nb} -- ${department.name.nb}` ||
-                `${parentCategory?.name.sv} -- ${department.name.sv}` ||
-                `${parentCategory?.name.da} -- ${department.name.da}`,
+              label: `${parentCategory?.name.en} -- ${department.name.en}`,
             };
           }
           return {
             value: department.id,
-            label:
-              department.name.en ||
-              department.name.nb ||
-              department.name.sv ||
-              department.name.da,
+            label: department?.name.en ?? '',
           };
         }),
       );
@@ -298,11 +299,7 @@ function AddHospitalProcedure({ params }: { params: { id: string } }) {
       setProcedureList(() =>
         allProcedureByDeptId.data.data.map((procedure) => ({
           value: procedure.id,
-          label:
-            procedure.name.en ||
-            procedure.name.nb ||
-            procedure.name.sv ||
-            procedure.name.da,
+          label: procedure.name.en ?? '',
         })),
       );
     }
@@ -323,14 +320,21 @@ function AddHospitalProcedure({ params }: { params: { id: string } }) {
     createHospitalProcedure.data?.data,
     params.id,
   ]);
-  const currencyOption = React.useMemo(
-    () =>
-      countryData.map((data) => ({
+  const currencyOption = React.useMemo(() => {
+    const unqiueCurrencies = new Set<string>();
+    return countryData
+      .filter((data) => {
+        if (!unqiueCurrencies.has(data.currency)) {
+          unqiueCurrencies.add(data.currency);
+          return true;
+        }
+        return false;
+      })
+      .map((data) => ({
         value: data.currency as AvailableCurrencyType,
         label: data.currency,
-      })),
-    [],
-  );
+      }));
+  }, []);
   const hospitalCountry =
     handleGetLocalStorage({ tokenKey: 'hospital_country' }) ?? '';
   const gallery = watch('gallery');
@@ -436,7 +440,7 @@ function AddHospitalProcedure({ params }: { params: { id: string } }) {
 
             <div className={addHospitalStyle.langTabContainer}>
               {countryData.map((data) => {
-                const lang = hospitalProcedureObj[
+                const lang = hospitalProcedureDescObj[
                   data.language
                 ] as HospitalProcedureFormSchemaType;
                 return (
@@ -453,7 +457,7 @@ function AddHospitalProcedure({ params }: { params: { id: string } }) {
                           }
                         : {}
                     }
-                    className={`${errors[lang] && errors[lang]?.message ? '!border-2 !border-error !text-error' : ''}`}
+                    className={`${(errors as FormErrors)[lang] && (errors as FormErrors)[lang]?.message ? '!border-2 !border-error !text-error' : ''}`}
                   >
                     {data.language}
                   </button>
@@ -462,7 +466,7 @@ function AddHospitalProcedure({ params }: { params: { id: string } }) {
             </div>
 
             {countryData.map((c) => {
-              const lang = hospitalProcedureObj[
+              const lang = hospitalProcedureDescObj[
                 c.language
               ] as HospitalProcedureFormSchemaType;
               return (
@@ -471,9 +475,10 @@ function AddHospitalProcedure({ params }: { params: { id: string } }) {
                     <textarea
                       // eslint-disable-next-line jsx-a11y/no-autofocus
                       autoFocus
-                      className={`${errors[lang]?.message ? 'outline-2 outline-error' : ''} h-[128px] w-full rounded-lg border-2 border-lightsilver px-4 py-2 placeholder:text-sm placeholder:font-normal placeholder:text-neutral-3`}
+                      className={`${(errors as FormErrors)[lang]?.message ? 'outline-2 outline-error' : ''} h-[128px] w-full rounded-lg border-2 border-lightsilver px-4 py-2 placeholder:text-sm placeholder:font-normal placeholder:text-neutral-3`}
                       placeholder="Enter procedure description"
                       id="procedure-description"
+                      // @ts-ignore
                       {...register(lang)}
                     />
                   )}
@@ -800,7 +805,7 @@ function AddHospitalProcedure({ params }: { params: { id: string } }) {
                   return (
                     <HospitalMemberCard
                       name={member.member.name}
-                      role={member.role.en}
+                      role={member.role.en ?? ''}
                       key={`${member.member.name}-${member.role.en}`}
                       setTeamMembers={setTeamMembers}
                       memberId={member.member.id}

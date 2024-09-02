@@ -20,36 +20,41 @@ import type { LanguagesType } from '@/types/components';
 import { countryData } from '@/utils/global';
 
 import modalStyle from '../CreateHospitalTeamMemberModal/style.module.scss';
+import type { Locale } from '../DepartmentModal/DepartmentModal';
 
-const roleObj = {
-  English: 'roleEn',
-  Norwegian: 'roleNb',
-  Danish: 'roleDa',
-  Swedish: 'roleSv',
-};
 export const teamMemberTypeSchema = z.object({
   label: z.string().min(1, { message: 'Please select member to proceed' }),
   value: z.string().min(1, { message: 'Please select member to proceed' }),
 });
-export type HospitalTeamMemberSchemaType =
-  | 'roleEn'
-  | 'roleNb'
-  | 'roleDa'
-  | 'roleSv';
+
+export type HospitalTeamMemberSchemaType = `role${Capitalize<Locale>}`;
+type FormErrors = {
+  [key in HospitalTeamMemberSchemaType]?: { message?: string };
+} & {
+  teamMemberId?: { message?: string };
+};
+const RoleSchema = countryData.reduce(
+  (acc, currValue) => {
+    const schema =
+      `role${currValue.locale.charAt(0).toUpperCase()}${currValue.locale.slice(1)}` as HospitalTeamMemberSchemaType;
+    acc[schema] = z
+      .string()
+      .min(1, { message: 'Fill in details in all the languages' });
+    return acc;
+  },
+  {} as Record<HospitalTeamMemberSchemaType, z.ZodString>,
+);
+const roleObj = countryData.reduce(
+  (acc, currValue) => {
+    const name = `role${currValue.locale.charAt(0).toUpperCase()}${currValue.locale.slice(1)}`;
+    acc[currValue.language] = name;
+    return acc;
+  },
+  {} as Record<string, string>,
+);
 const addTeamMemberFormSchema = z.object({
   teamMemberId: teamMemberTypeSchema,
-  roleEn: z
-    .string()
-    .min(1, { message: 'Fill in details in all the languages' }),
-  roleNb: z
-    .string()
-    .min(1, { message: 'Fill in details in all the languages' }),
-  roleDa: z
-    .string()
-    .min(1, { message: 'Fill in details in all the languages' }),
-  roleSv: z
-    .string()
-    .min(1, { message: 'Fill in details in all the languages' }),
+  ...RoleSchema,
 });
 export type EditHospitalTeamMemberFormFields = z.infer<
   typeof addTeamMemberFormSchema
@@ -133,7 +138,9 @@ export function AddTeamMemberAPI({
   });
   const shouldRenderError = countryData.some((c) => {
     const lang = roleObj[c.language] as HospitalTeamMemberSchemaType;
-    return errors[lang] && errors[lang]?.message;
+    return (
+      (errors as FormErrors)[lang] && (errors as FormErrors)[lang]?.message
+    );
   });
   const addHospitalMemberToProcedure = useAddHospitalMemberToProcedure({
     hospitalProcedureId,
@@ -150,26 +157,33 @@ export function AddTeamMemberAPI({
       toast.error('Invalid hospital procedure, refresh the page and try again');
       return;
     }
+    const roleDataObj = Object.keys(data).reduce(
+      (acc, curr) => {
+        const value =
+          curr.split('role').length > 0
+            ? curr.split('role')[1]?.toLowerCase()
+            : '';
+        if (value) {
+          // @ts-ignore
+          acc[value] = data[curr] as string;
+        }
+        return acc;
+      },
+      {} as Record<HospitalTeamMemberSchemaType, string>,
+    );
     if (isEditTeamMember) {
       editHospitalProcedureMember.mutate({
         role: {
-          en: data.roleEn,
-          da: data.roleDa,
-          nb: data.roleNb,
-          sv: data.roleSv,
+          ...roleDataObj,
         },
         memberId: data.teamMemberId.value,
         hospitalProcedure: hospitalProcedureId,
       });
       return;
     }
-
     addHospitalMemberToProcedure.mutate({
       role: {
-        en: data.roleEn,
-        da: data.roleDa,
-        nb: data.roleNb,
-        sv: data.roleSv,
+        ...roleDataObj,
       },
       hospitalProcedure: hospitalProcedureId,
       memberId: data.teamMemberId.value,
@@ -188,15 +202,27 @@ export function AddTeamMemberAPI({
       selectedTeamMemberDetails.id &&
       selectedTeamMemberDetails.role
     ) {
-      setValue('roleEn', selectedTeamMemberDetails.role.en);
-      setValue('roleDa', selectedTeamMemberDetails.role.da);
-      setValue('roleSv', selectedTeamMemberDetails.role.sv);
-      setValue('roleNb', selectedTeamMemberDetails.role.nb);
+      Object.values(roleObj).forEach((d) => {
+        const locale = d.split('role')[1]?.toLowerCase();
+        if (
+          locale &&
+          selectedTeamMemberDetails &&
+          selectedTeamMemberDetails.role
+        ) {
+          const val = selectedTeamMemberDetails.role[locale];
+          if (val) {
+            // @ts-ignore
+            setValue(d, val);
+          }
+        }
+      });
+
       setValue('teamMemberId.label', selectedTeamMemberDetails.name);
       setValue('teamMemberId.value', selectedTeamMemberDetails.id);
     }
   }, [
     isEditTeamMember,
+    selectedTeamMemberDetails,
     selectedTeamMemberDetails.id,
     selectedTeamMemberDetails.name,
     selectedTeamMemberDetails.role,
@@ -274,10 +300,19 @@ export function AddTeamMemberAPI({
                             label: string;
                             role: NameJSONType;
                           };
-                          setValue('roleEn', v.role.en);
-                          setValue('roleNb', v.role.nb);
-                          setValue('roleDa', v.role.da);
-                          setValue('roleSv', v.role.sv);
+                          Object.values(roleObj).forEach((d) => {
+                            const locale = d.split('role')[1]?.toLowerCase();
+                            if (locale) {
+                              const val = v.role[locale];
+                              if (val) {
+                                setValue(
+                                  d as keyof EditHospitalTeamMemberFormFields,
+                                  // @ts-ignore
+                                  val,
+                                );
+                              }
+                            }
+                          });
                           setSelectedOption({
                             label: v.name,
                             value: v.value,
@@ -325,7 +360,7 @@ export function AddTeamMemberAPI({
                             : {}
                         }
                         onClick={() => setActiveLanguageTab(data.language)}
-                        className={`${errors[lang] && errors[lang]?.message ? '!border !border-error !text-error' : ''}`}
+                        className={`${(errors as FormErrors)[lang] && (errors as FormErrors)[lang]?.message ? '!border !border-error !text-error' : ''}`}
                       >
                         {data.language}
                       </button>
@@ -345,6 +380,7 @@ export function AddTeamMemberAPI({
                           className="w-full rounded-lg border-2 border-lightsilver px-4 py-3"
                           type="text"
                           id="position"
+                          // @ts-ignore
                           {...register(lang)}
                         />
                       )}

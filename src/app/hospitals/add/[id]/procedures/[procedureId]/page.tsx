@@ -367,7 +367,9 @@ function HospitalDetailsPage({
                                   teamMemberId={member.id}
                                   name={member.name}
                                   qualification={member.qualification}
-                                  role={member.role ? member.role.en : '---'}
+                                  role={
+                                    member.role ? member.role.en ?? '' : '---'
+                                  }
                                   key={member.id}
                                   isEdit={isEditTeamMember}
                                   onOpen={() => {
@@ -397,7 +399,9 @@ function HospitalDetailsPage({
                                   teamMemberId={member.id}
                                   name={member.name}
                                   qualification={member.qualification}
-                                  role={member.role ? member.role.en : '---'}
+                                  role={
+                                    member.role ? member.role.en ?? '' : '---'
+                                  }
                                   key={member.id}
                                   isEdit={isEditTeamMember}
                                   onOpen={() => {

@@ -2,19 +2,17 @@ import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { toast } from 'sonner';
 
 import { axiosInstance } from '@/utils/axiosInstance';
+import type { countryData } from '@/utils/global';
 
+type Locale = (typeof countryData)[number]['locale'];
+type CountryCode = (typeof countryData)[number]['countryCode'];
 export type NameJSONType = {
-  en: string;
-  nb: string;
-  da: string;
-  sv: string;
+  [K in Locale]: string;
 };
 export type ReimbursementJSONType = {
-  ie: number;
-  no: number;
-  dk: number;
-  se: number;
+  [K in CountryCode]: number;
 };
+
 export type CostJSONType = {
   price: number;
   currency: string;

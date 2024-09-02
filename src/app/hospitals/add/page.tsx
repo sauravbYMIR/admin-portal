@@ -23,21 +23,23 @@ import {
   PlusIcon,
   WithAuth,
 } from '@/components';
+import type { Locale } from '@/components/Modal/DepartmentModal/DepartmentModal';
 import {
   useCreateHospital,
   useUpdateHospitalGallery,
   useUpdateHospitalLogo,
 } from '@/hooks';
 import type { LanguagesType } from '@/types/components';
-import { availableCountries, countryData } from '@/utils/global';
+import {
+  availableCountries,
+  countryData,
+  hospitalDescObj,
+  HospitalDescSchema,
+} from '@/utils/global';
 
 import addHospitalStyle from './style.module.scss';
 
-export type HospitalFormSchemaType =
-  | 'hospitalDescEn'
-  | 'hospitalDescNb'
-  | 'hospitalDescDa'
-  | 'hospitalDescSv';
+export type HospitalDescFormSchemaType = `hospitalDesc${Capitalize<Locale>}`;
 
 const countryTypeSchema = z.object({
   label: z.string().min(1, { message: 'Please select a country' }),
@@ -46,18 +48,7 @@ const countryTypeSchema = z.object({
 
 const createHospitalFormSchema = z.object({
   hospitalName: z.string().min(1, { message: 'Fill in hospital name' }),
-  hospitalDescEn: z
-    .string()
-    .min(1, { message: 'Add description in all languages' }),
-  hospitalDescNb: z
-    .string()
-    .min(1, { message: 'Add description in all languages' }),
-  hospitalDescDa: z
-    .string()
-    .min(1, { message: 'Add description in all languages' }),
-  hospitalDescSv: z
-    .string()
-    .min(1, { message: 'Add description in all languages' }),
+  ...HospitalDescSchema,
   streetName: z.string().min(1, { message: 'Street name is required' }),
   city: z.string().min(1, { message: 'City is required' }),
   externalLink: z
@@ -87,6 +78,19 @@ const createHospitalFormSchema = z.object({
     .max(10, 'You can upload up to 10 images'),
 });
 export type CreateHospitalFormFields = z.infer<typeof createHospitalFormSchema>;
+type FormErrors = {
+  [key in HospitalDescFormSchemaType]?: { message?: string };
+} & {
+  hospitalName?: { message?: string };
+  streetName?: { message?: string };
+  city?: { message?: string };
+  externalLink?: { message?: string };
+  country?: { message?: string };
+  streetNumber?: { message?: string };
+  zipCode?: { message?: string };
+  logo?: { message?: string };
+  gallery?: { message?: string };
+};
 function AddHospital() {
   const [showLogoOverlay, setShowLogoOverlay] = React.useState<boolean>(false);
   const logoRef = React.useRef<HTMLInputElement>(null);
@@ -118,26 +122,32 @@ function AddHospital() {
   } = useForm<CreateHospitalFormFields>({
     resolver: zodResolver(createHospitalFormSchema),
   });
-  const hospitalObj = {
-    English: 'hospitalDescEn',
-    Norwegian: 'hospitalDescNb',
-    Danish: 'hospitalDescDa',
-    Swedish: 'hospitalDescSv',
-  };
   const shouldRenderProcedureError = countryData.some((c) => {
-    const lang = hospitalObj[c.language] as HospitalFormSchemaType;
-    return errors[lang] && errors[lang]?.message;
+    const lang = hospitalDescObj[c.language] as HospitalDescFormSchemaType;
+    return (
+      (errors as FormErrors)[lang] && (errors as FormErrors)[lang]?.message
+    );
   });
   const onFormSubmit: SubmitHandler<CreateHospitalFormFields> = (
     data: CreateHospitalFormFields,
   ) => {
+    const hDescObj = Object.keys(data).reduce(
+      (acc, curr) => {
+        const value =
+          curr.split('hospitalDesc').length > 0
+            ? curr.split('hospitalDesc')[1]?.toLowerCase()
+            : '';
+        if (typeof value === 'string') {
+          acc[value] = data[curr as keyof CreateHospitalFormFields] as string;
+        }
+        return acc;
+      },
+      {} as Record<string, string>,
+    );
     createHospital.mutate({
       name: data.hospitalName,
       description: {
-        en: data.hospitalDescEn,
-        nb: data.hospitalDescNb,
-        da: data.hospitalDescDa,
-        sv: data.hospitalDescSv,
+        ...hDescObj,
       },
       streetName: data.streetName,
       streetNumber: data.streetNumber,
@@ -338,9 +348,9 @@ function AddHospital() {
 
               <div className={addHospitalStyle.langTabContainer}>
                 {countryData.map((data) => {
-                  const lang = hospitalObj[
+                  const lang = hospitalDescObj[
                     data.language
-                  ] as HospitalFormSchemaType;
+                  ] as HospitalDescFormSchemaType;
                   return (
                     <button
                       key={data.locale}
@@ -355,10 +365,10 @@ function AddHospital() {
                             }
                           : {}
                       }
-                      className={`px-3 py-2 ${errors[lang] && errors[lang]?.message ? '!border-2 !border-error !text-error' : ''}`}
+                      className={`px-3 py-2 ${(errors as FormErrors)[lang] && (errors as FormErrors)[lang]?.message ? '!border-2 !border-error !text-error' : ''}`}
                     >
                       <span
-                        className={`${errors[lang] && errors[lang]?.message ? '!text-error' : 'text-darkteal'} font-poppins text-sm font-medium`}
+                        className={`${(errors as FormErrors)[lang] && (errors as FormErrors)[lang]?.message ? '!text-error' : 'text-darkteal'} font-poppins text-sm font-medium`}
                       >
                         {data.language}
                       </span>
@@ -368,16 +378,19 @@ function AddHospital() {
               </div>
 
               {countryData.map((c) => {
-                const lang = hospitalObj[c.language] as HospitalFormSchemaType;
+                const lang = hospitalDescObj[
+                  c.language
+                ] as HospitalDescFormSchemaType;
                 return (
                   <div key={c.countryCode}>
                     {c.language === activeLanguageTab && (
                       <textarea
                         // eslint-disable-next-line jsx-a11y/no-autofocus
                         autoFocus
-                        className={`${errors[lang]?.message ? 'outline-2 outline-error' : ''} h-[150px]  w-full rounded-lg border-2 border-lightsilver px-4 py-2 placeholder:text-sm placeholder:font-normal placeholder:text-neutral-3`}
+                        className={`${(errors as FormErrors)[lang]?.message ? 'outline-2 outline-error' : ''} h-[150px]  w-full rounded-lg border-2 border-lightsilver px-4 py-2 placeholder:text-sm placeholder:font-normal placeholder:text-neutral-3`}
                         placeholder="Enter hospital description"
                         id="hospital-description"
+                        // @ts-ignore
                         {...register(lang)}
                       />
                     )}

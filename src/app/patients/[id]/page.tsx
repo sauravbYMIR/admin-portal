@@ -57,7 +57,7 @@ const PatientBooking = ({ params }: { params: { id: string } }) => {
                 bookingDetail.data.data.reimbursementCost[
                   bookingDetail.data.data
                     .claimCountry as keyof typeof bookingDetail.data.data.reimbursementCost
-                ],
+                ] ?? 0,
               currency:
                 availableCountriesByCountryCode[
                   bookingDetail.data.data

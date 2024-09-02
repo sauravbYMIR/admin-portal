@@ -32,15 +32,16 @@ import {
   useUpdateHospitalLogo,
 } from '@/hooks';
 import type { LanguagesType } from '@/types/components';
-import { availableCountries, countryData } from '@/utils/global';
+import {
+  availableCountries,
+  countryData,
+  hospitalDescObj,
+  HospitalDescSchema,
+} from '@/utils/global';
 
+import type { HospitalDescFormSchemaType } from '../../add/page';
 import addHospitalStyle from '../../add/style.module.scss';
 
-export type HospitalFormSchemaType =
-  | 'hospitalDescEn'
-  | 'hospitalDescNb'
-  | 'hospitalDescDa'
-  | 'hospitalDescSv';
 const countryTypeSchema = z.object({
   label: z.string().min(1, { message: 'Please select a country' }),
   value: z.string().min(1, { message: 'Please select a country' }),
@@ -48,18 +49,7 @@ const countryTypeSchema = z.object({
 
 const editHospitalFormSchema = z.object({
   hospitalName: z.string().min(1, { message: 'Hospital name is required' }),
-  hospitalDescEn: z
-    .string()
-    .min(1, { message: 'Fill in details in all the languages' }),
-  hospitalDescNb: z
-    .string()
-    .min(1, { message: 'Fill in details in all the languages' }),
-  hospitalDescDa: z
-    .string()
-    .min(1, { message: 'Fill in details in all the languages' }),
-  hospitalDescSv: z
-    .string()
-    .min(1, { message: 'Fill in details in all the languages' }),
+  ...HospitalDescSchema,
   streetName: z.string().min(1, { message: 'Street name is required' }),
   city: z.string().min(1, { message: 'City is required' }),
   externalLink: z
@@ -89,6 +79,19 @@ const editHospitalFormSchema = z.object({
     .max(10, 'You can upload up to 10 images')
     .optional(),
 });
+type FormErrors = {
+  [key in HospitalDescFormSchemaType]?: { message?: string };
+} & {
+  hospitalName?: { message?: string };
+  streetName?: { message?: string };
+  city?: { message?: string };
+  externalLink?: { message?: string };
+  country?: { message?: string };
+  streetNumber?: { message?: string };
+  zipCode?: { message?: string };
+  logo?: { message?: string };
+  gallery?: { message?: string };
+};
 export type EditHospitalFormFields = z.infer<typeof editHospitalFormSchema>;
 function EditHospital({ params: { id } }: { params: { id: string } }) {
   const [showLogoOverlay, setShowLogoOverlay] = React.useState<boolean>(false);
@@ -130,15 +133,11 @@ function EditHospital({ params: { id } }: { params: { id: string } }) {
   >([]);
   const logo = watch('logo');
   const gallery = watch('gallery');
-  const hospitalObj = {
-    English: 'hospitalDescEn',
-    Norwegian: 'hospitalDescNb',
-    Danish: 'hospitalDescDa',
-    Swedish: 'hospitalDescSv',
-  };
   const shouldRenderProcedureError = countryData.some((c) => {
-    const lang = hospitalObj[c.language] as HospitalFormSchemaType;
-    return errors[lang] && errors[lang]?.message;
+    const lang = hospitalDescObj[c.language] as HospitalDescFormSchemaType;
+    return (
+      (errors as FormErrors)[lang] && (errors as FormErrors)[lang]?.message
+    );
   });
   const handleCheckIsNoOfImagesValid = (
     galleryImg: File[] | undefined,
@@ -166,13 +165,24 @@ function EditHospital({ params: { id } }: { params: { id: string } }) {
     if (!isValidNoOfImages) {
       return;
     }
+    const hDescObj = Object.keys(data).reduce(
+      (acc, curr) => {
+        const value =
+          curr.split('hospitalDesc').length > 0
+            ? curr.split('hospitalDesc')[1]?.toLowerCase()
+            : '';
+        if (value) {
+          // @ts-ignore
+          acc[value] = data[curr as keyof EditHospitalFormFields];
+        }
+        return acc;
+      },
+      {} as Record<string, string>,
+    );
     editHospital.mutate({
       name: data.hospitalName,
       description: {
-        en: data.hospitalDescEn,
-        sv: data.hospitalDescSv,
-        da: data.hospitalDescDa,
-        nb: data.hospitalDescNb,
+        ...hDescObj,
       },
       streetName: data.streetName,
       streetNumber: data.streetNumber,
@@ -198,10 +208,15 @@ function EditHospital({ params: { id } }: { params: { id: string } }) {
         setHospitalImages(reqdHospital.data.data.hospitalImages);
       }
       setValue('hospitalName', reqdHospital.data.data.name);
-      setValue('hospitalDescEn', reqdHospital.data.data.description.en);
-      setValue('hospitalDescNb', reqdHospital.data.data.description.nb);
-      setValue('hospitalDescDa', reqdHospital.data.data.description.da);
-      setValue('hospitalDescSv', reqdHospital.data.data.description.sv);
+      Object.values(hospitalDescObj).forEach((d) => {
+        const locale = d.split('hospitalDesc')[1]?.toLowerCase();
+        if (locale) {
+          const val = reqdHospital.data.data.description[locale];
+          if (val) {
+            setValue(d as keyof EditHospitalFormFields, val);
+          }
+        }
+      });
       setValue('streetName', reqdHospital.data.data.streetName);
       setValue('city', reqdHospital.data.data.city);
       setValue('streetNumber', reqdHospital.data.data.streetNumber);
@@ -535,9 +550,9 @@ function EditHospital({ params: { id } }: { params: { id: string } }) {
 
               <div className={addHospitalStyle.langTabContainer}>
                 {countryData.map((data) => {
-                  const lang = hospitalObj[
+                  const lang = hospitalDescObj[
                     data.language
-                  ] as HospitalFormSchemaType;
+                  ] as HospitalDescFormSchemaType;
                   return (
                     <button
                       key={data.locale}
@@ -550,7 +565,7 @@ function EditHospital({ params: { id } }: { params: { id: string } }) {
                             }
                           : {}
                       }
-                      className={`px-3 py-2 ${errors[lang] && errors[lang]?.message ? '!border-2 !border-error !text-error' : ''}`}
+                      className={`px-3 py-2 ${(errors as FormErrors)[lang] && (errors as FormErrors)[lang]?.message ? '!border-2 !border-error !text-error' : ''}`}
                       type="button"
                       onClick={() => {
                         setActiveLanguageTab(data.language);
@@ -565,16 +580,19 @@ function EditHospital({ params: { id } }: { params: { id: string } }) {
               </div>
 
               {countryData.map((c) => {
-                const lang = hospitalObj[c.language] as HospitalFormSchemaType;
+                const lang = hospitalDescObj[
+                  c.language
+                ] as HospitalDescFormSchemaType;
                 return (
                   <div key={c.countryCode}>
                     {c.language === activeLanguageTab && (
                       <textarea
                         // eslint-disable-next-line jsx-a11y/no-autofocus
                         autoFocus
-                        className={`${errors[lang]?.message ? 'outline-2 outline-error' : ''} w-full rounded-lg border-2 border-lightsilver px-4 py-2 placeholder:text-sm placeholder:font-normal placeholder:text-neutral-3`}
+                        className={`${(errors as FormErrors)[lang]?.message ? 'outline-2 outline-error' : ''} w-full rounded-lg border-2 border-lightsilver px-4 py-2 placeholder:text-sm placeholder:font-normal placeholder:text-neutral-3`}
                         placeholder="Enter hospital description"
                         id="hospital-description"
+                        // @ts-ignore
                         {...register(lang)}
                       />
                     )}

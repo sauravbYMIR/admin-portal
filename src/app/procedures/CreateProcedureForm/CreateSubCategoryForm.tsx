@@ -17,7 +17,8 @@ import {
   useGetAllDepartment,
 } from '@/hooks/useDepartment';
 import type { LanguagesType } from '@/types/components';
-import { countryData } from '@/utils/global';
+import type { SubCategoryFormSchemaType } from '@/utils/global';
+import { countryData, subCategoryObj, SubCategorySchema } from '@/utils/global';
 
 import type { DepartmentType } from './CreateProcedureForm';
 import { departmentTypeSchema } from './CreateProcedureForm';
@@ -33,29 +34,17 @@ interface CreateSubCategoryFormPropType {
   };
 }
 
-export type SubCategoryFormSchemaType =
-  | 'subCategoryEn'
-  | 'subCategoryNb'
-  | 'subCategoryDa'
-  | 'subCategorySv'
-  | 'department';
+export type SubCategoryFormWithDepSchemaType = SubCategoryFormSchemaType &
+  `department`;
 
 const subCategoryFormSchema = z.object({
-  subCategoryEn: z
-    .string()
-    .min(1, { message: 'Fill in details in all the languages' }),
-  subCategoryNb: z
-    .string()
-    .min(1, { message: 'Fill in details in all the languages' }),
-  subCategoryDa: z
-    .string()
-    .min(1, { message: 'Fill in details in all the languages' }),
-  subCategorySv: z
-    .string()
-    .min(1, { message: 'Fill in details in all the languages' }),
+  ...SubCategorySchema,
   department: departmentTypeSchema,
 });
 export type SubCategoryFormFields = z.infer<typeof subCategoryFormSchema>;
+type FormErrors = {
+  [key in SubCategoryFormWithDepSchemaType]?: { message?: string };
+};
 
 function CreateSubCategoryForm({
   isEdit,
@@ -85,11 +74,7 @@ function CreateSubCategoryForm({
           .filter((department) => !department.parentCategoryId)
           .map((department) => ({
             value: department.id,
-            label:
-              department.name.en ||
-              department.name.nb ||
-              department.name.sv ||
-              department.name.da,
+            label: department.name.en ?? '',
           })),
       );
     }
@@ -117,12 +102,20 @@ function CreateSubCategoryForm({
   });
 
   const handleCreateSubCategory = (data: SubCategoryFormFields) => {
+    const subCategoryData = Object.keys(data).reduce(
+      (acc, currValue) => {
+        const localeName = currValue.split('subCategory')[1]?.toLowerCase();
+        if (localeName) {
+          // @ts-ignore
+          acc[localeName] = data[currValue] as string;
+        }
+        return acc;
+      },
+      {} as Record<string, string>,
+    );
     createDepartment.mutate({
       name: {
-        en: data.subCategoryEn,
-        nb: data.subCategoryNb,
-        da: data.subCategoryDa,
-        sv: data.subCategorySv,
+        ...subCategoryData,
       },
       parentCategoryId: data.department.value,
     });
@@ -130,13 +123,21 @@ function CreateSubCategoryForm({
     reset();
   };
   const handleEditSubCategory = (data: SubCategoryFormFields) => {
+    const subCategoryData = Object.keys(data).reduce(
+      (acc, currValue) => {
+        const localeName = currValue.split('subCategory')[1]?.toLowerCase();
+        if (localeName) {
+          // @ts-ignore
+          acc[localeName] = data[currValue] as string;
+        }
+        return acc;
+      },
+      {} as Record<string, string>,
+    );
     editDepartment.mutate({
       departmentId: updateId,
       name: {
-        en: data.subCategoryEn,
-        nb: data.subCategoryNb,
-        da: data.subCategoryDa,
-        sv: data.subCategorySv,
+        ...subCategoryData,
       },
     });
     setCreateAnotherSubCategory(false);
@@ -145,29 +146,25 @@ function CreateSubCategoryForm({
   };
 
   React.useEffect(() => {
-    if (selectedData && selectedData?.id && selectedData?.category) {
-      setValue(
-        'department.label',
-        selectedData.category.name.en ||
-          selectedData.category.name.da ||
-          selectedData.category.name.nb ||
-          selectedData.category.name.sv,
-      );
+    if (selectedData && selectedData?.id && selectedData?.category && isEdit) {
+      setValue('department.label', selectedData.category.name.en ?? '');
       setSelectedOption(() => ({
-        label:
-          selectedData.category.name.en ||
-          selectedData.category.name.da ||
-          selectedData.category.name.nb ||
-          selectedData.category.name.sv,
+        label: selectedData.category.name.en ?? '',
         value: selectedData.category.id,
       }));
       setValue('department.value', selectedData.category.id);
-      setValue('subCategoryEn', selectedData.name.en);
-      setValue('subCategoryDa', selectedData.name.da);
-      setValue('subCategorySv', selectedData.name.sv);
-      setValue('subCategoryNb', selectedData.name.nb);
+      Object.values(subCategoryObj).forEach((d) => {
+        const locale = d.split('subCategory')[1]?.toLowerCase();
+        if (locale) {
+          const val = selectedData.name[locale];
+          if (val) {
+            // @ts-ignore
+            setValue(d, val);
+          }
+        }
+      });
     }
-  }, [selectedData, setValue]);
+  }, [selectedData, setValue, isEdit]);
 
   const onFormSubmit: SubmitHandler<SubCategoryFormFields> = (
     data: SubCategoryFormFields,
@@ -179,16 +176,12 @@ function CreateSubCategoryForm({
     }
   };
 
-  const subCategoryObj = {
-    English: 'subCategoryEn',
-    Norwegian: 'subCategoryNb',
-    Danish: 'subCategoryDa',
-    Swedish: 'subCategorySv',
-  };
-
   const shouldRenderProcedureError = countryData.some((c) => {
-    const lang = subCategoryObj[c.language] as SubCategoryFormSchemaType;
-    return errors[lang] && errors[lang]?.message;
+    const lang = subCategoryObj[c.language] as SubCategoryFormWithDepSchemaType;
+    return (
+      // @ts-ignore
+      (errors as FormErrors)[lang] && (errors as FormErrors)[lang]?.message
+    );
   });
 
   return (
@@ -243,7 +236,7 @@ function CreateSubCategoryForm({
         {countryData.map((data) => {
           const lang = subCategoryObj[
             data.language
-          ] as SubCategoryFormSchemaType;
+          ] as SubCategoryFormWithDepSchemaType;
           return (
             <button
               key={data.locale}
@@ -259,7 +252,8 @@ function CreateSubCategoryForm({
               }
               className={
                 activeLanguageTab === data.language
-                  ? `px-3 py-2 ${procedureModalStyle.activeLanguageTab}  ${errors[lang] && errors[lang]?.message ? '!border-2 !border-error !text-error' : ''}`
+                  ? // @ts-ignore
+                    `px-3 py-2 ${procedureModalStyle.activeLanguageTab}  ${(errors as FormErrors)[lang] && (errors as FormErrors)[lang]?.message ? '!border-2 !border-error !text-error' : ''}`
                   : ''
               }
               type="button"
@@ -273,7 +267,9 @@ function CreateSubCategoryForm({
       </div>
 
       {countryData.map((c) => {
-        const lang = subCategoryObj[c.language] as SubCategoryFormSchemaType;
+        const lang = subCategoryObj[
+          c.language
+        ] as SubCategoryFormWithDepSchemaType;
         return (
           <div key={c.countryCode}>
             {c.language === activeLanguageTab && (

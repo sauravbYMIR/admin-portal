@@ -57,6 +57,8 @@
         gap: 8px;
         align-items: center;
         margin: 20px 0;
+        overflow-x: scroll; 
+        width: 100%;
 
         button {
           border-radius: 8px;

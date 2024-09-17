@@ -1,4 +1,5 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
+import { AxiosError } from 'axios';
 import { toast } from 'sonner';
 
 import { axiosInstance } from '@/utils/axiosInstance';
@@ -218,7 +219,9 @@ export const useCreateHospital = () => {
       toast.success('Hospital added successfully');
     },
     onError: (error) => {
-      toast(`Something went wrong: ${error.message}`);
+      toast.error(
+        `Something went wrong: ${error instanceof AxiosError ? error?.response?.data?.error?.message : error.message}`,
+      );
     },
   });
 };
@@ -278,7 +281,9 @@ export const useEditHospital = () => {
       toast.success('Hospital updated successfully!');
     },
     onError: (error) => {
-      toast(`Something went wrong: ${error.message}`);
+      toast.error(
+        `Something went wrong: ${error instanceof AxiosError ? error?.response?.data?.error?.message : error.message}`,
+      );
     },
   });
 };
@@ -426,7 +431,9 @@ export const useRemoveGallery = () => {
       toast.error('Hospital gallery removed successfully');
     },
     onError: (error) => {
-      toast(`Something went wrong: ${error.message}`);
+      toast.error(
+        `Something went wrong: ${error instanceof AxiosError ? error?.response?.data?.error?.message : error.message}`,
+      );
     },
   });
 };

@@ -1,4 +1,5 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
+import { AxiosError } from 'axios';
 import { toast } from 'sonner';
 
 import { axiosInstance } from '@/utils/axiosInstance';
@@ -143,7 +144,9 @@ export const useUpdateBookingStatus = () => {
       });
     },
     onError: (error) => {
-      toast(`Something went wrong: ${error.message}`);
+      toast.error(
+        `Something went wrong: ${error instanceof AxiosError ? error?.response?.data?.error?.message : error.message}`,
+      );
     },
   });
 };

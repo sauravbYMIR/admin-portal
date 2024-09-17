@@ -143,6 +143,16 @@ function CreateHospitalTeamMemberModal({
         },
         hospitalMemberId: memberId,
       });
+      const profile = getValues('profile');
+      if (profile) {
+        const formData = new FormData();
+        formData.append('profile', profile as Blob);
+        updateHospitalProfile.mutate({
+          memberId,
+          formData,
+        });
+        reset();
+      }
     } else {
       createHospitalMember.mutate({
         name: data.name,
@@ -203,7 +213,7 @@ function CreateHospitalTeamMemberModal({
     createHospitalMember.data,
     createHospitalMember.isSuccess,
     isAnotherMemberChecked,
-    editHospitalMember?.data?.data,
+    editHospitalMember.isSuccess,
   ]);
   React.useEffect(() => {
     if (
@@ -225,8 +235,8 @@ function CreateHospitalTeamMemberModal({
       });
       Object.values(qualificationObj).forEach((d) => {
         const locale = d.split('qualification')[1]?.toLowerCase();
-        if (locale) {
-          const val = memberByIdDetails.data.data.qualification[locale];
+        if (locale && memberByIdDetails.data.data?.qualification) {
+          const val = memberByIdDetails.data.data?.qualification[locale];
           if (val) {
             setValue(d as keyof CreateHospitalTeamMemberFormFields, val);
           }

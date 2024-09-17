@@ -53,7 +53,7 @@ const createHospitalFormSchema = z.object({
   city: z.string().min(1, { message: 'City is required' }),
   externalLink: z
     .string()
-    .optional()
+    .min(1, { message: 'External link is required' })
     .refine(
       (value) =>
         !value ||

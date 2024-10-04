@@ -1,17 +1,104 @@
 'use client';
 
 import { useRouter } from 'next/navigation';
+import React from 'react';
+import { ClipLoader } from 'react-spinners';
+import { toast } from 'sonner';
 
 import { BackArrowIcon, Header, WithAuth } from '@/components';
 import ArticleSkeleton from '@/components/SkeletonLoader/ArticleSkeleton';
-import { useGetBookingDetail } from '@/hooks/useBooking';
 import {
+  useGetBookingDetail,
+  useUpdateBookingStatus,
+} from '@/hooks/useBooking';
+import {
+  ACCEPT,
+  ACCEPTED,
   availableCountries,
   availableCountriesByCountryCode,
   convertToValidCurrency,
+  REJECT,
+  REQUESTED,
 } from '@/utils/global';
 
 import patientBookingStyle from './patientBooking.module.scss';
+
+const AdminActionButton = ({
+  bookingId,
+  status,
+}: {
+  bookingId: string;
+  status: string;
+}) => {
+  const router = useRouter();
+  const [loadingType, setLoadingType] = React.useState<string>('NONE');
+  const updateBookingStatus = useUpdateBookingStatus();
+  React.useEffect(() => {
+    if (updateBookingStatus.isSuccess) {
+      setLoadingType('NONE');
+      toast.success('Application status updated successfully');
+      router.push(`/patients`);
+    }
+  }, [router, updateBookingStatus.isSuccess]);
+  return (
+    <div className="flex items-center gap-x-8">
+      {status.toUpperCase() === REQUESTED.toUpperCase() && (
+        <>
+          <button
+            type="button"
+            className="flex h-[41px] w-[90.45px] items-center justify-center rounded-[6.4px] bg-darkteal px-5 py-[10px]"
+            onClick={() => {
+              setLoadingType(ACCEPT);
+              updateBookingStatus.mutate({
+                bookingId,
+                status: true,
+              });
+            }}
+          >
+            {loadingType === ACCEPT && updateBookingStatus.isPending ? (
+              <ClipLoader
+                loading={updateBookingStatus.isPending}
+                color="#fff"
+                size={13}
+                aria-label="Loading Spinner"
+                data-testid="loader"
+              />
+            ) : (
+              <span className="font-poppins text-sm font-semibold text-white">
+                Accept
+              </span>
+            )}
+          </button>
+          <button
+            type="button"
+            className="flex h-[41px] w-[90.45px] items-center justify-center rounded-[6.4px] border-2 border-darkteal px-5 py-[10px]"
+            onClick={() => {
+              setLoadingType(REJECT);
+              updateBookingStatus.mutate({
+                bookingId,
+                status: false,
+              });
+            }}
+          >
+            {loadingType === REJECT && updateBookingStatus.isPending ? (
+              <ClipLoader
+                loading={updateBookingStatus.isPending}
+                color="rgba(9, 111, 144, 1)"
+                size={13}
+                aria-label="Loading Spinner"
+                data-testid="loader"
+              />
+            ) : (
+              <span className="font-poppins text-sm font-semibold text-darkteal">
+                Reject
+              </span>
+            )}
+          </button>
+        </>
+      )}
+    </div>
+  );
+};
 
 const PatientBooking = ({ params }: { params: { id: string } }) => {
   const router = useRouter();
@@ -27,7 +114,7 @@ const PatientBooking = ({ params }: { params: { id: string } }) => {
           },
           {
             label: 'Patients preferred dates',
-            value: `${bookingDetail.data.data.patientPreferredStartDate} to ${bookingDetail.data.data.patientPreferredEndDate}`,
+            value: `${bookingDetail.data.data.patientPreferredStartDate ? new Date(bookingDetail.data.data.patientPreferredStartDate).toLocaleDateString('en-US') : '----'} to ${bookingDetail.data.data.patientPreferredEndDate ? new Date(bookingDetail.data.data.patientPreferredEndDate).toLocaleDateString('en-US') : '----'}`,
           },
           {
             label: 'Application status',
@@ -112,7 +199,11 @@ const PatientBooking = ({ params }: { params: { id: string } }) => {
           },
           {
             label: 'Application date',
-            value: bookingDetail.data.data.applicationDate,
+            value: bookingDetail.data.data.applicationDate
+              ? new Date(
+                  bookingDetail.data.data.applicationDate,
+                ).toLocaleDateString('en-US')
+              : '----',
           },
         ]
       : [
@@ -129,18 +220,24 @@ const PatientBooking = ({ params }: { params: { id: string } }) => {
       bookingDetail.data.data &&
       bookingDetail.data.data.id ? (
         <div className={patientBookingStyle.patientBookingContentContainer}>
-          <div className="mb-20 flex items-center gap-x-14">
-            <button
-              type="button"
-              onClick={() => router.push('/patients')}
-              className="flex size-10 cursor-pointer items-center justify-center rounded-full border-none bg-rgba244"
-            >
-              <BackArrowIcon strokeWidth="2" stroke="rgba(17, 17, 17, 0.8)" />
-              <p className="hidden">text</p>
-            </button>
-            <h2 className="font-poppins text-3xl font-medium text-darkslategray">
-              Booking details
-            </h2>
+          <div className="flex w-full items-start justify-between">
+            <div className="mb-20 flex items-center gap-x-14">
+              <button
+                type="button"
+                onClick={() => router.push('/patients')}
+                className="flex size-10 cursor-pointer items-center justify-center rounded-full border-none bg-rgba244"
+              >
+                <BackArrowIcon strokeWidth="2" stroke="rgba(17, 17, 17, 0.8)" />
+                <p className="hidden">text</p>
+              </button>
+              <h2 className="font-poppins text-3xl font-medium text-darkslategray">
+                Booking details
+              </h2>
+            </div>
+            <AdminActionButton
+              bookingId={bookingDetail.data.data.id}
+              status={bookingDetail.data.data.applicationStatus}
+            />
           </div>
 
           <div className="px-20">
@@ -150,9 +247,35 @@ const PatientBooking = ({ params }: { params: { id: string } }) => {
                   Electronic ID verified
                 </p>
 
-                <p className={patientBookingStyle.patientStatusTag}>
-                  {bookingDetail.data.data.applicationStatus}
-                </p>
+                <div
+                  className="flex items-center justify-center rounded-sm px-2 py-1"
+                  style={
+                    // eslint-disable-next-line no-nested-ternary
+                    bookingDetail.data.data.applicationStatus.toUpperCase() ===
+                    REQUESTED.toUpperCase()
+                      ? {
+                          color: 'rgba(220, 104, 3, 1)',
+                          backgroundColor: 'rgba(254, 240, 199, 1)',
+                        }
+                      : bookingDetail.data.data.applicationStatus.toUpperCase() ===
+                          ACCEPTED.toUpperCase()
+                        ? {
+                            color: 'rgba(0, 59, 212, 1)',
+                            backgroundColor: 'rgba(230, 237, 255, 1)',
+                          }
+                        : {
+                            color: 'rgba(144, 0, 18, 1)',
+                            backgroundColor: 'rgba(253, 237, 237, 1)',
+                          }
+                  }
+                >
+                  <span className="text-sm">
+                    {bookingDetail.data.data.applicationStatus
+                      .charAt(0)
+                      .toUpperCase()}
+                    {bookingDetail.data.data.applicationStatus.slice(1)}
+                  </span>
+                </div>
               </div>
 
               <div className="grid grid-cols-3 gap-4">
@@ -166,9 +289,7 @@ const PatientBooking = ({ params }: { params: { id: string } }) => {
                         {data.label}
                       </p>
                       <p className="font-poppins text-base font-medium text-black">
-                        {data.label === 'Application date'
-                          ? `${new Date(data.value).getDate()}/${new Date(data.value).getMonth()}/${new Date(data.value).getFullYear()}`
-                          : data.value}
+                        {data.value}
                       </p>
                     </div>
                   );

@@ -51,7 +51,7 @@ const CustomStatusEditComponent = (props: CustomCellRendererProps) => {
         <>
           <button
             type="button"
-            className="flex h-[41px] items-center justify-center rounded-[6.4px] bg-darkteal px-5 py-[10px]"
+            className="flex h-[41px] w-[90.45px] items-center justify-center rounded-[6.4px] bg-darkteal px-5 py-[10px]"
             onClick={() => {
               setLoadingType(ACCEPT);
               updateBookingStatus.mutate({
@@ -76,7 +76,7 @@ const CustomStatusEditComponent = (props: CustomCellRendererProps) => {
           </button>
           <button
             type="button"
-            className="flex h-[41px] items-center justify-center rounded-[6.4px] border-2 border-darkteal px-5 py-[10px]"
+            className="flex h-[41px] w-[90.45px] items-center justify-center rounded-[6.4px] border-2 border-darkteal px-5 py-[10px]"
             onClick={() => {
               setLoadingType(REJECT);
               updateBookingStatus.mutate({
@@ -116,7 +116,6 @@ function PatientsPage() {
   return (
     <div>
       <Header />
-
       <div className={patientsStyle.patientsPageContentContainer}>
         <h2 className={patientsStyle.patientsPageTitle}>Our patients</h2>
         <p className={patientsStyle.patientsPageDesc}>

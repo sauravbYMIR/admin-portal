@@ -257,6 +257,14 @@ const countryData: CountryData[] = [
   // },
 ] as const;
 
+const genderObject = {
+  men: {
+    value: 'Male',
+  },
+  women: {
+    value: 'Female',
+  },
+};
 const handleSetLocalStorage = ({
   tokenKey,
   tokenValue,
@@ -477,6 +485,7 @@ export {
   ACCEPTED,
   convertToValidCurrency,
   countryData,
+  genderObject,
   handleGetLocalStorage,
   handleRemoveFromLocalStorage,
   handleSetLocalStorage,

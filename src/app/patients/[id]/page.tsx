@@ -17,6 +17,7 @@ import {
   availableCountries,
   availableCountriesByCountryCode,
   convertToValidCurrency,
+  genderObject,
   REJECT,
   REQUESTED,
 } from '@/utils/global';
@@ -180,7 +181,13 @@ const PatientBooking = ({ params }: { params: { id: string } }) => {
             label: 'Patient name',
             value: `${bookingDetail.data.data.user.firstName} ${bookingDetail.data.data.user.lastName}`,
           },
-          { label: 'Gender', value: bookingDetail.data.data.gender },
+          {
+            label: 'Gender',
+            value:
+              genderObject[
+                bookingDetail.data.data.gender as keyof typeof genderObject
+              ]?.value ?? '----',
+          },
           {
             label: 'Country of claim ',
             value:

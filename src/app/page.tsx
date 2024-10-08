@@ -31,7 +31,7 @@ function LandingPage() {
         <Image
           className={style.bannerImg}
           src={landingPageBanner}
-          alt="landing-page-banner-img"
+          alt="landing-page-banner-image"
         />
       </div>
     </div>

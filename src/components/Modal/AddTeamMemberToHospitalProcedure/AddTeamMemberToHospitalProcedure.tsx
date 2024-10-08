@@ -10,6 +10,7 @@ import { CloseIcon } from '@/components/Icons/Icons';
 import departmentModalStyle from '@/components/Modal/DepartmentModal/departmentModal.module.scss';
 import { useGetHospitalTeamMembersByHospitalId } from '@/hooks';
 import type { NameJSONType } from '@/hooks/useDepartment';
+import useScrollToError from '@/hooks/useScrollToError';
 import type { LanguagesType } from '@/types/components';
 import { countryData, roleObj, RoleSchema } from '@/utils/global';
 
@@ -170,6 +171,7 @@ export function AddTeamMemberToHospitalProcedure({
       onClose();
     }
   };
+  useScrollToError(errors);
   return (
     <div>
       {isOpen && (

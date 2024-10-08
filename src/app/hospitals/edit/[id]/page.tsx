@@ -31,6 +31,7 @@ import {
   useUpdateHospitalGallery,
   useUpdateHospitalLogo,
 } from '@/hooks';
+import useScrollToError from '@/hooks/useScrollToError';
 import type { LanguagesType } from '@/types/components';
 import {
   availableCountries,
@@ -270,6 +271,7 @@ function EditHospital({ params: { id } }: { params: { id: string } }) {
         ),
     [],
   );
+  useScrollToError(errors);
   return (
     <div>
       <Header />
@@ -348,8 +350,7 @@ function EditHospital({ params: { id } }: { params: { id: string } }) {
                         fill
                         priority
                         unoptimized
-                        style={{ backgroundImage: 'contain' }}
-                        className="inline-block rounded-full"
+                        className="inline-block aspect-square rounded-full object-cover"
                       />
                     ) : (
                       <>
@@ -589,7 +590,7 @@ function EditHospital({ params: { id } }: { params: { id: string } }) {
                       <textarea
                         // eslint-disable-next-line jsx-a11y/no-autofocus
                         autoFocus
-                        className={`${(errors as FormErrors)[lang]?.message ? 'outline-2 outline-error' : ''} w-full rounded-lg border-2 border-lightsilver px-4 py-2 placeholder:text-sm placeholder:font-normal placeholder:text-neutral-3`}
+                        className={`${(errors as FormErrors)[lang]?.message ? 'outline-2 outline-error' : ''} h-[200px] w-full rounded-lg border-2 border-lightsilver px-4 py-2 placeholder:text-sm placeholder:font-normal placeholder:text-neutral-3`}
                         placeholder="Enter hospital description"
                         id="hospital-description"
                         // @ts-ignore
@@ -798,7 +799,7 @@ function EditHospital({ params: { id } }: { params: { id: string } }) {
                         width={200}
                         height={180}
                         alt="hospital-gallery"
-                        className="h-[180px] w-[200px] rounded-lg object-contain"
+                        className="h-[180px] w-[200px] rounded-lg object-cover"
                       />
                     </div>
                   ))}
@@ -816,7 +817,7 @@ function EditHospital({ params: { id } }: { params: { id: string } }) {
                         unoptimized
                         priority
                         alt="hospital-gallery"
-                        className="relative aspect-square size-[200px] cursor-pointer rounded-lg border border-neutral-4 object-contain"
+                        className="relative aspect-square size-[200px] cursor-pointer rounded-lg border border-neutral-4 object-cover"
                       />
                       <button
                         type="button"

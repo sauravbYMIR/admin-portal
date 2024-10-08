@@ -15,6 +15,7 @@ import {
   useGetHospitalTeamMemberById,
   useUpdateHospitalProfile,
 } from '@/hooks/useMember';
+import useScrollToError from '@/hooks/useScrollToError';
 import type { LanguagesType } from '@/types/components';
 import {
   countryData,
@@ -245,6 +246,7 @@ function CreateHospitalTeamMemberModal({
     }
   }, [memberByIdDetails.data, memberByIdDetails.isSuccess, setValue, memberId]);
   const profile = watch('profile');
+  useScrollToError(errors);
   return (
     <div>
       {isOpen && (
@@ -430,14 +432,14 @@ function CreateHospitalTeamMemberModal({
                 render={({ field: { name, onBlur, onChange } }) => (
                   <button
                     type="button"
-                    className="relative flex h-[180px] w-[205px] flex-col items-center justify-center rounded-lg border border-neutral-4 p-4"
+                    className="relative flex h-[200px] w-[205px] flex-col items-center justify-center rounded-lg border border-neutral-4 p-4"
                     onClick={() => profileRef.current?.click()}
                     onMouseEnter={() => setShowLogoOverlay(true)}
                     onMouseLeave={() => setShowLogoOverlay(false)}
                   >
                     {showLogoOverlay && profile && (
                       <div
-                        className="absolute left-0 top-0 flex size-full flex-col items-center justify-center rounded-full"
+                        className="absolute left-0 top-0 z-[9999] flex size-full flex-col items-center justify-center rounded-full"
                         style={{
                           backgroundColor: 'rgba(0, 0, 0, 0.4)',
                         }}
@@ -479,8 +481,7 @@ function CreateHospitalTeamMemberModal({
                         fill
                         priority
                         unoptimized
-                        style={{ backgroundImage: 'contain' }}
-                        className="inline-block rounded-lg"
+                        className="inline-block aspect-square rounded-lg object-contain"
                       />
                     ) : (
                       <div>
@@ -496,8 +497,7 @@ function CreateHospitalTeamMemberModal({
                               fill
                               priority
                               unoptimized
-                              style={{ backgroundImage: 'contain' }}
-                              className="inline-block rounded-lg"
+                              className="inline-block aspect-square rounded-lg object-contain"
                             />
                             <div className="absolute left-0 top-0 flex size-full flex-col items-center justify-center gap-y-4 rounded-lg bg-black/25">
                               <p className="mt-3 font-poppins text-sm font-medium text-white">

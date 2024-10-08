@@ -99,7 +99,7 @@ function HospitalDetailsPage({ params: { id } }: { params: { id: string } }) {
                 hospitalById.data.data &&
                 typeof hospitalById.data.data.logo === 'string' ? (
                   <Image
-                    className="aspect-square rounded-full border border-lightsilver object-contain"
+                    className="aspect-square rounded-full border border-lightsilver object-cover"
                     src={`${hospitalById.data.data.logo}?version=${new Date().getTime()}`}
                     alt="hospital logo"
                     width={100}
@@ -210,7 +210,7 @@ function HospitalDetailsPage({ params: { id } }: { params: { id: string } }) {
                       alt="hospital-gallery"
                       unoptimized
                       priority
-                      className="aspect-square h-[250px] w-[260px] rounded-lg border border-stone-400 object-contain"
+                      className="aspect-square h-[250px] w-[260px] rounded-lg border border-stone-400 object-cover"
                     />
                   );
                 })}

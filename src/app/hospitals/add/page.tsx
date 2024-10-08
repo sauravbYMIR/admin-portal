@@ -29,6 +29,7 @@ import {
   useUpdateHospitalGallery,
   useUpdateHospitalLogo,
 } from '@/hooks';
+import useScrollToError from '@/hooks/useScrollToError';
 import type { LanguagesType } from '@/types/components';
 import {
   availableCountries,
@@ -197,6 +198,7 @@ function AddHospital() {
     // updateHospitalGallery,
     // updateHospitalLogo,
   ]);
+  useScrollToError(errors);
   const logo = watch('logo');
   const gallery = watch('gallery');
   const countryOptions = React.useMemo(
@@ -289,8 +291,7 @@ function AddHospital() {
                       fill
                       priority
                       unoptimized
-                      style={{ backgroundImage: 'contain' }}
-                      className="inline-block rounded-full"
+                      className="inline-block aspect-square rounded-full object-cover"
                     />
                   ) : (
                     <>
@@ -579,7 +580,7 @@ function AddHospital() {
                     >
                       <button
                         type="button"
-                        className="absolute right-4 top-4 z-10"
+                        className="absolute right-4 top-4 z-10 flex size-7 items-center justify-center rounded-full bg-white shadow-md"
                         onClick={() => {
                           const updatedGallery = gallery.filter(
                             (f) => f.lastModified !== file.lastModified,
@@ -587,7 +588,7 @@ function AddHospital() {
                           setValue('gallery', updatedGallery);
                         }}
                       >
-                        <CloseIcon className="mb-2 size-6" strokeWidth={1.7} />
+                        <CloseIcon className="size-5" strokeWidth={1.7} />
                       </button>
                       <Image
                         src={`${URL.createObjectURL(file)}`}
@@ -596,7 +597,7 @@ function AddHospital() {
                         fill
                         priority
                         unoptimized
-                        className="object-contain"
+                        className="aspect-square object-cover"
                       />
                     </div>
                   ))}

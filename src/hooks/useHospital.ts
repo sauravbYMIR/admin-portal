@@ -310,7 +310,8 @@ export const useUpdateHospitalLogo = () => {
   return useMutation({
     mutationFn: updateHospitalLogo,
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['hospital'] });
+      toast.success('Hospital logo added successfully');
+      return queryClient.invalidateQueries({ queryKey: ['hospital'] });
     },
   });
 };
@@ -336,6 +337,7 @@ export const useUpdateHospitalGallery = () => {
   return useMutation({
     mutationFn: updateHospitalGallery,
     onSuccess: () => {
+      toast.success('Hospital images added successfully');
       return queryClient.invalidateQueries({ queryKey: ['hospital'] });
     },
   });

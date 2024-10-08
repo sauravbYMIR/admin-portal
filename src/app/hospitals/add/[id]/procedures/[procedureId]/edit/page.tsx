@@ -29,6 +29,7 @@ import {
   useGetHospitalProcedureById,
   useUpdateHospitalProcedureGallery,
 } from '@/hooks/useHospitalProcedure';
+import useScrollToError from '@/hooks/useScrollToError';
 import type { LanguagesType } from '@/types/components';
 import type { AvailableCurrencyType } from '@/utils/global';
 import {
@@ -261,6 +262,7 @@ function EditHospitalProcedure({
   const hospitalCountry =
     handleGetLocalStorage({ tokenKey: 'hospital_country' }) ?? '';
   const gallery = watch('gallery');
+  useScrollToError(errors);
   return (
     <div>
       <Header />
@@ -591,7 +593,7 @@ function EditHospitalProcedure({
                               width={250}
                               height={264}
                               alt="hospital-gallery"
-                              className="aspect-square h-[250px] w-[264px] rounded-lg object-contain"
+                              className="aspect-square h-[250px] w-[264px] rounded-lg object-cover"
                             />
                           </div>
                         );

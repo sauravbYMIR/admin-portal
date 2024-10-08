@@ -16,6 +16,7 @@ import {
   useAddHospitalMemberToProcedure,
   useEditHospitalProcedureMember,
 } from '@/hooks/useHospitalProcedure';
+import useScrollToError from '@/hooks/useScrollToError';
 import type { LanguagesType } from '@/types/components';
 import { countryData } from '@/utils/global';
 
@@ -228,6 +229,7 @@ export function AddTeamMemberAPI({
     selectedTeamMemberDetails.role,
     setValue,
   ]);
+  useScrollToError(errors);
   return (
     <div>
       {isOpen && (

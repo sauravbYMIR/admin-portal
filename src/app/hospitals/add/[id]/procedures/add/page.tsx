@@ -38,6 +38,7 @@ import {
   useUpdateHospitalProcedureGallery,
 } from '@/hooks/useHospitalProcedure';
 import { useGetAllProcedureByDeptId } from '@/hooks/useProcedure';
+import useScrollToError from '@/hooks/useScrollToError';
 import emptyTeamMember from '@/public/assets/images/emptyTeamMember.svg';
 import type { LanguagesType } from '@/types/components';
 import type { AvailableCurrencyType } from '@/utils/global';
@@ -338,6 +339,7 @@ function AddHospitalProcedure({ params }: { params: { id: string } }) {
   const hospitalCountry =
     handleGetLocalStorage({ tokenKey: 'hospital_country' }) ?? '';
   const gallery = watch('gallery');
+  useScrollToError(errors);
   return (
     <div>
       <Header />

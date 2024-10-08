@@ -39,7 +39,7 @@ function HospitalTeamMemberCard({
             src={`${profile}?version=${new Date().getTime()}`}
             width={32}
             height={32}
-            className="size-8 rounded-full object-cover"
+            className="aspect-square size-8 rounded-full object-cover"
             alt="sample profile image"
             priority
             unoptimized

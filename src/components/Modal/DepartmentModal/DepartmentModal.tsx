@@ -13,6 +13,7 @@ import { z } from 'zod';
 import { CloseIcon } from '@/components/Icons/Icons';
 import type { NameJSONType } from '@/hooks/useDepartment';
 import { useCreateDepartment, useEditDepartment } from '@/hooks/useDepartment';
+import useScrollToError from '@/hooks/useScrollToError';
 import type { LanguagesType } from '@/types/components';
 import { countryData } from '@/utils/global';
 
@@ -123,7 +124,7 @@ function DepartmentModal({
       });
     }
   }, [selectedDepartment, setValue, isEdit]);
-
+  useScrollToError(errors);
   return (
     <div>
       {isOpen && (

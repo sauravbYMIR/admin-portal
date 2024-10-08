@@ -16,6 +16,7 @@ import {
   useEditDepartment,
   useGetAllDepartment,
 } from '@/hooks/useDepartment';
+import useScrollToError from '@/hooks/useScrollToError';
 import type { LanguagesType } from '@/types/components';
 import type { SubCategoryFormSchemaType } from '@/utils/global';
 import { countryData, subCategoryObj, SubCategorySchema } from '@/utils/global';
@@ -183,7 +184,7 @@ function CreateSubCategoryForm({
       (errors as FormErrors)[lang] && (errors as FormErrors)[lang]?.message
     );
   });
-
+  useScrollToError(errors);
   return (
     <form
       onSubmit={handleSubmit(onFormSubmit)}

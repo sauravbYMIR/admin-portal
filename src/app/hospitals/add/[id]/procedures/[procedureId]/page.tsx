@@ -242,7 +242,7 @@ function HospitalDetailsPage({
                             priority
                             unoptimized
                             alt="hospital-gallery"
-                            className="size-[220px] rounded-lg object-contain"
+                            className="aspect-square size-[220px] rounded-lg border border-stone-400 object-cover"
                           />
                         );
                       },

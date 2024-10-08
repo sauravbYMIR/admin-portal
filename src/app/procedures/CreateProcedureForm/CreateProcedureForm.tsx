@@ -21,6 +21,7 @@ import type {
 } from '@/hooks/useDepartment';
 import { useGetAllDepartment } from '@/hooks/useDepartment';
 import { useCreateProcedure, useEditProcedure } from '@/hooks/useProcedure';
+import useScrollToError from '@/hooks/useScrollToError';
 import type { LanguagesType } from '@/types/components';
 import type {
   ProcedureSchemaType,
@@ -260,7 +261,7 @@ function CreateProcedureForm({
       (errors as FormErrors)[lang] && (errors as FormErrors)[lang]?.message
     );
   });
-
+  useScrollToError(errors);
   return (
     <form
       className={procedureModalStyle.createProcedureFormContainer}

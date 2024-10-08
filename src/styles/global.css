@@ -59,6 +59,12 @@ input[type=number] {
   min-height: 48px !important;
   border-radius: 10.67px !important;
 }
+.css-xerkwg-control {
+  padding: 0.165em 0.25em !important;
+}
+.css-h11ufu-control {
+  padding: 0.165em 0em !important;
+}
 
 /* AG GRID */
 .ag-header-cell-text {

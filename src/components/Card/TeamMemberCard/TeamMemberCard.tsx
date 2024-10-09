@@ -36,7 +36,7 @@ function TeamMemberCard({
             src={`${profile}?version=${new Date().getTime()}`}
             width={32}
             height={32}
-            className="aspect-square size-8 rounded-full object-cover"
+            className="aspect-square size-8 rounded-full border border-lightsilver object-contain"
             alt={name}
             priority
             unoptimized

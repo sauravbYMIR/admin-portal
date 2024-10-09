@@ -313,6 +313,9 @@ export const useUpdateHospitalLogo = () => {
       toast.success('Hospital logo added successfully');
       return queryClient.invalidateQueries({ queryKey: ['hospital'] });
     },
+    onError: () => {
+      toast.error('Error while updating image');
+    },
   });
 };
 export const updateHospitalGallery = async ({
@@ -339,6 +342,9 @@ export const useUpdateHospitalGallery = () => {
     onSuccess: () => {
       toast.success('Hospital images added successfully');
       return queryClient.invalidateQueries({ queryKey: ['hospital'] });
+    },
+    onError: () => {
+      toast.error('Error while uploading image');
     },
   });
 };

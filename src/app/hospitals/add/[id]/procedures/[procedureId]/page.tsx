@@ -3,6 +3,7 @@
 'use client';
 
 /* eslint-disable jsx-a11y/label-has-associated-control */
+import DOMPurify from 'dompurify';
 import Image from 'next/image';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
@@ -162,11 +163,18 @@ function HospitalDetailsPage({
             <h3 className="mb-4 font-poppins text-lg font-medium text-neutral-1">
               About the procedure
             </h3>
-            {hospitalProcedureId.isSuccess && hospitalProcedureId.data.data && (
-              <p className="mb-12 font-lexend text-base font-light text-neutral-3">
-                {hospitalProcedureId.data.data.description.en}
-              </p>
-            )}
+            {hospitalProcedureId.isSuccess &&
+              hospitalProcedureId.data.data &&
+              hospitalProcedureId.data.data?.description?.en && (
+                <div
+                  className="mb-12 font-lexend text-base font-light text-neutral-3"
+                  dangerouslySetInnerHTML={{
+                    __html: DOMPurify.sanitize(
+                      hospitalProcedureId.data.data.description.en,
+                    ),
+                  }}
+                />
+              )}
 
             {hospitalProcedureId.isSuccess && hospitalProcedureId.data.data && (
               <div className="grid w-[520px] grid-cols-2 gap-x-20 gap-y-10">

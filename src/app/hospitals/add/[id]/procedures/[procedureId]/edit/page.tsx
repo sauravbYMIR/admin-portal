@@ -9,6 +9,7 @@ import { useRouter } from 'next/navigation';
 import React from 'react';
 import type { SubmitHandler } from 'react-hook-form';
 import { Controller, useForm } from 'react-hook-form';
+import ReactQuill from 'react-quill';
 import Select from 'react-select';
 import { ClipLoader } from 'react-spinners';
 import { toast } from 'sonner';
@@ -23,6 +24,7 @@ import {
   WithAuth,
 } from '@/components';
 import type { Locale } from '@/components/Modal/DepartmentModal/DepartmentModal';
+import { useDisableNumberInputScroll } from '@/hooks/useDisableNumberInputScroll';
 import type { HospitalProcedureImageType } from '@/hooks/useHospitalProcedure';
 import {
   useEditHospitalProcedure,
@@ -263,6 +265,7 @@ function EditHospitalProcedure({
     handleGetLocalStorage({ tokenKey: 'hospital_country' }) ?? '';
   const gallery = watch('gallery');
   useScrollToError(errors);
+  useDisableNumberInputScroll();
   return (
     <div>
       <Header />
@@ -366,18 +369,24 @@ function EditHospitalProcedure({
               const lang = hospitalProcedureDescObj[
                 c.language
               ] as HospitalProcedureFormSchemaType;
+              const procedureDesc = watch(
+                lang as keyof EditHospitalProcedureFormFields,
+              ) as string;
               return (
                 <div key={c.countryCode} className="w-full">
                   {c.language === activeLanguageTab && (
-                    <textarea
-                      // eslint-disable-next-line jsx-a11y/no-autofocus
-                      autoFocus
-                      className={`${(errors as FormErrors)[lang]?.message ? 'outline-2 outline-error' : ''} h-[128px] w-full rounded-lg border-2 border-lightsilver px-4 py-2 placeholder:text-sm placeholder:font-normal placeholder:text-neutral-3`}
+                    <ReactQuill
+                      theme="snow"
+                      value={procedureDesc}
+                      onChange={(e) =>
+                        setValue(
+                          lang as keyof EditHospitalProcedureFormFields,
+                          e,
+                        )
+                      }
+                      className={`${(errors as FormErrors)[lang]?.message ? 'outline-2 outline-error' : ''} w-full rounded-lg placeholder:text-sm placeholder:font-normal placeholder:text-neutral-3`}
                       placeholder="Type here"
                       id="hospital-procedure-description"
-                      {...register(
-                        lang as keyof EditHospitalProcedureFormFields,
-                      )}
                     />
                   )}
                 </div>

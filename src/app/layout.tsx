@@ -1,4 +1,5 @@
 import '@/styles/global.css';
+import 'react-quill/dist/quill.snow.css';
 
 import type { Metadata } from 'next';
 import { Toaster } from 'sonner';

@@ -3,6 +3,7 @@
 
 'use client';
 
+import DOMPurify from 'dompurify';
 import Image from 'next/image';
 import { usePathname, useRouter } from 'next/navigation';
 import React, { useState } from 'react';
@@ -159,11 +160,18 @@ function HospitalDetailsPage({ params: { id } }: { params: { id: string } }) {
             <h3 className="mb-4 font-poppins text-[18px] font-medium text-rgba77">
               About the hospital
             </h3>
-            {hospitalById.isSuccess && hospitalById.data.data && (
-              <p className="mb-12 font-lexend text-base font-light text-neutral-3">
-                {hospitalById.data.data.description.en}
-              </p>
-            )}
+            {hospitalById.isSuccess &&
+              hospitalById.data.data &&
+              hospitalById.data.data.description.en && (
+                <div
+                  className="mb-12 font-lexend text-base font-light text-neutral-3"
+                  dangerouslySetInnerHTML={{
+                    __html: DOMPurify.sanitize(
+                      hospitalById.data.data.description.en,
+                    ),
+                  }}
+                />
+              )}
 
             <h3 className="mb-4 font-poppins text-[18px] font-medium text-rgba77">
               Address

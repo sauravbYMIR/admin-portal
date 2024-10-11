@@ -9,6 +9,7 @@ import { useRouter } from 'next/navigation';
 import React from 'react';
 import type { SubmitHandler } from 'react-hook-form';
 import { Controller, useForm } from 'react-hook-form';
+import ReactQuill from 'react-quill';
 import Select from 'react-select';
 import countryList from 'react-select-country-list';
 import { ClipLoader } from 'react-spinners';
@@ -584,17 +585,21 @@ function EditHospital({ params: { id } }: { params: { id: string } }) {
                 const lang = hospitalDescObj[
                   c.language
                 ] as HospitalDescFormSchemaType;
+                const hospitalDesc = watch(
+                  lang as keyof EditHospitalFormFields,
+                ) as string;
                 return (
                   <div key={c.countryCode}>
                     {c.language === activeLanguageTab && (
-                      <textarea
-                        // eslint-disable-next-line jsx-a11y/no-autofocus
-                        autoFocus
-                        className={`${(errors as FormErrors)[lang]?.message ? 'outline-2 outline-error' : ''} h-[200px] w-full rounded-lg border-2 border-lightsilver px-4 py-2 placeholder:text-sm placeholder:font-normal placeholder:text-neutral-3`}
+                      <ReactQuill
+                        theme="snow"
+                        value={hospitalDesc}
+                        onChange={(e) =>
+                          setValue(lang as keyof EditHospitalFormFields, e)
+                        }
+                        className={`${(errors as FormErrors)[lang]?.message ? 'outline-2 outline-error' : ''} w-full rounded-lg placeholder:text-sm placeholder:font-normal placeholder:text-neutral-3`}
                         placeholder="Enter hospital description"
                         id="hospital-description"
-                        // @ts-ignore
-                        {...register(lang)}
                       />
                     )}
                   </div>

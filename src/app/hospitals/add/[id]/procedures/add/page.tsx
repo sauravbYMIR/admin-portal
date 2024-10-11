@@ -5,12 +5,12 @@
 
 /* eslint-disable jsx-a11y/label-has-associated-control */
 import { zodResolver } from '@hookform/resolvers/zod';
+import dynamic from 'next/dynamic';
 import Image from 'next/image';
 import { useRouter } from 'next/navigation';
 import React from 'react';
 import type { SubmitHandler } from 'react-hook-form';
 import { Controller, useForm } from 'react-hook-form';
-import ReactQuill from 'react-quill';
 import Select from 'react-select';
 import { ClipLoader } from 'react-spinners';
 import { toast } from 'sonner';
@@ -146,6 +146,10 @@ const HospitalMemberCard = ({
   );
 };
 function AddHospitalProcedure({ params }: { params: { id: string } }) {
+  const ReactQuill = React.useMemo(
+    () => dynamic(() => import('react-quill'), { ssr: false }),
+    [],
+  );
   const updateHospitalProcedureGallery = useUpdateHospitalProcedureGallery();
   const galleryRef = React.useRef<HTMLInputElement>(null);
   const [isCreateHospitalTeamModal, setIsCreateHospitalTeamModal] =

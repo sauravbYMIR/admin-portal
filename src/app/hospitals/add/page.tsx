@@ -4,12 +4,12 @@
 
 /* eslint-disable jsx-a11y/label-has-associated-control */
 import { zodResolver } from '@hookform/resolvers/zod';
+import dynamic from 'next/dynamic';
 import Image from 'next/image';
 import { useRouter } from 'next/navigation';
 import React from 'react';
 import type { SubmitHandler } from 'react-hook-form';
 import { Controller, useForm } from 'react-hook-form';
-import ReactQuill from 'react-quill';
 import Select from 'react-select';
 import countryList from 'react-select-country-list';
 import { ClipLoader } from 'react-spinners';
@@ -94,6 +94,10 @@ type FormErrors = {
   gallery?: { message?: string };
 };
 function AddHospital() {
+  const ReactQuill = React.useMemo(
+    () => dynamic(() => import('react-quill'), { ssr: false }),
+    [],
+  );
   const [showLogoOverlay, setShowLogoOverlay] = React.useState<boolean>(false);
   const logoRef = React.useRef<HTMLInputElement>(null);
   const galleryRef = React.useRef<HTMLInputElement>(null);

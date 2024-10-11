@@ -3,7 +3,6 @@
 
 'use client';
 
-import DOMPurify from 'dompurify';
 import Image from 'next/image';
 import { usePathname, useRouter } from 'next/navigation';
 import React, { useState } from 'react';
@@ -19,6 +18,7 @@ import {
   TeamMemberCard,
   WithAuth,
 } from '@/components';
+import InnerHTMLText from '@/components/InnerHTMLText';
 import { useGetHospitalById } from '@/hooks';
 import arrowForward from '@/public/assets/icons/arrowForward.svg';
 import hospitalLogo from '@/public/assets/icons/sampleLogo.svg';
@@ -162,15 +162,8 @@ function HospitalDetailsPage({ params: { id } }: { params: { id: string } }) {
             </h3>
             {hospitalById.isSuccess &&
               hospitalById.data.data &&
-              hospitalById.data.data.description.en && (
-                <div
-                  className="mb-12 font-lexend text-base font-light text-neutral-3"
-                  dangerouslySetInnerHTML={{
-                    __html: DOMPurify.sanitize(
-                      hospitalById.data.data.description.en,
-                    ),
-                  }}
-                />
+              hospitalById.data.data?.description?.en && (
+                <InnerHTMLText text={hospitalById.data.data?.description?.en} />
               )}
 
             <h3 className="mb-4 font-poppins text-[18px] font-medium text-rgba77">

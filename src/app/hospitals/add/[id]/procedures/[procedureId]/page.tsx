@@ -3,7 +3,6 @@
 'use client';
 
 /* eslint-disable jsx-a11y/label-has-associated-control */
-import DOMPurify from 'dompurify';
 import Image from 'next/image';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
@@ -20,6 +19,7 @@ import {
   WithAuth,
 } from '@/components';
 import HospitalTeamMemberCard from '@/components/Card/HospitalTeamMemberCard/HospitalTeamMemberCard';
+import InnerHTMLText from '@/components/InnerHTMLText';
 import { AddTeamMemberAPI } from '@/components/Modal/AddTeamMemberAPI/AddTeamMemberAPI';
 import type { NameJSONType } from '@/hooks/useDepartment';
 import { useGetHospitalProcedureById } from '@/hooks/useHospitalProcedure';
@@ -166,13 +166,8 @@ function HospitalDetailsPage({
             {hospitalProcedureId.isSuccess &&
               hospitalProcedureId.data.data &&
               hospitalProcedureId.data.data?.description?.en && (
-                <div
-                  className="mb-12 font-lexend text-base font-light text-neutral-3"
-                  dangerouslySetInnerHTML={{
-                    __html: DOMPurify.sanitize(
-                      hospitalProcedureId.data.data.description.en,
-                    ),
-                  }}
+                <InnerHTMLText
+                  text={hospitalProcedureId.data.data.description.en}
                 />
               )}
 

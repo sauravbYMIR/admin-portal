@@ -24,6 +24,7 @@ import {
   PlusIcon,
   WithAuth,
 } from '@/components';
+import ImageCropperModal from '@/components/ImageCropperModal/ImageCropperModal';
 import type { Locale } from '@/components/Modal/DepartmentModal/DepartmentModal';
 import {
   useCreateHospital,
@@ -35,6 +36,7 @@ import type { LanguagesType } from '@/types/components';
 import {
   availableCountries,
   countryData,
+  handleFileSetter,
   hospitalDescObj,
   HospitalDescSchema,
 } from '@/utils/global';
@@ -99,6 +101,9 @@ function AddHospital() {
     [],
   );
   const [showLogoOverlay, setShowLogoOverlay] = React.useState<boolean>(false);
+  const [logoImg, setLogoImg] = React.useState<File | null>(null);
+  const [isModalActiveLogo, setIsModalActiveLogo] =
+    React.useState<boolean>(false);
   const logoRef = React.useRef<HTMLInputElement>(null);
   const galleryRef = React.useRef<HTMLInputElement>(null);
   const updateHospitalLogo = useUpdateHospitalLogo();
@@ -170,10 +175,9 @@ function AddHospital() {
       createHospital.data &&
       createHospital.data.data.id
     ) {
-      const logo = getValues('logo');
-      if (logo) {
+      if (logoImg) {
         const formData = new FormData();
-        formData.append('logo', logo as Blob);
+        formData.append('logo', logoImg as Blob);
         updateHospitalLogo.mutate({
           hospitalId: `${createHospital.data.data.id}`,
           formData,
@@ -204,7 +208,7 @@ function AddHospital() {
     // updateHospitalLogo,
   ]);
   useScrollToError(errors);
-  const logo = watch('logo');
+  // const logo = watch('logo');
   const gallery = watch('gallery');
   const countryOptions = React.useMemo(
     () =>
@@ -244,15 +248,15 @@ function AddHospital() {
             <Controller
               name="logo"
               control={control}
-              render={({ field: { name, onBlur, onChange } }) => (
+              render={() => (
                 <button
                   type="button"
                   className="relative flex size-[220px] flex-col items-center justify-center rounded-full border border-neutral-4"
-                  onClick={() => logoRef.current?.click()}
+                  onClick={() => !isModalActiveLogo && logoRef.current?.click()}
                   onMouseEnter={() => setShowLogoOverlay(true)}
                   onMouseLeave={() => setShowLogoOverlay(false)}
                 >
-                  {showLogoOverlay && logo && (
+                  {showLogoOverlay && logoImg && (
                     <div
                       className="absolute left-0 top-0 z-10 flex size-[220px] flex-col items-center justify-center rounded-full"
                       style={{
@@ -277,22 +281,34 @@ function AddHospital() {
                   )}
                   <input
                     type="file"
-                    ref={logoRef}
-                    name={name}
-                    onBlur={onBlur}
                     accept="image/*"
-                    // onChange={(e) => onChange(e.target.files?.[0])}
-                    onChange={(e) => {
-                      const file = e.target.files?.[0];
-                      onChange(file);
-                    }}
                     className="invisible absolute"
+                    ref={logoRef}
+                    onChange={(e) => {
+                      handleFileSetter({
+                        e,
+                        imageSetter: setLogoImg,
+                        setIsModalActive: setIsModalActiveLogo,
+                      });
+                    }}
                   />
-                  {logo ? (
+                  {isModalActiveLogo && (
+                    <ImageCropperModal
+                      imageRef={logoRef}
+                      imageFile={logoImg}
+                      heading="Adjust your Logo"
+                      setIsModalActive={setIsModalActiveLogo}
+                      imageSetter={setLogoImg}
+                      aspectRatio={{ w: 846, h: 150 }}
+                      // handleUploadType="LOGO"
+                    />
+                  )}
+
+                  {logoImg ? (
                     <Image
-                      src={`${URL.createObjectURL(logo)}`}
+                      src={`${URL.createObjectURL(logoImg)}`}
                       alt="hospitalLogo"
-                      key={`${logo}`}
+                      key={`${logoImg}`}
                       fill
                       priority
                       unoptimized

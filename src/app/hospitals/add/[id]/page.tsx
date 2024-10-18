@@ -75,7 +75,6 @@ function HospitalDetailsPage({ params: { id } }: { params: { id: string } }) {
       });
     }
   }, [hospitalById?.data?.data.country]);
-
   return (
     <div>
       <Header />

@@ -25,6 +25,7 @@ import {
   PlusIcon,
   WithAuth,
 } from '@/components';
+import ImageCropperModal from '@/components/ImageCropperModal/ImageCropperModal';
 import type { HospitalImageType } from '@/hooks';
 import {
   useEditHospital,
@@ -37,6 +38,7 @@ import type { LanguagesType } from '@/types/components';
 import {
   availableCountries,
   countryData,
+  handleFileSetter,
   hospitalDescObj,
   HospitalDescSchema,
 } from '@/utils/global';
@@ -137,7 +139,9 @@ function EditHospital({ params: { id } }: { params: { id: string } }) {
   const [hospitalImageRemoveIds, setHospitalImageRemoveIds] = React.useState<
     Array<string>
   >([]);
-  const logo = watch('logo');
+  const [logoImg, setLogoImg] = React.useState<File | null>(null);
+  const [isModalActiveLogo, setIsModalActiveLogo] =
+    React.useState<boolean>(false);
   const gallery = watch('gallery');
   const shouldRenderProcedureError = countryData.some((c) => {
     const lang = hospitalDescObj[c.language] as HospitalDescFormSchemaType;
@@ -240,10 +244,9 @@ function EditHospital({ params: { id } }: { params: { id: string } }) {
   }, [reqdHospital.data, reqdHospital.isSuccess, setValue, id]);
   React.useEffect(() => {
     if (editHospital.isSuccess && editHospital.data && editHospital.data.data) {
-      const logoVal = getValues('logo');
-      if (logoVal) {
+      if (logoImg) {
         const formData = new FormData();
-        formData.append('logo', logoVal as Blob);
+        formData.append('logo', logoImg as Blob);
         updateHospitalLogo.mutate({
           hospitalId: `${editHospital.data.data}`,
           formData,
@@ -300,19 +303,21 @@ function EditHospital({ params: { id } }: { params: { id: string } }) {
           onSubmit={handleSubmit(onFormSubmit)}
         >
           <div className="flex flex-col items-center justify-center">
-            {logo && (
+            {logoImg && (
               <Controller
                 name="logo"
                 control={control}
-                render={({ field: { name, onBlur, onChange } }) => (
+                render={() => (
                   <button
                     type="button"
                     className="relative flex size-[220px] flex-col items-center justify-center rounded-full border border-neutral-4"
-                    onClick={() => logoRef.current?.click()}
+                    onClick={() =>
+                      !isModalActiveLogo && logoRef.current?.click()
+                    }
                     onMouseEnter={() => setShowLogoOverlay(true)}
                     onMouseLeave={() => setShowLogoOverlay(false)}
                   >
-                    {showLogoOverlay && logo && (
+                    {showLogoOverlay && logoImg && (
                       <div
                         className="absolute left-0 top-0 z-10 flex size-[220px] flex-col items-center justify-center rounded-full"
                         style={{
@@ -330,28 +335,40 @@ function EditHospital({ params: { id } }: { params: { id: string } }) {
                         </p>
                       </div>
                     )}
-                    {!getValues('logo') && (
+                    {!logoImg && (
                       <div className="flex size-10 items-center justify-center rounded-full border border-darkgray p-2">
                         <FileUploadIcon />
                       </div>
                     )}
                     <input
                       type="file"
-                      ref={logoRef}
-                      name={name}
-                      onBlur={onBlur}
                       accept="image/*"
-                      onChange={(e) => {
-                        const file = e.target.files?.[0];
-                        onChange(file);
-                      }}
                       className="invisible absolute"
+                      ref={logoRef}
+                      onChange={(e) => {
+                        handleFileSetter({
+                          e,
+                          imageSetter: setLogoImg,
+                          setIsModalActive: setIsModalActiveLogo,
+                        });
+                      }}
                     />
-                    {logo ? (
+                    {isModalActiveLogo && (
+                      <ImageCropperModal
+                        imageRef={logoRef}
+                        imageFile={logoImg}
+                        heading="Adjust your Logo"
+                        setIsModalActive={setIsModalActiveLogo}
+                        imageSetter={setLogoImg}
+                        aspectRatio={{ w: 846, h: 150 }}
+                        // handleUploadType="LOGO"
+                      />
+                    )}
+                    {logoImg ? (
                       <Image
-                        src={`${URL.createObjectURL(logo)}`}
+                        src={`${URL.createObjectURL(logoImg)}`}
                         alt="hospitalLogo"
-                        key={`${logo}`}
+                        key={`${logoImg}`}
                         fill
                         priority
                         unoptimized
@@ -372,7 +389,7 @@ function EditHospital({ params: { id } }: { params: { id: string } }) {
               />
             )}
 
-            {!logo &&
+            {!logoImg &&
               reqdHospital.data &&
               reqdHospital.data.data.logo &&
               typeof reqdHospital.data.data.logo === 'string' && (
@@ -389,7 +406,7 @@ function EditHospital({ params: { id } }: { params: { id: string } }) {
                     <Controller
                       name="logo"
                       control={control}
-                      render={({ field: { name, onBlur, onChange } }) => (
+                      render={() => (
                         <button
                           type="button"
                           className="relative flex size-[220px] flex-col items-center justify-center rounded-full border border-neutral-4"
@@ -398,24 +415,36 @@ function EditHospital({ params: { id } }: { params: { id: string } }) {
                           }}
                           onClick={() => logoRefImgInput.current?.click()}
                         >
-                          {!getValues('logo') && (
+                          {!logoImg && (
                             <div className="flex size-10 items-center justify-center rounded-full border border-white p-2">
                               <FileUploadIcon stroke="#fff" />
                             </div>
                           )}
                           <input
                             type="file"
-                            ref={logoRefImgInput}
-                            name={name}
-                            onBlur={onBlur}
                             accept="image/*"
-                            onChange={(e) => {
-                              const file = e.target.files?.[0];
-                              onChange(file);
-                            }}
                             className="invisible absolute"
+                            ref={logoRefImgInput}
+                            onChange={(e) => {
+                              handleFileSetter({
+                                e,
+                                imageSetter: setLogoImg,
+                                setIsModalActive: setIsModalActiveLogo,
+                              });
+                            }}
                           />
-                          {!logo && (
+                          {isModalActiveLogo && (
+                            <ImageCropperModal
+                              imageRef={logoRefImgInput}
+                              imageFile={logoImg}
+                              heading="Adjust your Logo"
+                              setIsModalActive={setIsModalActiveLogo}
+                              imageSetter={setLogoImg}
+                              aspectRatio={{ w: 846, h: 150 }}
+                              // handleUploadType="LOGO"
+                            />
+                          )}
+                          {!logoImg && (
                             <>
                               <p className="mt-3 font-poppins text-sm font-medium text-white">
                                 click to upload an image
@@ -432,7 +461,7 @@ function EditHospital({ params: { id } }: { params: { id: string } }) {
                 </div>
               )}
 
-            {!logo &&
+            {!logoImg &&
               !(
                 reqdHospital.data &&
                 reqdHospital.data.data.logo &&
@@ -441,7 +470,7 @@ function EditHospital({ params: { id } }: { params: { id: string } }) {
                 <Controller
                   name="logo"
                   control={control}
-                  render={({ field: { name, onBlur, onChange } }) => (
+                  render={() => (
                     <button
                       type="button"
                       className="relative flex size-[220px] flex-col items-center justify-center rounded-full border border-neutral-4"
@@ -449,7 +478,7 @@ function EditHospital({ params: { id } }: { params: { id: string } }) {
                       onMouseEnter={() => setShowLogoOverlay(true)}
                       onMouseLeave={() => setShowLogoOverlay(false)}
                     >
-                      {showLogoOverlay && logo && (
+                      {showLogoOverlay && logoImg && (
                         <div
                           className="absolute left-0 top-0 z-10 flex size-[220px] flex-col items-center justify-center rounded-full"
                           style={{
@@ -467,28 +496,40 @@ function EditHospital({ params: { id } }: { params: { id: string } }) {
                           </p>
                         </div>
                       )}
-                      {!getValues('logo') && (
+                      {!logoImg && (
                         <div className="flex size-10 items-center justify-center rounded-full border border-darkgray p-2">
                           <FileUploadIcon />
                         </div>
                       )}
                       <input
                         type="file"
-                        ref={logoRef}
-                        name={name}
-                        onBlur={onBlur}
                         accept="image/*"
-                        onChange={(e) => {
-                          const file = e.target.files?.[0];
-                          onChange(file);
-                        }}
                         className="invisible absolute"
+                        ref={logoRef}
+                        onChange={(e) => {
+                          handleFileSetter({
+                            e,
+                            imageSetter: setLogoImg,
+                            setIsModalActive: setIsModalActiveLogo,
+                          });
+                        }}
                       />
-                      {logo ? (
+                      {isModalActiveLogo && (
+                        <ImageCropperModal
+                          imageRef={logoRef}
+                          imageFile={logoImg}
+                          heading="Adjust your Logo"
+                          setIsModalActive={setIsModalActiveLogo}
+                          imageSetter={setLogoImg}
+                          aspectRatio={{ w: 846, h: 150 }}
+                          // handleUploadType="LOGO"
+                        />
+                      )}
+                      {logoImg ? (
                         <Image
-                          src={`${URL.createObjectURL(logo)}`}
+                          src={`${URL.createObjectURL(logoImg)}`}
                           alt="hospitalLogo"
-                          key={`${logo}`}
+                          key={`${logoImg}`}
                           fill
                           priority
                           unoptimized

@@ -1,3 +1,4 @@
+/* eslint-disable import/no-cycle */
 /* eslint-disable jsx-a11y/label-has-associated-control */
 import { zodResolver } from '@hookform/resolvers/zod';
 import Image from 'next/image';
@@ -8,6 +9,7 @@ import { ClipLoader } from 'react-spinners';
 import { z } from 'zod';
 
 import { CloseIcon, FileUploadIcon } from '@/components/Icons/Icons';
+import ImageCropperModal from '@/components/ImageCropperModal/ImageCropperModal';
 import departmentModalStyle from '@/components/Modal/DepartmentModal/departmentModal.module.scss';
 import {
   useCreateHospitalMember,
@@ -19,6 +21,7 @@ import useScrollToError from '@/hooks/useScrollToError';
 import type { LanguagesType } from '@/types/components';
 import {
   countryData,
+  handleFileSetter,
   positionObj,
   PositionSchema,
   qualificationObj,
@@ -65,16 +68,16 @@ function CreateHospitalTeamMemberModal({
     register,
     handleSubmit,
     control,
-    getValues,
     setValue,
     reset,
-    watch,
     formState: { errors },
   } = useForm<CreateHospitalTeamMemberFormFields>({
     resolver: zodResolver(createTeamMemberFormSchema),
   });
   const [showLogoOverlay, setShowLogoOverlay] = React.useState<boolean>(false);
   const profileRef = React.useRef<HTMLInputElement>(null);
+  const [profileImg, setProfileImg] = React.useState<File | null>(null);
+  const [isModalActive, setIsModalActive] = React.useState<boolean>(false);
   const editHospitalMember = useEditHospitalMember({ onClose, reset });
   const memberByIdDetails = useGetHospitalTeamMemberById({ id: memberId });
   const [isAnotherMemberChecked, setIsAnotherMemberChecked] =
@@ -144,10 +147,9 @@ function CreateHospitalTeamMemberModal({
         },
         hospitalMemberId: memberId,
       });
-      const profile = getValues('profile');
-      if (profile) {
+      if (profileImg) {
         const formData = new FormData();
-        formData.append('profile', profile as Blob);
+        formData.append('profile', profileImg as Blob);
         updateHospitalProfile.mutate({
           memberId,
           formData,
@@ -170,10 +172,9 @@ function CreateHospitalTeamMemberModal({
   };
   React.useEffect(() => {
     if (editHospitalMember.data && editHospitalMember.data.data) {
-      const profile = getValues('profile');
-      if (profile) {
+      if (profileImg) {
         const formData = new FormData();
-        formData.append('profile', profile as Blob);
+        formData.append('profile', profileImg as Blob);
         updateHospitalProfile.mutate({
           memberId: editHospitalMember.data.data,
           formData,
@@ -196,10 +197,9 @@ function CreateHospitalTeamMemberModal({
       createHospitalMember.data &&
       createHospitalMember.data.data.id
     ) {
-      const profile = getValues('profile');
-      if (profile) {
+      if (profileImg) {
         const formData = new FormData();
-        formData.append('profile', profile as Blob);
+        formData.append('profile', profileImg as Blob);
         updateHospitalProfile.mutate({
           memberId: createHospitalMember.data.data.id,
           formData,
@@ -245,7 +245,6 @@ function CreateHospitalTeamMemberModal({
       });
     }
   }, [memberByIdDetails.data, memberByIdDetails.isSuccess, setValue, memberId]);
-  const profile = watch('profile');
   useScrollToError(errors);
   return (
     <div>
@@ -433,13 +432,15 @@ function CreateHospitalTeamMemberModal({
                   <button
                     type="button"
                     className="relative flex h-[200px] w-[205px] flex-col items-center justify-center rounded-lg border border-neutral-4 p-4"
-                    onClick={() => profileRef.current?.click()}
+                    onClick={() =>
+                      !isModalActive && profileRef.current?.click()
+                    }
                     onMouseEnter={() => setShowLogoOverlay(true)}
                     onMouseLeave={() => setShowLogoOverlay(false)}
                   >
-                    {showLogoOverlay && profile && (
+                    {showLogoOverlay && profileImg && (
                       <div
-                        className="absolute left-0 top-0 z-[9999] flex size-full flex-col items-center justify-center rounded-full"
+                        className="absolute left-0 top-0 z-10 flex size-full flex-col items-center justify-center"
                         style={{
                           backgroundColor: 'rgba(0, 0, 0, 0.4)',
                         }}
@@ -455,7 +456,7 @@ function CreateHospitalTeamMemberModal({
                         </p>
                       </div>
                     )}
-                    {!getValues('profile') && (
+                    {!profileImg && (
                       <div className="flex size-10 items-center justify-center rounded-full border border-darkgray p-2">
                         <FileUploadIcon />
                       </div>
@@ -473,11 +474,35 @@ function CreateHospitalTeamMemberModal({
                       }}
                       className="invisible absolute"
                     />
-                    {profile ? (
+                    <input
+                      type="file"
+                      accept="image/*"
+                      className="invisible absolute"
+                      ref={profileRef}
+                      onChange={(e) => {
+                        handleFileSetter({
+                          e,
+                          imageSetter: setProfileImg,
+                          setIsModalActive,
+                        });
+                      }}
+                    />
+                    {isModalActive && (
+                      <ImageCropperModal
+                        imageRef={profileRef}
+                        imageFile={profileImg}
+                        heading="Adjust your profile"
+                        setIsModalActive={setIsModalActive}
+                        imageSetter={setProfileImg}
+                        aspectRatio={{ w: 846, h: 150 }}
+                        // handleUploadType="LOGO"
+                      />
+                    )}
+                    {profileImg ? (
                       <Image
-                        src={`${URL.createObjectURL(profile)}`}
+                        src={`${URL.createObjectURL(profileImg)}`}
                         alt="team-member-profile"
-                        key={`${profile}`}
+                        key={`${profileImg}`}
                         fill
                         priority
                         unoptimized

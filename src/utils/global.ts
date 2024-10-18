@@ -480,12 +480,33 @@ const reimburismentObj = countryData.reduce(
   {} as Record<string, string>,
 );
 
+const handleFileSetter = ({
+  e,
+  imageSetter,
+  setIsModalActive,
+}: {
+  e: React.ChangeEvent<HTMLInputElement>;
+  imageSetter: React.Dispatch<React.SetStateAction<any>>;
+  setIsModalActive?: React.Dispatch<React.SetStateAction<boolean>>;
+}) => {
+  if (e.target.files && e.target.files.length > 0) {
+    const image = e.target.files[0];
+    if (image) {
+      imageSetter(image);
+      if (setIsModalActive) {
+        setIsModalActive(true);
+      }
+    }
+  }
+};
+
 export {
   ACCEPT,
   ACCEPTED,
   convertToValidCurrency,
   countryData,
   genderObject,
+  handleFileSetter,
   handleGetLocalStorage,
   handleRemoveFromLocalStorage,
   handleSetLocalStorage,

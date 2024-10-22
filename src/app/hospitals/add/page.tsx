@@ -307,7 +307,7 @@ function AddHospital() {
                   {logoImg ? (
                     <Image
                       src={`${URL.createObjectURL(logoImg)}`}
-                      alt="hospitalLogo"
+                      alt="hospital-logo"
                       key={`${logoImg}`}
                       fill
                       priority

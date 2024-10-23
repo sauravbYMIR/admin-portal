@@ -499,6 +499,22 @@ const handleFileSetter = ({
     }
   }
 };
+const handleMultipleFileSetter = ({
+  totalFiles,
+  imageSetter,
+  setIsModalActive,
+}: {
+  totalFiles: File[];
+  imageSetter: React.Dispatch<React.SetStateAction<any>>;
+  setIsModalActive?: React.Dispatch<React.SetStateAction<boolean>>;
+}) => {
+  if (totalFiles && totalFiles.length > 0) {
+    imageSetter(totalFiles);
+    if (setIsModalActive) {
+      setIsModalActive(true);
+    }
+  }
+};
 
 export {
   ACCEPT,
@@ -508,6 +524,7 @@ export {
   genderObject,
   handleFileSetter,
   handleGetLocalStorage,
+  handleMultipleFileSetter,
   handleRemoveFromLocalStorage,
   handleSetLocalStorage,
   hospitalDescObj,

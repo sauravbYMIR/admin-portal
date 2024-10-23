@@ -14,10 +14,6 @@ export type ImageCropperModalPropType = {
   setIsModalActive: React.Dispatch<React.SetStateAction<boolean>>;
   imageSetter: React.Dispatch<React.SetStateAction<File | null>>;
   imageRef: React.RefObject<HTMLInputElement>;
-  // isHandleUpload?: boolean;
-  // handleUploadType?: string;
-  // uploadParamId?: string;
-  // uploadKey?: string;
   aspectRatio?: 1 | { h: number; w: number };
 };
 const ImageCropperModal = ({
@@ -33,68 +29,6 @@ const ImageCropperModal = ({
   // uploadParamId,
 }: ImageCropperModalPropType) => {
   const [cropper, setCropper] = React.useState<Cropper>();
-  // const handleImageUpload = (
-  //   handleUploadType: string | undefined,
-  //   imageBlob: Blob,
-  // ) => {
-  //   // const formData = new FormData();
-  //   // if (
-  //   //   handleUploadType === "PROFILE_PICTURE" ||
-  //   //   handleUploadType === "STAKEHOLDER_PROFILE_PICTURE"
-  //   // ) {
-  //   //   formData.append("profile", imageBlob);
-  //   // }
-  //   // if (handleUploadType === "EVENT_PROFILE_PICTURE") {
-  //   //   formData.append("thumbnail", imageBlob);
-  //   // }
-  //   // if (handleUploadType === HOVER_BRANDING_LOGO) {
-  //   //   formData.append("logo", imageBlob);
-  //   // }
-  //   // if (handleUploadType === HOVER_BRANDING_BANNER) {
-  //   //   formData.append("banner", imageBlob);
-  //   // }
-  //   // switch (handleUploadType) {
-  //   //   case "PROFILE_PICTURE":
-  //   //     updateProfilePicture.mutate({ formData });
-  //   //     break;
-  //   //   case HOVER_BRANDING_LOGO:
-  //   //     setBranding.mutate({ formData });
-  //   //     break;
-  //   //   case HOVER_BRANDING_BANNER:
-  //   //     setBranding.mutate({ formData });
-  //   //     break;
-  //   //     if (uploadParamId) {
-  //   //       uploadEventImage.mutate({ id: uploadParamId, formData });
-  //   //       break;
-  //   //     }
-  //   //     toast.error(
-  //   //       `Cannot upload thumbnail (id not found), please refresh the page and try again`
-  //   //       ,
-  //   //     );
-  //   //     break;
-  //   //   default:
-  //   //     break;
-  //   // }
-  // };
-  // React.useEffect(
-  //   () => {
-  //     // if (
-  //     //   updateProfilePicture.isSuccess ||
-  //     //   uploadMgmtProfilePic.isSuccess ||
-  //     //   uploadEventImage.isSuccess ||
-  //     //   setBranding.isSuccess
-  //     // ) {
-  //     //   setIsModalActive(false);
-  //     // }
-  //   },
-  //   [
-  //     // setBranding.isSuccess,
-  //     // setIsModalActive,
-  //     // updateProfilePicture.isSuccess,
-  //     // uploadEventImage.isSuccess,
-  //     // uploadMgmtProfilePic.isSuccess,
-  //   ],
-  // );
   const getCropData = () => {
     if (typeof cropper !== 'undefined') {
       cropper
@@ -112,13 +46,6 @@ const ImageCropperModal = ({
               lastModified: Date.now(),
             });
             imageSetter(blobToFile);
-            // (handleUploadType === 'BRANDING' ||
-            //   handleUploadType === STAKEHOLDER_IMG_CROPER_ADD ||
-            //   handleUploadType === ADD_EVENT_IMG) &&
-            //   setIsModalActive(false);
-            // if (isHandleUpload) {
-            //   handleImageUpload(handleUploadType, blob);
-            // }
           }
         });
       setIsModalActive(false);

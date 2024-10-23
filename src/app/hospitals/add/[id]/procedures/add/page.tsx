@@ -32,6 +32,7 @@ import {
   RemoveIcon,
   WithAuth,
 } from '@/components';
+import MultipleImageCropperModal from '@/components/ImageCropperModal/MulipleImageCropperModal';
 import type { NameJSONType } from '@/hooks/useDepartment';
 import { useGetAllDepartment } from '@/hooks/useDepartment';
 import { useDisableNumberInputScroll } from '@/hooks/useDisableNumberInputScroll';
@@ -49,6 +50,7 @@ import {
   availableCurrency,
   countryData,
   handleGetLocalStorage,
+  handleMultipleFileSetter,
   hospitalProcedureDescObj,
   ProcedureDescSchema,
 } from '@/utils/global';
@@ -155,6 +157,9 @@ function AddHospitalProcedure({ params }: { params: { id: string } }) {
   const [isCreateHospitalTeamModal, setIsCreateHospitalTeamModal] =
     React.useState<boolean>(false);
   const createHospitalProcedure = useCreateHospitalProcedure();
+  const [galleryImg, setGalleryImg] = React.useState<File[] | null>(null);
+  const [isModalActiveGallery, setIsModalActiveGallery] =
+    React.useState<boolean>(false);
   const [teamMembers, setTeamMembers] = React.useState<
     Array<{
       role: NameJSONType;
@@ -696,7 +701,9 @@ function AddHospitalProcedure({ params }: { params: { id: string } }) {
                 <button
                   className="mt-6 flex cursor-pointer gap-x-4 border-b-2 border-darkteal pb-1"
                   type="button"
-                  onClick={() => galleryRef.current?.click()}
+                  onClick={() =>
+                    !isModalActiveGallery && galleryRef.current?.click()
+                  }
                 >
                   <PlusIcon stroke="rgba(9, 111, 144, 1)" />
                   <span className="font-poppins text-base font-medium text-darkteal">
@@ -705,27 +712,49 @@ function AddHospitalProcedure({ params }: { params: { id: string } }) {
                   <Controller
                     name="gallery"
                     control={control}
-                    render={({ field: { name, onBlur, onChange } }) => (
-                      <input
-                        type="file"
-                        ref={galleryRef}
-                        accept="image/*"
-                        multiple
-                        name={name}
-                        onBlur={onBlur}
-                        onChange={(e) => {
-                          if (e.target.files) {
-                            if (
-                              gallery &&
-                              Array.isArray(gallery) &&
-                              gallery.length > 0
-                            ) {
-                              let totalImageFiles = Array.from(e.target.files);
-                              totalImageFiles = [
-                                ...totalImageFiles,
-                                ...gallery,
-                              ];
-                              totalImageFiles = totalImageFiles.filter(
+                    render={({ field: { name, onBlur } }) => (
+                      <>
+                        <input
+                          type="file"
+                          ref={galleryRef}
+                          accept="image/*"
+                          multiple
+                          name={name}
+                          onBlur={onBlur}
+                          onChange={(e) => {
+                            if (e.target.files) {
+                              if (
+                                galleryImg &&
+                                Array.isArray(galleryImg) &&
+                                galleryImg.length > 0
+                              ) {
+                                let totalImageFiles = Array.from(
+                                  e.target.files,
+                                );
+                                totalImageFiles = [
+                                  ...totalImageFiles,
+                                  ...galleryImg,
+                                ];
+                                totalImageFiles = totalImageFiles.filter(
+                                  (file, index, self) =>
+                                    index ===
+                                    self.findIndex(
+                                      (f) =>
+                                        f.size === file.size &&
+                                        f.name === file.name &&
+                                        f.type === file.type &&
+                                        f.lastModified === file.lastModified,
+                                    ),
+                                );
+                                handleMultipleFileSetter({
+                                  totalFiles: totalImageFiles,
+                                  imageSetter: setGalleryImg,
+                                  setIsModalActive: setIsModalActiveGallery,
+                                });
+                                return;
+                              }
+                              let files = Array.from(e.target.files);
+                              files = files.filter(
                                 (file, index, self) =>
                                   index ===
                                   self.findIndex(
@@ -736,26 +765,24 @@ function AddHospitalProcedure({ params }: { params: { id: string } }) {
                                       f.lastModified === file.lastModified,
                                   ),
                               );
-                              onChange(totalImageFiles);
-                              return;
+                              handleMultipleFileSetter({
+                                totalFiles: files,
+                                imageSetter: setGalleryImg,
+                                setIsModalActive: setIsModalActiveGallery,
+                              });
                             }
-                            let files = Array.from(e.target.files);
-                            files = files.filter(
-                              (file, index, self) =>
-                                index ===
-                                self.findIndex(
-                                  (f) =>
-                                    f.size === file.size &&
-                                    f.name === file.name &&
-                                    f.type === file.type &&
-                                    f.lastModified === file.lastModified,
-                                ),
-                            );
-                            onChange(files);
-                          }
-                        }}
-                        className="invisible absolute"
-                      />
+                          }}
+                          className="invisible absolute"
+                        />
+                        {isModalActiveGallery && galleryImg && (
+                          <MultipleImageCropperModal
+                            imageFiles={galleryImg}
+                            heading="Adjust your Image"
+                            setIsModalActive={setIsModalActiveGallery}
+                            imageSetter={setGalleryImg}
+                          />
+                        )}
+                      </>
                     )}
                   />
                 </button>
@@ -763,7 +790,9 @@ function AddHospitalProcedure({ params }: { params: { id: string } }) {
                 <button
                   type="button"
                   className={`flex size-[220px] flex-col items-center justify-center rounded-lg ${errors.gallery?.message ? 'border-[1.5px] border-error' : 'border border-neutral-4'}`}
-                  onClick={() => galleryRef.current?.click()}
+                  onClick={() =>
+                    !isModalActiveGallery && galleryRef.current?.click()
+                  }
                 >
                   {!gallery && (
                     <div className="flex size-10 items-center justify-center rounded-full border border-darkgray p-2">
@@ -773,33 +802,47 @@ function AddHospitalProcedure({ params }: { params: { id: string } }) {
                   <Controller
                     name="gallery"
                     control={control}
-                    render={({ field: { name, onBlur, onChange } }) => (
-                      <input
-                        type="file"
-                        ref={galleryRef}
-                        accept="image/*"
-                        multiple
-                        name={name}
-                        onBlur={onBlur}
-                        onChange={(e) => {
-                          if (e.target.files) {
-                            const files = Array.from(e.target.files);
-                            const updatedFiles = files.filter(
-                              (file, index, self) =>
-                                index ===
-                                self.findIndex(
-                                  (f) =>
-                                    f.size === file.size &&
-                                    f.name === file.name &&
-                                    f.type === file.type &&
-                                    f.lastModified === file.lastModified,
-                                ),
-                            );
-                            onChange(updatedFiles);
-                          }
-                        }}
-                        className="invisible absolute"
-                      />
+                    render={({ field: { name, onBlur } }) => (
+                      <>
+                        <input
+                          type="file"
+                          ref={galleryRef}
+                          accept="image/*"
+                          multiple
+                          name={name}
+                          onBlur={onBlur}
+                          onChange={(e) => {
+                            if (e.target.files) {
+                              const files = Array.from(e.target.files);
+                              const updatedFiles = files.filter(
+                                (file, index, self) =>
+                                  index ===
+                                  self.findIndex(
+                                    (f) =>
+                                      f.size === file.size &&
+                                      f.name === file.name &&
+                                      f.type === file.type &&
+                                      f.lastModified === file.lastModified,
+                                  ),
+                              );
+                              handleMultipleFileSetter({
+                                totalFiles: updatedFiles,
+                                imageSetter: setGalleryImg,
+                                setIsModalActive: setIsModalActiveGallery,
+                              });
+                            }
+                          }}
+                          className="invisible absolute"
+                        />
+                        {isModalActiveGallery && galleryImg && (
+                          <MultipleImageCropperModal
+                            imageFiles={galleryImg}
+                            heading="Adjust your Image"
+                            setIsModalActive={setIsModalActiveGallery}
+                            imageSetter={setGalleryImg}
+                          />
+                        )}
+                      </>
                     )}
                   />
 

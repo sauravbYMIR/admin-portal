@@ -25,6 +25,7 @@ import {
   WithAuth,
 } from '@/components';
 import ImageCropperModal from '@/components/ImageCropperModal/ImageCropperModal';
+import MultipleImageCropperModal from '@/components/ImageCropperModal/MulipleImageCropperModal';
 import type { Locale } from '@/components/Modal/DepartmentModal/DepartmentModal';
 import {
   useCreateHospital,
@@ -37,6 +38,7 @@ import {
   availableCountries,
   countryData,
   handleFileSetter,
+  handleMultipleFileSetter,
   hospitalDescObj,
   HospitalDescSchema,
 } from '@/utils/global';
@@ -102,6 +104,9 @@ function AddHospital() {
   );
   const [showLogoOverlay, setShowLogoOverlay] = React.useState<boolean>(false);
   const [logoImg, setLogoImg] = React.useState<File | null>(null);
+  const [galleryImg, setGalleryImg] = React.useState<File[] | null>(null);
+  const [isModalActiveGallery, setIsModalActiveGallery] =
+    React.useState<boolean>(false);
   const [isModalActiveLogo, setIsModalActiveLogo] =
     React.useState<boolean>(false);
   const logoRef = React.useRef<HTMLInputElement>(null);
@@ -183,10 +188,9 @@ function AddHospital() {
           formData,
         });
       }
-      const gallery = getValues('gallery');
-      if (gallery) {
+      if (galleryImg) {
         const formData = new FormData();
-        gallery.forEach((file) => {
+        galleryImg.forEach((file) => {
           formData.append(`gallery`, file);
         });
         updateHospitalGallery.mutate({
@@ -208,8 +212,6 @@ function AddHospital() {
     // updateHospitalLogo,
   ]);
   useScrollToError(errors);
-  // const logo = watch('logo');
-  const gallery = watch('gallery');
   const countryOptions = React.useMemo(
     () =>
       countryList()
@@ -300,7 +302,6 @@ function AddHospital() {
                       setIsModalActive={setIsModalActiveLogo}
                       imageSetter={setLogoImg}
                       aspectRatio={{ w: 846, h: 150 }}
-                      // handleUploadType="LOGO"
                     />
                   )}
 
@@ -596,9 +597,9 @@ function AddHospital() {
               Upload a minimum of 3 media items and maximum 10 media items
             </p>
             <div className="mt-7 flex w-full flex-wrap items-center gap-x-6 gap-y-2">
-              {gallery && gallery.length > 0 && (
+              {galleryImg && galleryImg.length > 0 && (
                 <div className="flex w-full flex-wrap items-center gap-x-4 gap-y-2">
-                  {gallery.map((file) => (
+                  {galleryImg.map((file) => (
                     <div
                       className="relative size-[180px] cursor-pointer rounded-lg border border-neutral-4"
                       key={file.size}
@@ -607,10 +608,10 @@ function AddHospital() {
                         type="button"
                         className="absolute right-4 top-4 z-10 flex size-7 items-center justify-center rounded-full bg-white shadow-md"
                         onClick={() => {
-                          const updatedGallery = gallery.filter(
+                          const updatedGallery = galleryImg.filter(
                             (f) => f.lastModified !== file.lastModified,
                           );
-                          setValue('gallery', updatedGallery);
+                          setGalleryImg(updatedGallery);
                         }}
                       >
                         <CloseIcon className="size-5" strokeWidth={1.7} />
@@ -628,11 +629,13 @@ function AddHospital() {
                   ))}
                 </div>
               )}
-              {gallery ? (
+              {galleryImg ? (
                 <button
                   className="mt-6 flex cursor-pointer gap-x-4 border-b-2 border-darkteal pb-1"
                   type="button"
-                  onClick={() => galleryRef.current?.click()}
+                  onClick={() =>
+                    !isModalActiveGallery && galleryRef.current?.click()
+                  }
                 >
                   <PlusIcon stroke="rgba(9, 111, 144, 1)" />
                   <span className="font-poppins text-base font-medium text-darkteal">
@@ -641,27 +644,49 @@ function AddHospital() {
                   <Controller
                     name="gallery"
                     control={control}
-                    render={({ field: { name, onBlur, onChange } }) => (
-                      <input
-                        type="file"
-                        ref={galleryRef}
-                        accept="image/*"
-                        multiple
-                        name={name}
-                        onBlur={onBlur}
-                        onChange={(e) => {
-                          if (e.target.files) {
-                            if (
-                              gallery &&
-                              Array.isArray(gallery) &&
-                              gallery.length > 0
-                            ) {
-                              let totalImageFiles = Array.from(e.target.files);
-                              totalImageFiles = [
-                                ...totalImageFiles,
-                                ...gallery,
-                              ];
-                              totalImageFiles = totalImageFiles.filter(
+                    render={({ field: { name, onBlur } }) => (
+                      <>
+                        <input
+                          type="file"
+                          ref={galleryRef}
+                          accept="image/*"
+                          multiple
+                          name={name}
+                          onBlur={onBlur}
+                          onChange={(e) => {
+                            if (e.target.files) {
+                              if (
+                                galleryImg &&
+                                Array.isArray(galleryImg) &&
+                                galleryImg.length > 0
+                              ) {
+                                let totalImageFiles = Array.from(
+                                  e.target.files,
+                                );
+                                totalImageFiles = [
+                                  ...totalImageFiles,
+                                  ...galleryImg,
+                                ];
+                                totalImageFiles = totalImageFiles.filter(
+                                  (file, index, self) =>
+                                    index ===
+                                    self.findIndex(
+                                      (f) =>
+                                        f.size === file.size &&
+                                        f.name === file.name &&
+                                        f.type === file.type &&
+                                        f.lastModified === file.lastModified,
+                                    ),
+                                );
+                                handleMultipleFileSetter({
+                                  totalFiles: totalImageFiles,
+                                  imageSetter: setGalleryImg,
+                                  setIsModalActive: setIsModalActiveGallery,
+                                });
+                                return;
+                              }
+                              let files = Array.from(e.target.files);
+                              files = files.filter(
                                 (file, index, self) =>
                                   index ===
                                   self.findIndex(
@@ -672,26 +697,24 @@ function AddHospital() {
                                       f.lastModified === file.lastModified,
                                   ),
                               );
-                              onChange(totalImageFiles);
-                              return;
+                              handleMultipleFileSetter({
+                                totalFiles: files,
+                                imageSetter: setGalleryImg,
+                                setIsModalActive: setIsModalActiveGallery,
+                              });
                             }
-                            let files = Array.from(e.target.files);
-                            files = files.filter(
-                              (file, index, self) =>
-                                index ===
-                                self.findIndex(
-                                  (f) =>
-                                    f.size === file.size &&
-                                    f.name === file.name &&
-                                    f.type === file.type &&
-                                    f.lastModified === file.lastModified,
-                                ),
-                            );
-                            onChange(files);
-                          }
-                        }}
-                        className="invisible absolute"
-                      />
+                          }}
+                          className="invisible absolute"
+                        />
+                        {isModalActiveGallery && galleryImg && (
+                          <MultipleImageCropperModal
+                            imageFiles={galleryImg}
+                            heading="Adjust your Image"
+                            setIsModalActive={setIsModalActiveGallery}
+                            imageSetter={setGalleryImg}
+                          />
+                        )}
+                      </>
                     )}
                   />
                 </button>
@@ -699,9 +722,11 @@ function AddHospital() {
                 <button
                   type="button"
                   className={`flex size-[220px] flex-col items-center justify-center rounded-lg ${errors.gallery?.message ? 'border-[1.5px] border-error' : 'border border-neutral-4'}`}
-                  onClick={() => galleryRef.current?.click()}
+                  onClick={() =>
+                    !isModalActiveGallery && galleryRef.current?.click()
+                  }
                 >
-                  {!gallery && (
+                  {!galleryImg && (
                     <div className="flex size-10 items-center justify-center rounded-full border border-darkgray p-2">
                       <FileUploadIcon />
                     </div>
@@ -709,33 +734,77 @@ function AddHospital() {
                   <Controller
                     name="gallery"
                     control={control}
-                    render={({ field: { name, onBlur, onChange } }) => (
-                      <input
-                        type="file"
-                        ref={galleryRef}
-                        accept="image/*"
-                        multiple
-                        name={name}
-                        onBlur={onBlur}
-                        onChange={(e) => {
-                          if (e.target.files) {
-                            let files = Array.from(e.target.files);
-                            files = files.filter(
-                              (file, index, self) =>
-                                index ===
-                                self.findIndex(
-                                  (f) =>
-                                    f.size === file.size &&
-                                    f.name === file.name &&
-                                    f.type === file.type &&
-                                    f.lastModified === file.lastModified,
-                                ),
-                            );
-                            onChange(files);
-                          }
-                        }}
-                        className="invisible absolute"
-                      />
+                    render={({ field: { name, onBlur } }) => (
+                      <>
+                        <input
+                          type="file"
+                          ref={galleryRef}
+                          accept="image/*"
+                          multiple
+                          name={name}
+                          onBlur={onBlur}
+                          onChange={(e) => {
+                            if (e.target.files) {
+                              if (
+                                galleryImg &&
+                                Array.isArray(galleryImg) &&
+                                galleryImg[0]
+                              ) {
+                                let totalImageFiles = Array.from(
+                                  e.target.files,
+                                );
+                                totalImageFiles = [
+                                  ...totalImageFiles,
+                                  ...galleryImg,
+                                ];
+                                totalImageFiles = totalImageFiles.filter(
+                                  (file, index, self) =>
+                                    index ===
+                                    self.findIndex(
+                                      (f) =>
+                                        f.size === file.size &&
+                                        f.name === file.name &&
+                                        f.type === file.type &&
+                                        f.lastModified === file.lastModified,
+                                    ),
+                                );
+                                handleMultipleFileSetter({
+                                  totalFiles: totalImageFiles,
+                                  imageSetter: setGalleryImg,
+                                  setIsModalActive: setIsModalActiveGallery,
+                                });
+                                return;
+                              }
+                              let files = Array.from(e.target.files);
+                              files = files.filter(
+                                (file, index, self) =>
+                                  index ===
+                                  self.findIndex(
+                                    (f) =>
+                                      f.size === file.size &&
+                                      f.name === file.name &&
+                                      f.type === file.type &&
+                                      f.lastModified === file.lastModified,
+                                  ),
+                              );
+                              handleMultipleFileSetter({
+                                totalFiles: files,
+                                imageSetter: setGalleryImg,
+                                setIsModalActive: setIsModalActiveGallery,
+                              });
+                            }
+                          }}
+                          className="invisible absolute"
+                        />
+                        {isModalActiveGallery && galleryImg && (
+                          <MultipleImageCropperModal
+                            imageFiles={galleryImg}
+                            heading="Adjust your Image"
+                            setIsModalActive={setIsModalActiveGallery}
+                            imageSetter={setGalleryImg}
+                          />
+                        )}
+                      </>
                     )}
                   />
 

@@ -428,7 +428,7 @@ function CreateHospitalTeamMemberModal({
               <Controller
                 name="profile"
                 control={control}
-                render={({ field: { name, onBlur, onChange } }) => (
+                render={() => (
                   <button
                     type="button"
                     className="relative flex h-[200px] w-[205px] flex-col items-center justify-center rounded-lg border border-neutral-4 p-4"
@@ -461,19 +461,6 @@ function CreateHospitalTeamMemberModal({
                         <FileUploadIcon />
                       </div>
                     )}
-                    <input
-                      type="file"
-                      ref={profileRef}
-                      name={name}
-                      onBlur={onBlur}
-                      accept="image/*"
-                      // onChange={(e) => onChange(e.target.files?.[0])}
-                      onChange={(e) => {
-                        const file = e.target.files?.[0];
-                        onChange(file);
-                      }}
-                      className="invisible absolute"
-                    />
                     <input
                       type="file"
                       accept="image/*"

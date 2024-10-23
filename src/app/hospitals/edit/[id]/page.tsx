@@ -26,6 +26,7 @@ import {
   WithAuth,
 } from '@/components';
 import ImageCropperModal from '@/components/ImageCropperModal/ImageCropperModal';
+import MultipleImageCropperModal from '@/components/ImageCropperModal/MulipleImageCropperModal';
 import type { HospitalImageType } from '@/hooks';
 import {
   useEditHospital,
@@ -39,6 +40,7 @@ import {
   availableCountries,
   countryData,
   handleFileSetter,
+  handleMultipleFileSetter,
   hospitalDescObj,
   HospitalDescSchema,
 } from '@/utils/global';
@@ -102,6 +104,9 @@ function EditHospital({ params: { id } }: { params: { id: string } }) {
     () => dynamic(() => import('react-quill'), { ssr: false }),
     [],
   );
+  const [galleryImg, setGalleryImg] = React.useState<File[] | null>(null);
+  const [isModalActiveGallery, setIsModalActiveGallery] =
+    React.useState<boolean>(false);
   const [showLogoOverlay, setShowLogoOverlay] = React.useState<boolean>(false);
   const logoRef = React.useRef<HTMLInputElement>(null);
   const logoRefImgInput = React.useRef<HTMLInputElement>(null);
@@ -150,13 +155,13 @@ function EditHospital({ params: { id } }: { params: { id: string } }) {
     );
   });
   const handleCheckIsNoOfImagesValid = (
-    galleryImg: File[] | undefined,
+    galleryImage: File[] | undefined,
     minimumNoOfImages: number,
   ) => {
     if (hospitalImages) {
       const noOfGalleryImage =
-        Array.isArray(galleryImg) && galleryImg.length > 0
-          ? galleryImg.length
+        Array.isArray(galleryImage) && galleryImage.length > 0
+          ? galleryImage.length
           : 0;
       const noOfHospitalImage = hospitalImages.length;
       const totalImages = noOfHospitalImage + noOfGalleryImage;
@@ -413,7 +418,10 @@ function EditHospital({ params: { id } }: { params: { id: string } }) {
                           style={{
                             backgroundColor: 'rgba(0, 0, 0, 0.3)',
                           }}
-                          onClick={() => logoRefImgInput.current?.click()}
+                          onClick={() =>
+                            !isModalActiveLogo &&
+                            logoRefImgInput.current?.click()
+                          }
                         >
                           {!logoImg && (
                             <div className="flex size-10 items-center justify-center rounded-full border border-white p-2">
@@ -474,7 +482,9 @@ function EditHospital({ params: { id } }: { params: { id: string } }) {
                     <button
                       type="button"
                       className="relative flex size-[220px] flex-col items-center justify-center rounded-full border border-neutral-4"
-                      onClick={() => logoRef.current?.click()}
+                      onClick={() =>
+                        !isModalActiveLogo && logoRef.current?.click()
+                      }
                       onMouseEnter={() => setShowLogoOverlay(true)}
                       onMouseLeave={() => setShowLogoOverlay(false)}
                     >
@@ -912,24 +922,45 @@ function EditHospital({ params: { id } }: { params: { id: string } }) {
               <Controller
                 name="gallery"
                 control={control}
-                render={({ field: { name, onBlur, onChange } }) => (
-                  <input
-                    type="file"
-                    ref={galleryRef}
-                    accept="image/*"
-                    multiple
-                    name={name}
-                    onBlur={onBlur}
-                    onChange={(e) => {
-                      if (e.target.files) {
-                        if (
-                          gallery &&
-                          Array.isArray(gallery) &&
-                          gallery.length > 0
-                        ) {
-                          let totalImageFiles = Array.from(e.target.files);
-                          totalImageFiles = [...totalImageFiles, ...gallery];
-                          totalImageFiles = totalImageFiles.filter(
+                render={({ field: { name, onBlur } }) => (
+                  <>
+                    <input
+                      type="file"
+                      ref={galleryRef}
+                      accept="image/*"
+                      multiple
+                      name={name}
+                      onBlur={onBlur}
+                      onChange={(e) => {
+                        if (e.target.files) {
+                          if (
+                            gallery &&
+                            Array.isArray(gallery) &&
+                            gallery.length > 0
+                          ) {
+                            let totalImageFiles = Array.from(e.target.files);
+                            totalImageFiles = [...totalImageFiles, ...gallery];
+                            totalImageFiles = totalImageFiles.filter(
+                              (file, index, self) =>
+                                index ===
+                                self.findIndex(
+                                  (f) =>
+                                    f.size === file.size &&
+                                    f.name === file.name &&
+                                    f.type === file.type &&
+                                    f.lastModified === file.lastModified,
+                                ),
+                            );
+
+                            handleMultipleFileSetter({
+                              totalFiles: totalImageFiles,
+                              imageSetter: setGalleryImg,
+                              setIsModalActive: setIsModalActiveGallery,
+                            });
+                            return;
+                          }
+                          let files = Array.from(e.target.files);
+                          files = files.filter(
                             (file, index, self) =>
                               index ===
                               self.findIndex(
@@ -940,26 +971,24 @@ function EditHospital({ params: { id } }: { params: { id: string } }) {
                                   f.lastModified === file.lastModified,
                               ),
                           );
-                          onChange(totalImageFiles);
-                          return;
+                          handleMultipleFileSetter({
+                            totalFiles: files,
+                            imageSetter: setGalleryImg,
+                            setIsModalActive: setIsModalActiveGallery,
+                          });
                         }
-                        let files = Array.from(e.target.files);
-                        files = files.filter(
-                          (file, index, self) =>
-                            index ===
-                            self.findIndex(
-                              (f) =>
-                                f.size === file.size &&
-                                f.name === file.name &&
-                                f.type === file.type &&
-                                f.lastModified === file.lastModified,
-                            ),
-                        );
-                        onChange(files);
-                      }
-                    }}
-                    className="invisible absolute"
-                  />
+                      }}
+                      className="invisible absolute"
+                    />
+                    {isModalActiveGallery && galleryImg && (
+                      <MultipleImageCropperModal
+                        imageFiles={galleryImg}
+                        heading="Adjust your Image"
+                        setIsModalActive={setIsModalActiveGallery}
+                        imageSetter={setGalleryImg}
+                      />
+                    )}
+                  </>
                 )}
               />
             </button>

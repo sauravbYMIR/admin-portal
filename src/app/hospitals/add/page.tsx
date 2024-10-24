@@ -131,7 +131,6 @@ function AddHospital() {
     control,
     reset,
     handleSubmit,
-    getValues,
     watch,
     setValue,
     formState: { errors },
@@ -205,7 +204,6 @@ function AddHospital() {
   }, [
     createHospital.data,
     createHospital.isSuccess,
-    // getValues,
     // reset,
     // router,
     // updateHospitalGallery,
@@ -276,7 +274,7 @@ function AddHospital() {
                       </p>
                     </div>
                   )}
-                  {!getValues('logo') && (
+                  {!logoImg && (
                     <div className="flex size-10 items-center justify-center rounded-full border border-darkgray p-2">
                       <FileUploadIcon />
                     </div>
@@ -712,6 +710,7 @@ function AddHospital() {
                             heading="Adjust your Image"
                             setIsModalActive={setIsModalActiveGallery}
                             imageSetter={setGalleryImg}
+                            aspectRatio={{ w: 846, h: 150 }}
                           />
                         )}
                       </>
@@ -802,6 +801,7 @@ function AddHospital() {
                             heading="Adjust your Image"
                             setIsModalActive={setIsModalActiveGallery}
                             imageSetter={setGalleryImg}
+                            aspectRatio={{ w: 846, h: 150 }}
                           />
                         )}
                       </>

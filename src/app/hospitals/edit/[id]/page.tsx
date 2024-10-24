@@ -132,7 +132,6 @@ function EditHospital({ params: { id } }: { params: { id: string } }) {
     control,
     handleSubmit,
     setValue,
-    getValues,
     watch,
     formState: { errors },
   } = useForm<EditHospitalFormFields>({
@@ -147,7 +146,6 @@ function EditHospital({ params: { id } }: { params: { id: string } }) {
   const [logoImg, setLogoImg] = React.useState<File | null>(null);
   const [isModalActiveLogo, setIsModalActiveLogo] =
     React.useState<boolean>(false);
-  const gallery = watch('gallery');
   const shouldRenderProcedureError = countryData.some((c) => {
     const lang = hospitalDescObj[c.language] as HospitalDescFormSchemaType;
     return (
@@ -155,7 +153,7 @@ function EditHospital({ params: { id } }: { params: { id: string } }) {
     );
   });
   const handleCheckIsNoOfImagesValid = (
-    galleryImage: File[] | undefined,
+    galleryImage: File[] | null | undefined,
     minimumNoOfImages: number,
   ) => {
     if (hospitalImages) {
@@ -257,10 +255,9 @@ function EditHospital({ params: { id } }: { params: { id: string } }) {
           formData,
         });
       }
-      const galleryVal = getValues('gallery');
-      if (galleryVal) {
+      if (galleryImg) {
         const formData = new FormData();
-        galleryVal.forEach((file) => {
+        galleryImg.forEach((file) => {
           formData.append(`gallery`, file);
         });
         updateHospitalGallery.mutate({
@@ -828,9 +825,9 @@ function EditHospital({ params: { id } }: { params: { id: string } }) {
               </p>
             </div>
             <div className="flex w-full flex-wrap items-center gap-x-6 gap-y-8">
-              {gallery && gallery.length > 0 && (
+              {galleryImg && galleryImg.length > 0 && (
                 <>
-                  {gallery.map((image) => (
+                  {galleryImg.map((image) => (
                     <div
                       className="relative size-[180px] cursor-pointer rounded-lg border border-neutral-4"
                       key={image.size}
@@ -841,14 +838,14 @@ function EditHospital({ params: { id } }: { params: { id: string } }) {
                         onClick={(e) => {
                           e.preventDefault();
                           const isValidNoOfImages =
-                            handleCheckIsNoOfImagesValid(gallery, 4);
+                            handleCheckIsNoOfImagesValid(galleryImg, 4);
                           if (!isValidNoOfImages) {
                             return;
                           }
-                          const updatedGallery = gallery.filter(
+                          const updatedGallery = galleryImg.filter(
                             (f) => f.lastModified !== image.lastModified,
                           );
-                          setValue('gallery', updatedGallery);
+                          setGalleryImg(updatedGallery);
                         }}
                       >
                         <CloseIcon className="size-4" strokeWidth={3} />
@@ -885,7 +882,7 @@ function EditHospital({ params: { id } }: { params: { id: string } }) {
                         onClick={(e) => {
                           e.preventDefault();
                           const isValidNoOfImages =
-                            handleCheckIsNoOfImagesValid(gallery, 4);
+                            handleCheckIsNoOfImagesValid(galleryImg, 4);
                           if (!isValidNoOfImages) {
                             return;
                           }
@@ -913,7 +910,9 @@ function EditHospital({ params: { id } }: { params: { id: string } }) {
             <button
               className="mt-6 flex cursor-pointer gap-x-4 border-b-2 border-darkteal pb-1"
               type="button"
-              onClick={() => galleryRef.current?.click()}
+              onClick={() =>
+                !isModalActiveGallery && galleryRef.current?.click()
+              }
             >
               <PlusIcon stroke="rgba(9, 111, 144, 1)" />
               <span className="font-poppins text-base font-medium text-darkteal">
@@ -934,12 +933,15 @@ function EditHospital({ params: { id } }: { params: { id: string } }) {
                       onChange={(e) => {
                         if (e.target.files) {
                           if (
-                            gallery &&
-                            Array.isArray(gallery) &&
-                            gallery.length > 0
+                            galleryImg &&
+                            Array.isArray(galleryImg) &&
+                            galleryImg.length > 0
                           ) {
                             let totalImageFiles = Array.from(e.target.files);
-                            totalImageFiles = [...totalImageFiles, ...gallery];
+                            totalImageFiles = [
+                              ...totalImageFiles,
+                              ...galleryImg,
+                            ];
                             totalImageFiles = totalImageFiles.filter(
                               (file, index, self) =>
                                 index ===
@@ -986,6 +988,7 @@ function EditHospital({ params: { id } }: { params: { id: string } }) {
                         heading="Adjust your Image"
                         setIsModalActive={setIsModalActiveGallery}
                         imageSetter={setGalleryImg}
+                        aspectRatio={{ w: 846, h: 150 }}
                       />
                     )}
                   </>

@@ -200,7 +200,6 @@ function AddHospitalProcedure({ params }: { params: { id: string } }) {
     formState: { errors },
     watch,
     setValue,
-    getValues,
   } = useForm<CreateHospitalProcedureFormFields>({
     resolver: zodResolver(createHospitalProcedureFormSchema),
   });
@@ -261,10 +260,9 @@ function AddHospitalProcedure({ params }: { params: { id: string } }) {
       createHospitalProcedure.data &&
       createHospitalProcedure.data.data
     ) {
-      const gallery = getValues('gallery');
-      if (gallery) {
+      if (galleryImg) {
         const formData = new FormData();
-        gallery.forEach((file) => {
+        galleryImg.forEach((file) => {
           formData.append(`procedurePicture`, file);
         });
         updateHospitalProcedureGallery.mutate({
@@ -352,7 +350,6 @@ function AddHospitalProcedure({ params }: { params: { id: string } }) {
   }, []);
   const hospitalCountry =
     handleGetLocalStorage({ tokenKey: 'hospital_country' }) ?? '';
-  const gallery = watch('gallery');
   useScrollToError(errors);
   useDisableNumberInputScroll();
   return (
@@ -667,9 +664,9 @@ function AddHospitalProcedure({ params }: { params: { id: string } }) {
               Procedure related images (Optional)
             </h3>
             <div className="flex w-full flex-wrap items-center gap-x-6 gap-y-2">
-              {gallery && gallery.length > 0 && (
+              {galleryImg && galleryImg.length > 0 && (
                 <div className="flex w-full flex-wrap items-center gap-x-4 gap-y-2">
-                  {gallery.map((file) => (
+                  {galleryImg.map((file) => (
                     <div className="relative" key={file.size}>
                       <div className="size-[180px] cursor-pointer rounded-lg border border-neutral-4">
                         <Image
@@ -685,10 +682,10 @@ function AddHospitalProcedure({ params }: { params: { id: string } }) {
                         type="button"
                         className="absolute right-4 top-4 z-10 rounded-full bg-white p-1"
                         onClick={() => {
-                          const updatedGallery = gallery.filter(
+                          const updatedGallery = galleryImg.filter(
                             (f) => f.lastModified !== file.lastModified,
                           );
-                          setValue('gallery', updatedGallery);
+                          setGalleryImg(updatedGallery);
                         }}
                       >
                         <CloseIcon className="size-4" strokeWidth={3} />
@@ -697,7 +694,7 @@ function AddHospitalProcedure({ params }: { params: { id: string } }) {
                   ))}
                 </div>
               )}
-              {gallery ? (
+              {galleryImg ? (
                 <button
                   className="mt-6 flex cursor-pointer gap-x-4 border-b-2 border-darkteal pb-1"
                   type="button"
@@ -780,6 +777,7 @@ function AddHospitalProcedure({ params }: { params: { id: string } }) {
                             heading="Adjust your Image"
                             setIsModalActive={setIsModalActiveGallery}
                             imageSetter={setGalleryImg}
+                            aspectRatio={{ w: 846, h: 150 }}
                           />
                         )}
                       </>
@@ -794,7 +792,7 @@ function AddHospitalProcedure({ params }: { params: { id: string } }) {
                     !isModalActiveGallery && galleryRef.current?.click()
                   }
                 >
-                  {!gallery && (
+                  {!galleryImg && (
                     <div className="flex size-10 items-center justify-center rounded-full border border-darkgray p-2">
                       <FileUploadIcon />
                     </div>
@@ -840,6 +838,7 @@ function AddHospitalProcedure({ params }: { params: { id: string } }) {
                             heading="Adjust your Image"
                             setIsModalActive={setIsModalActiveGallery}
                             imageSetter={setGalleryImg}
+                            aspectRatio={{ w: 846, h: 150 }}
                           />
                         )}
                       </>

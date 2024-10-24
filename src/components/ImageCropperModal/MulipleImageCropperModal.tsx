@@ -6,7 +6,7 @@ import Cropper from 'react-cropper';
 
 import { CloseIcon, ModalWrapper, ZoomInIcon, ZoomOutIcon } from '..';
 
-export type ImageCropperModalPropType = {
+export type MultipleImageCropperModalPropType = {
   imageFiles: File[];
   heading?: string;
   setIsModalActive: React.Dispatch<React.SetStateAction<boolean>>;
@@ -14,13 +14,13 @@ export type ImageCropperModalPropType = {
   aspectRatio?: 1 | { h: number; w: number };
 };
 
-const ImageCropperModal = ({
+const MultipleImageCropperModal = ({
   imageFiles,
   heading,
   setIsModalActive,
   imageSetter,
   aspectRatio,
-}: ImageCropperModalPropType) => {
+}: MultipleImageCropperModalPropType) => {
   const [currentIndex, setCurrentIndex] = useState(0);
   const [cropper, setCropper] = useState<Cropper>();
   const [editedImages, setEditedImages] = useState<File[]>([...imageFiles]); // Track edited images
@@ -184,4 +184,4 @@ const ImageCropperModal = ({
   );
 };
 
-export default ImageCropperModal;
+export default MultipleImageCropperModal;

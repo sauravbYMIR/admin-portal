@@ -122,7 +122,6 @@ function EditHospitalProcedure({
     setValue,
     control,
     watch,
-    getValues,
     reset,
     formState: { errors },
   } = useForm<EditHospitalProcedureFormFields>({
@@ -231,10 +230,9 @@ function EditHospitalProcedure({
       editHospitalProcedure.data &&
       editHospitalProcedure.data.data
     ) {
-      const gallery = getValues('gallery');
-      if (gallery) {
+      if (galleryImg) {
         const formData = new FormData();
-        gallery.forEach((file) => {
+        galleryImg.forEach((file) => {
           formData.append(`procedurePicture`, file);
         });
         updateHospitalProcedureGallery.mutate({
@@ -251,7 +249,6 @@ function EditHospitalProcedure({
   }, [
     editHospitalProcedure.data,
     editHospitalProcedure.isSuccess,
-    // getValues,
     // updateHospitalLogo,
     // updateHospitalGallery,
   ]);
@@ -272,7 +269,6 @@ function EditHospitalProcedure({
   }, []);
   const hospitalCountry =
     handleGetLocalStorage({ tokenKey: 'hospital_country' }) ?? '';
-  const gallery = watch('gallery');
   useScrollToError(errors);
   useDisableNumberInputScroll();
   return (
@@ -543,9 +539,9 @@ function EditHospitalProcedure({
 
             <div className="flex w-full flex-col items-start gap-y-4">
               <div className="flex w-full flex-wrap items-center gap-x-6 gap-y-8">
-                {gallery && gallery.length > 0 && (
+                {galleryImg && galleryImg.length > 0 && (
                   <>
-                    {gallery.map((file) => (
+                    {galleryImg.map((file) => (
                       <div
                         key={file.size}
                         className="relative size-[180px] cursor-pointer rounded-lg border border-neutral-4"
@@ -554,10 +550,10 @@ function EditHospitalProcedure({
                           type="button"
                           className="absolute right-4 top-4 z-10 rounded-full bg-white p-1"
                           onClick={() => {
-                            const updatedGallery = gallery.filter(
+                            const updatedGallery = galleryImg.filter(
                               (f) => f.lastModified !== file.lastModified,
                             );
-                            setValue('gallery', updatedGallery);
+                            setGalleryImg(updatedGallery);
                           }}
                         >
                           <CloseIcon className="size-4" strokeWidth={3} />
@@ -699,6 +695,7 @@ function EditHospitalProcedure({
                           heading="Adjust your Image"
                           setIsModalActive={setIsModalActiveGallery}
                           imageSetter={setGalleryImg}
+                          aspectRatio={{ w: 846, h: 150 }}
                         />
                       )}
                     </>

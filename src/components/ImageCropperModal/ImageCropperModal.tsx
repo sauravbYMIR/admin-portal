@@ -15,6 +15,7 @@ export type ImageCropperModalPropType = {
   imageSetter: React.Dispatch<React.SetStateAction<File | null>>;
   imageRef: React.RefObject<HTMLInputElement>;
   aspectRatio?: 1 | { h: number; w: number };
+  setValue: any;
 };
 const ImageCropperModal = ({
   imageFile,
@@ -23,6 +24,7 @@ const ImageCropperModal = ({
   imageSetter,
   imageRef,
   aspectRatio,
+  setValue,
   // isHandleUpload,
   // handleUploadType,
   // uploadKey,
@@ -46,6 +48,7 @@ const ImageCropperModal = ({
               lastModified: Date.now(),
             });
             imageSetter(blobToFile);
+            setValue('logo', blobToFile);
           }
         });
       setIsModalActive(false);
@@ -54,6 +57,7 @@ const ImageCropperModal = ({
   const handleCloseModal = () => {
     setIsModalActive(false);
     imageSetter(null);
+    setValue('logo', null);
     if (imageRef && imageRef.current) {
       // eslint-disable-next-line no-param-reassign
       imageRef.current.value = '';

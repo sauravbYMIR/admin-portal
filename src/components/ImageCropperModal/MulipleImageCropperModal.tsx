@@ -12,6 +12,7 @@ export type MultipleImageCropperModalPropType = {
   setIsModalActive: React.Dispatch<React.SetStateAction<boolean>>;
   imageSetter: React.Dispatch<React.SetStateAction<File[] | null>>;
   aspectRatio?: 1 | { h: number; w: number };
+  setValue: any;
 };
 
 const MultipleImageCropperModal = ({
@@ -20,6 +21,7 @@ const MultipleImageCropperModal = ({
   setIsModalActive,
   imageSetter,
   aspectRatio,
+  setValue,
 }: MultipleImageCropperModalPropType) => {
   const [currentIndex, setCurrentIndex] = useState(0);
   const [cropper, setCropper] = useState<Cropper>();
@@ -66,12 +68,14 @@ const MultipleImageCropperModal = ({
     } else {
       setIsModalActive(false); // Close when all images are done
       imageSetter(editedImages); // Send the edited images back
+      setValue('gallery', editedImages);
     }
   };
 
   const handleCloseModal = () => {
     setIsModalActive(false);
     imageSetter(imageFiles); // Reset to original files if closed
+    setValue('gallery', imageFiles);
   };
 
   return (

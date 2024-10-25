@@ -348,6 +348,9 @@ function EditHospital({ params: { id } }: { params: { id: string } }) {
                       className="invisible absolute"
                       ref={logoRef}
                       onChange={(e) => {
+                        if (e.target.files && e.target.files[0]) {
+                          setValue('logo', e.target.files[0]);
+                        }
                         handleFileSetter({
                           e,
                           imageSetter: setLogoImg,
@@ -362,8 +365,7 @@ function EditHospital({ params: { id } }: { params: { id: string } }) {
                         heading="Adjust your Logo"
                         setIsModalActive={setIsModalActiveLogo}
                         imageSetter={setLogoImg}
-                        aspectRatio={{ w: 846, h: 150 }}
-                        // handleUploadType="LOGO"
+                        setValue={setValue}
                       />
                     )}
                     {logoImg ? (
@@ -431,6 +433,9 @@ function EditHospital({ params: { id } }: { params: { id: string } }) {
                             className="invisible absolute"
                             ref={logoRefImgInput}
                             onChange={(e) => {
+                              if (e.target.files && e.target.files[0]) {
+                                setValue('logo', e.target.files[0]);
+                              }
                               handleFileSetter({
                                 e,
                                 imageSetter: setLogoImg,
@@ -445,8 +450,7 @@ function EditHospital({ params: { id } }: { params: { id: string } }) {
                               heading="Adjust your Logo"
                               setIsModalActive={setIsModalActiveLogo}
                               imageSetter={setLogoImg}
-                              aspectRatio={{ w: 846, h: 150 }}
-                              // handleUploadType="LOGO"
+                              setValue={setValue}
                             />
                           )}
                           {!logoImg && (
@@ -514,6 +518,9 @@ function EditHospital({ params: { id } }: { params: { id: string } }) {
                         className="invisible absolute"
                         ref={logoRef}
                         onChange={(e) => {
+                          if (e.target.files && e.target.files[0]) {
+                            setValue('logo', e.target.files[0]);
+                          }
                           handleFileSetter({
                             e,
                             imageSetter: setLogoImg,
@@ -528,8 +535,7 @@ function EditHospital({ params: { id } }: { params: { id: string } }) {
                           heading="Adjust your Logo"
                           setIsModalActive={setIsModalActiveLogo}
                           imageSetter={setLogoImg}
-                          aspectRatio={{ w: 846, h: 150 }}
-                          // handleUploadType="LOGO"
+                          setValue={setValue}
                         />
                       )}
                       {logoImg ? (
@@ -953,7 +959,9 @@ function EditHospital({ params: { id } }: { params: { id: string } }) {
                                     f.lastModified === file.lastModified,
                                 ),
                             );
-
+                            if (totalImageFiles) {
+                              setValue('gallery', totalImageFiles);
+                            }
                             handleMultipleFileSetter({
                               totalFiles: totalImageFiles,
                               imageSetter: setGalleryImg,
@@ -973,6 +981,9 @@ function EditHospital({ params: { id } }: { params: { id: string } }) {
                                   f.lastModified === file.lastModified,
                               ),
                           );
+                          if (files) {
+                            setValue('gallery', files);
+                          }
                           handleMultipleFileSetter({
                             totalFiles: files,
                             imageSetter: setGalleryImg,
@@ -988,7 +999,7 @@ function EditHospital({ params: { id } }: { params: { id: string } }) {
                         heading="Adjust your Image"
                         setIsModalActive={setIsModalActiveGallery}
                         imageSetter={setGalleryImg}
-                        aspectRatio={{ w: 846, h: 150 }}
+                        setValue={setValue}
                       />
                     )}
                   </>

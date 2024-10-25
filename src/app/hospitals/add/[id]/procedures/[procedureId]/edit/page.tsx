@@ -661,6 +661,9 @@ function EditHospitalProcedure({
                                       f.lastModified === file.lastModified,
                                   ),
                               );
+                              if (totalImageFiles) {
+                                setValue('gallery', totalImageFiles);
+                              }
                               handleMultipleFileSetter({
                                 totalFiles: totalImageFiles,
                                 imageSetter: setGalleryImg,
@@ -680,6 +683,9 @@ function EditHospitalProcedure({
                                     f.lastModified === file.lastModified,
                                 ),
                             );
+                            if (files) {
+                              setValue('gallery', files);
+                            }
                             handleMultipleFileSetter({
                               totalFiles: files,
                               imageSetter: setGalleryImg,
@@ -695,7 +701,7 @@ function EditHospitalProcedure({
                           heading="Adjust your Image"
                           setIsModalActive={setIsModalActiveGallery}
                           imageSetter={setGalleryImg}
-                          aspectRatio={{ w: 846, h: 150 }}
+                          setValue={setValue}
                         />
                       )}
                     </>

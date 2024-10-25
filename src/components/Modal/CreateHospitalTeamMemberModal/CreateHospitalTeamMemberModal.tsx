@@ -467,6 +467,9 @@ function CreateHospitalTeamMemberModal({
                       className="invisible absolute"
                       ref={profileRef}
                       onChange={(e) => {
+                        if (e.target.files && e.target.files[0]) {
+                          setValue('profile', e.target.files[0]);
+                        }
                         handleFileSetter({
                           e,
                           imageSetter: setProfileImg,
@@ -481,8 +484,7 @@ function CreateHospitalTeamMemberModal({
                         heading="Adjust your profile"
                         setIsModalActive={setIsModalActive}
                         imageSetter={setProfileImg}
-                        aspectRatio={{ w: 846, h: 150 }}
-                        // handleUploadType="LOGO"
+                        setValue={setValue}
                       />
                     )}
                     {profileImg ? (

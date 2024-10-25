@@ -285,6 +285,9 @@ function AddHospital() {
                     className="invisible absolute"
                     ref={logoRef}
                     onChange={(e) => {
+                      if (e.target.files && e.target.files[0]) {
+                        setValue('logo', e.target.files[0]);
+                      }
                       handleFileSetter({
                         e,
                         imageSetter: setLogoImg,
@@ -299,7 +302,7 @@ function AddHospital() {
                       heading="Adjust your Logo"
                       setIsModalActive={setIsModalActiveLogo}
                       imageSetter={setLogoImg}
-                      aspectRatio={{ w: 846, h: 150 }}
+                      setValue={setValue}
                     />
                   )}
 
@@ -676,6 +679,9 @@ function AddHospital() {
                                         f.lastModified === file.lastModified,
                                     ),
                                 );
+                                if (totalImageFiles) {
+                                  setValue('gallery', totalImageFiles);
+                                }
                                 handleMultipleFileSetter({
                                   totalFiles: totalImageFiles,
                                   imageSetter: setGalleryImg,
@@ -695,6 +701,9 @@ function AddHospital() {
                                       f.lastModified === file.lastModified,
                                   ),
                               );
+                              if (files) {
+                                setValue('gallery', files);
+                              }
                               handleMultipleFileSetter({
                                 totalFiles: files,
                                 imageSetter: setGalleryImg,
@@ -710,7 +719,7 @@ function AddHospital() {
                             heading="Adjust your Image"
                             setIsModalActive={setIsModalActiveGallery}
                             imageSetter={setGalleryImg}
-                            aspectRatio={{ w: 846, h: 150 }}
+                            setValue={setValue}
                           />
                         )}
                       </>
@@ -767,6 +776,9 @@ function AddHospital() {
                                         f.lastModified === file.lastModified,
                                     ),
                                 );
+                                if (totalImageFiles) {
+                                  setValue('gallery', totalImageFiles);
+                                }
                                 handleMultipleFileSetter({
                                   totalFiles: totalImageFiles,
                                   imageSetter: setGalleryImg,
@@ -786,6 +798,9 @@ function AddHospital() {
                                       f.lastModified === file.lastModified,
                                   ),
                               );
+                              if (files) {
+                                setValue('gallery', files);
+                              }
                               handleMultipleFileSetter({
                                 totalFiles: files,
                                 imageSetter: setGalleryImg,
@@ -801,7 +816,7 @@ function AddHospital() {
                             heading="Adjust your Image"
                             setIsModalActive={setIsModalActiveGallery}
                             imageSetter={setGalleryImg}
-                            aspectRatio={{ w: 846, h: 150 }}
+                            setValue={setValue}
                           />
                         )}
                       </>

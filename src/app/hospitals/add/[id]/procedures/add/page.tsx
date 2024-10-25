@@ -743,6 +743,9 @@ function AddHospitalProcedure({ params }: { params: { id: string } }) {
                                         f.lastModified === file.lastModified,
                                     ),
                                 );
+                                if (totalImageFiles) {
+                                  setValue('gallery', totalImageFiles);
+                                }
                                 handleMultipleFileSetter({
                                   totalFiles: totalImageFiles,
                                   imageSetter: setGalleryImg,
@@ -762,6 +765,9 @@ function AddHospitalProcedure({ params }: { params: { id: string } }) {
                                       f.lastModified === file.lastModified,
                                   ),
                               );
+                              if (files) {
+                                setValue('gallery', files);
+                              }
                               handleMultipleFileSetter({
                                 totalFiles: files,
                                 imageSetter: setGalleryImg,
@@ -777,7 +783,7 @@ function AddHospitalProcedure({ params }: { params: { id: string } }) {
                             heading="Adjust your Image"
                             setIsModalActive={setIsModalActiveGallery}
                             imageSetter={setGalleryImg}
-                            aspectRatio={{ w: 846, h: 150 }}
+                            setValue={setValue}
                           />
                         )}
                       </>
@@ -823,6 +829,9 @@ function AddHospitalProcedure({ params }: { params: { id: string } }) {
                                       f.lastModified === file.lastModified,
                                   ),
                               );
+                              if (updatedFiles) {
+                                setValue('gallery', updatedFiles);
+                              }
                               handleMultipleFileSetter({
                                 totalFiles: updatedFiles,
                                 imageSetter: setGalleryImg,
@@ -838,7 +847,7 @@ function AddHospitalProcedure({ params }: { params: { id: string } }) {
                             heading="Adjust your Image"
                             setIsModalActive={setIsModalActiveGallery}
                             imageSetter={setGalleryImg}
-                            aspectRatio={{ w: 846, h: 150 }}
+                            setValue={setValue}
                           />
                         )}
                       </>

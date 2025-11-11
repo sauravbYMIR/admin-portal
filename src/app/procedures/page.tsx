@@ -187,9 +187,9 @@ function ProceduresList() {
       >
         {departmentProcedureList.isSuccess ? (
           Array.isArray(
-            departmentProcedureList.data.data.allCategoryWithProcedure,
+            departmentProcedureList?.data?.data?.allCategoryWithProcedure,
           ) &&
-          departmentProcedureList.data.data.allCategoryWithProcedure.length >
+          departmentProcedureList?.data?.data?.allCategoryWithProcedure.length >
             0 ? (
             <>
               <div className="mb-11 flex w-[480px] items-center justify-between">
@@ -220,7 +220,7 @@ function ProceduresList() {
                   </p>
                 </button>
               </div>
-              {departmentProcedureList.data.data.allCategoryWithProcedure.map(
+              {departmentProcedureList?.data?.data?.allCategoryWithProcedure.map(
                 (procedureData) => {
                   return (
                     <div key={procedureData.id} className="mb-3">

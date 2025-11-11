@@ -68,13 +68,13 @@ function HospitalDetailsPage({ params: { id } }: { params: { id: string } }) {
 
   const router = useRouter();
   React.useEffect(() => {
-    if (hospitalById?.data?.data.country) {
+    if (hospitalById?.data?.data?.country) {
       handleSetLocalStorage({
         tokenKey: 'hospital_country',
-        tokenValue: hospitalById.data.data.country,
+        tokenValue: hospitalById.data.data?.country,
       });
     }
-  }, [hospitalById?.data?.data.country]);
+  }, [hospitalById?.data?.data?.country]);
   return (
     <div>
       <Header />
@@ -183,7 +183,7 @@ function HospitalDetailsPage({ params: { id } }: { params: { id: string } }) {
                   {hospitalById.data.data.city}
                 </p>
                 <p className="font-lexend text-base font-light text-neutral-3">
-                  {hospitalById.data.data.country}
+                  {hospitalById?.data?.data?.country}
                 </p>
                 <p className="font-lexend text-base font-light text-neutral-3">
                   {hospitalById.data.data.zipcode}

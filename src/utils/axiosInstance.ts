@@ -34,6 +34,7 @@ export const handleSignout = (axiosInstance: AxiosInstance | undefined) => {
 
 const axiosInstance = axios.create({
   baseURL: `${baseURL}`,
+  headers: { 'ngrok-skip-browser-warning': 'true' },
 });
 
 // Interceptor for request

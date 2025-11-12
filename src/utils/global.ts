@@ -34,6 +34,8 @@ type CountryData = {
 export const availableCurrency = ['EUR', 'NOK', 'DKK', 'SEK', ''] as const;
 export type AvailableCurrencyType = 'EUR' | 'NOK' | 'DKK' | 'SEK';
 
+export const brandName = 'Medipath';
+
 export const availableCountries = {
   Ireland: {
     language: 'English',

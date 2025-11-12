@@ -1,5 +1,5 @@
 {
-  "name": "drfasttrack-admin-portal",
+  "name": "medipath-admin-portal",
   "version": "3.38.0",
   "scripts": {
     "dev:spotlight": "spotlight-sidecar",

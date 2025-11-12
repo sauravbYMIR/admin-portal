@@ -1,10 +1,9 @@
 'use client';
 
-import Image from 'next/image';
 import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
 
-import brandLogo from '@/public/assets/images/brandLogo.svg';
+import { brandName } from '@/utils/global';
 
 import LogButton from '../LogButton/LogButton';
 import headerStyle from './header.module.scss';
@@ -32,7 +31,7 @@ function Header() {
   return (
     <nav className={`h-24 w-full items-center ${headerStyle.headerContainer}`}>
       <button type="button" onClick={() => router.push('/patients')}>
-        <Image src={brandLogo} alt="branch icon" width={120} height={48} />
+        <h1 className="text-3xl font-semibold text-darkteal">{brandName}</h1>
       </button>
       <ul
         className={` flex list-none items-center gap-8 ${headerStyle.headerLinkContainer}`}

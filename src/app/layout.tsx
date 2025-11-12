@@ -7,7 +7,7 @@ import { Toaster } from 'sonner';
 import Providers from '@/utils/providers';
 
 export const metadata: Metadata = {
-  title: 'Drfasttrack Admin',
+  title: 'Medipath Admin',
   icons: [
     {
       rel: 'icon',

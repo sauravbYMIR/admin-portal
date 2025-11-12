@@ -1,7 +1,6 @@
 'use client';
 
 import { zodResolver } from '@hookform/resolvers/zod';
-import Image from 'next/image';
 import { useRouter, useSearchParams } from 'next/navigation';
 import React from 'react';
 import type { SubmitHandler } from 'react-hook-form';
@@ -11,8 +10,11 @@ import { toast } from 'sonner';
 import { z } from 'zod';
 
 import { resendOTP, sendOTP, verifyOTP } from '@/hooks';
-import brandLogo from '@/public/assets/images/brandLogo.svg';
-import { handleSetLocalStorage, SERVER_ERROR_MESSAGE } from '@/utils/global';
+import {
+  brandName,
+  handleSetLocalStorage,
+  SERVER_ERROR_MESSAGE,
+} from '@/utils/global';
 
 import style from '../../app/page.module.scss';
 import OTPInputWrapper from '../OtpInput/OtpInput';
@@ -290,7 +292,7 @@ function Login() {
   });
   return (
     <div className="flex flex-col items-center justify-center">
-      <Image src={brandLogo} alt="brand logo" />
+      <h1 className="text-4xl font-semibold text-darkteal">{brandName}</h1>
       {step.email && <LoginWithMail setStep={setStep} />}
       {step.otp && <LoginWithOtp />}
     </div>

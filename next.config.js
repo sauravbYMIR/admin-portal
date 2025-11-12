@@ -38,6 +38,12 @@ module.exports = {
         port: '',
         pathname: '/**',
       },
+      {
+        protocol: 'https',
+        hostname: 'dev-drfastrack.s3.eu-central-1.amazonaws.com',
+        port: '',
+        pathname: '/**',
+      },
     ],
   },
   env: {

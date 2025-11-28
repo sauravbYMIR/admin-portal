@@ -68,6 +68,14 @@ export const sendOTP = async ({
       success: response.status === 201,
       message: 'send-otp-successful',
     };
+    //     return await new Promise((resolve, _reject) => {
+    //   setTimeout(() => {
+    //     return resolve({
+    //       success: true,
+    //       message: 'send-otp-successful',
+    //     });
+    //   }, 1000);
+    // });
   } catch (err) {
     if (axios.isAxiosError(err)) {
       const serverError = err as AxiosError<ServerError>;

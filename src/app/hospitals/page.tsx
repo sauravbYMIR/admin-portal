@@ -132,30 +132,34 @@ function HospitalsPage() {
                   location: r.country,
                 }))}
                 colDefs={[
-                  {
-                    headerName: 'Hospital id',
-                    field: 'hospital_id',
-                    filter: true,
-                    floatingFilter: true,
-                    flex: 1,
-                  },
+                  // {
+                  //   headerName: 'Hospital id',
+                  //   field: 'hospital_id',
+                  //   filter: false,
+                  //   floatingFilter: false,
+                  //   flex: 1,
+                  //   resizable: false,
+                  // },
                   {
                     headerName: 'Hospital name',
                     field: 'hospital_name',
-                    filter: true,
-                    floatingFilter: true,
+                    filter: false,
+                    floatingFilter: false,
                     flex: 1,
+                    resizable: false,
                   },
                   {
                     headerName: 'Location',
                     field: 'location',
-                    filter: true,
-                    floatingFilter: true,
+                    filter: false,
+                    floatingFilter: false,
                     flex: 1,
+                    resizable: false,
                   },
                   {
                     field: '',
                     flex: 1,
+                    resizable: false,
                     cellRenderer: CustomStatusEditComponent,
                   },
                 ]}

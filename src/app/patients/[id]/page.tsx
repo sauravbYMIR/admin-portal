@@ -177,10 +177,10 @@ const PatientBooking = ({ params }: { params: { id: string } }) => {
     bookingDetail.data.data &&
     bookingDetail.data.data.id
       ? [
-          {
-            label: 'Patient name',
-            value: `${bookingDetail.data.data.user.firstName} ${bookingDetail.data.data.user.lastName}`,
-          },
+          // {
+          //   label: 'Patient name',
+          //   value: `${bookingDetail.data.data.user.firstName} ${bookingDetail.data.data.user.lastName}`,
+          // },
           {
             label: 'Gender',
             value:
@@ -250,9 +250,9 @@ const PatientBooking = ({ params }: { params: { id: string } }) => {
           <div className="px-20">
             <div className={patientBookingStyle.firstSectionContentContainer}>
               <div className={patientBookingStyle.patientTagContainer}>
-                <p className={patientBookingStyle.patientIdTag}>
+                {/* <p className={patientBookingStyle.patientIdTag}>
                   Electronic ID verified
-                </p>
+                </p> */}
 
                 <div
                   className="flex items-center justify-center rounded-sm px-2 py-1"

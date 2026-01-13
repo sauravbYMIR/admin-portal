@@ -7,12 +7,10 @@ import Select from 'react-select';
 import { z } from 'zod';
 
 import { CloseIcon } from '@/components/Icons/Icons';
-import departmentModalStyle from '@/components/Modal/DepartmentModal/departmentModal.module.scss';
 import { useGetHospitalTeamMembersByHospitalId } from '@/hooks';
 import type { NameJSONType } from '@/hooks/useDepartment';
 import useScrollToError from '@/hooks/useScrollToError';
-import type { LanguagesType } from '@/types/components';
-import { countryData, roleObj, RoleSchema } from '@/utils/global';
+import { roleObj, RoleSchema } from '@/utils/global';
 
 import modalStyle from '../CreateHospitalTeamMemberModal/style.module.scss';
 import type { Locale } from '../DepartmentModal/DepartmentModal';
@@ -29,11 +27,11 @@ const addTeamMemberFormSchema = z.object({
   ...RoleSchema,
 });
 
-type FormErrors = {
-  [key in RoleFormSchemaType]?: { message?: string };
-} & {
-  teamMemberId?: { message?: string };
-};
+// type FormErrors = {
+//   [key in RoleFormSchemaType]?: { message?: string };
+// } & {
+//   teamMemberId?: { message?: string };
+// };
 export type CreateHospitalTeamMemberFormFields = z.infer<
   typeof addTeamMemberFormSchema
 >;
@@ -107,10 +105,7 @@ export function AddTeamMemberToHospitalProcedure({
     value: string;
     name: string;
   } | null>(null);
-  const [activeLanguageTab, setActiveLanguageTab] =
-    React.useState<LanguagesType>('English');
   const {
-    register,
     handleSubmit,
     control,
     reset,
@@ -119,12 +114,12 @@ export function AddTeamMemberToHospitalProcedure({
   } = useForm<CreateHospitalTeamMemberFormFields>({
     resolver: zodResolver(addTeamMemberFormSchema),
   });
-  const shouldRenderError = countryData.some((c) => {
-    const lang = roleObj[c.language] as RoleFormSchemaType;
-    return (
-      (errors as FormErrors)[lang] && (errors as FormErrors)[lang]?.message
-    );
-  });
+  // const shouldRenderError = countryData.some((c) => {
+  //   const lang = roleObj[c.language] as RoleFormSchemaType;
+  //   return (
+  //     (errors as FormErrors)[lang] && (errors as FormErrors)[lang]?.message
+  //   );
+  // });
   const onFormSubmit: SubmitHandler<CreateHospitalTeamMemberFormFields> = (
     data: CreateHospitalTeamMemberFormFields,
   ) => {
@@ -210,7 +205,7 @@ export function AddTeamMemberToHospitalProcedure({
                     className="font-poppins text-base font-normal text-neutral-2"
                     htmlFor="teamMemberId"
                   >
-                    Team member
+                    Team member1
                   </label>
                   {selectedOption && (
                     <small className="text-sm font-normal italic">
@@ -275,10 +270,10 @@ export function AddTeamMemberToHospitalProcedure({
                   className="font-poppins text-base font-normal text-neutral-2"
                   htmlFor="position"
                 >
-                  Role
+                  Role1
                 </label>
 
-                <div className={modalStyle.languageTabContainer}>
+                {/* <div className={modalStyle.languageTabContainer}>
                   {countryData.map((data) => {
                     const lang = roleObj[data.language] as RoleFormSchemaType;
                     return (
@@ -325,10 +320,19 @@ export function AddTeamMemberToHospitalProcedure({
                   <small className="mb-5 mt-1 text-start font-lexend text-base font-normal text-error">
                     Fill in details in all the languages
                   </small>
-                )}
+                )} */}
+
+                <input
+                  // eslint-disable-next-line jsx-a11y/no-autofocus
+                  autoFocus
+                  className="w-full rounded-lg border-2 border-lightsilver px-4 py-3"
+                  type="text"
+                  id="position"
+                  onChange={() => {}}
+                />
               </div>
 
-              <div style={{ marginTop: '64px', marginBottom: '28px' }}>
+              {/* <div style={{ marginTop: '64px', marginBottom: '28px' }}>
                 <label
                   className={departmentModalStyle.checkboxLabel}
                   htmlFor="add-member-radio"
@@ -347,7 +351,7 @@ export function AddTeamMemberToHospitalProcedure({
                   />
                   <span className={departmentModalStyle.checkmark} />
                 </label>
-              </div>
+              </div> */}
               <button
                 className="flex w-[280px] cursor-pointer items-center justify-center rounded-lg bg-darkteal px-4 py-[15px]"
                 style={{ marginTop: '24px' }}

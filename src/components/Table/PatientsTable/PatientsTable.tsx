@@ -18,12 +18,18 @@ function ShowDataTable<T extends {}, U extends {}>({
   onCellClicked?: (params: any) => void;
 }): JSX.Element {
   return (
-    <div className="ag-theme-quartz" style={{ width: '100%', height: '408px' }}>
+    <div
+      className="ag-theme-quartz"
+      style={{
+        width: '100%',
+        height: `${48 * 2 + Math.min(rowData.length, 10) * 63 + Math.min(rowData.length, 10) + 3}px`,
+      }}
+    >
       <AgGridReact
         rowData={rowData}
         columnDefs={colDefs}
         pagination
-        paginationAutoPageSize
+        paginationPageSize={10}
         cacheBlockSize={20}
         onCellEditingStopped={onCellClicked}
       />

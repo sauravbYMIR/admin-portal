@@ -35,7 +35,6 @@ import {
   useUpdateHospitalLogo,
 } from '@/hooks';
 import useScrollToError from '@/hooks/useScrollToError';
-import type { LanguagesType } from '@/types/components';
 import {
   availableCountries,
   countryData,
@@ -85,19 +84,19 @@ const editHospitalFormSchema = z.object({
     .max(10, 'You can upload up to 10 images')
     .optional(),
 });
-type FormErrors = {
-  [key in HospitalDescFormSchemaType]?: { message?: string };
-} & {
-  hospitalName?: { message?: string };
-  streetName?: { message?: string };
-  city?: { message?: string };
-  externalLink?: { message?: string };
-  country?: { message?: string };
-  streetNumber?: { message?: string };
-  zipCode?: { message?: string };
-  logo?: { message?: string };
-  gallery?: { message?: string };
-};
+// type FormErrors = {
+//   [key in HospitalDescFormSchemaType]?: { message?: string };
+// } & {
+//   hospitalName?: { message?: string };
+//   streetName?: { message?: string };
+//   city?: { message?: string };
+//   externalLink?: { message?: string };
+//   country?: { message?: string };
+//   streetNumber?: { message?: string };
+//   zipCode?: { message?: string };
+//   logo?: { message?: string };
+//   gallery?: { message?: string };
+// };
 export type EditHospitalFormFields = z.infer<typeof editHospitalFormSchema>;
 function EditHospital({ params: { id } }: { params: { id: string } }) {
   const ReactQuill = React.useMemo(
@@ -115,8 +114,7 @@ function EditHospital({ params: { id } }: { params: { id: string } }) {
   const reqdHospital = useGetHospitalById({ id });
   const updateHospitalLogo = useUpdateHospitalLogo();
   const updateHospitalGallery = useUpdateHospitalGallery();
-  const [activeLanguageTab, setActiveLanguageTab] =
-    React.useState<LanguagesType>('English');
+  const [hospitalDesc, setHospitalDesc] = React.useState<string>('');
   const [isActiveCancelModal, setIsActiveCancelModal] =
     React.useState<boolean>(false);
   const [selectedCountry, setSelectedCountry] = React.useState<{
@@ -132,7 +130,6 @@ function EditHospital({ params: { id } }: { params: { id: string } }) {
     control,
     handleSubmit,
     setValue,
-    watch,
     formState: { errors },
   } = useForm<EditHospitalFormFields>({
     resolver: zodResolver(editHospitalFormSchema),
@@ -146,12 +143,12 @@ function EditHospital({ params: { id } }: { params: { id: string } }) {
   const [logoImg, setLogoImg] = React.useState<File | null>(null);
   const [isModalActiveLogo, setIsModalActiveLogo] =
     React.useState<boolean>(false);
-  const shouldRenderProcedureError = countryData.some((c) => {
-    const lang = hospitalDescObj[c.language] as HospitalDescFormSchemaType;
-    return (
-      (errors as FormErrors)[lang] && (errors as FormErrors)[lang]?.message
-    );
-  });
+  // const shouldRenderProcedureError = countryData.some((c) => {
+  //   const lang = hospitalDescObj[c.language] as HospitalDescFormSchemaType;
+  //   return (
+  //     (errors as FormErrors)[lang] && (errors as FormErrors)[lang]?.message
+  //   );
+  // });
   const handleCheckIsNoOfImagesValid = (
     galleryImage: File[] | null | undefined,
     minimumNoOfImages: number,
@@ -230,6 +227,7 @@ function EditHospital({ params: { id } }: { params: { id: string } }) {
           }
         }
       });
+      setHospitalDesc(reqdHospital.data.data.description.en as string);
       setValue('streetName', reqdHospital.data.data.streetName);
       setValue('city', reqdHospital.data.data.city);
       setValue('streetNumber', reqdHospital.data.data.streetNumber);
@@ -608,7 +606,7 @@ function EditHospital({ params: { id } }: { params: { id: string } }) {
                 Hospital Description
               </label>
 
-              <div className={addHospitalStyle.langTabContainer}>
+              {/* <div className={addHospitalStyle.langTabContainer}>
                 {countryData.map((data) => {
                   const lang = hospitalDescObj[
                     data.language
@@ -668,7 +666,24 @@ function EditHospital({ params: { id } }: { params: { id: string } }) {
                 <small className="mb-5 mt-1 text-start font-lexend text-base font-normal text-error">
                   Fill in details in all the languages
                 </small>
-              )}
+              )} */}
+              <ReactQuill
+                theme="snow"
+                value={hospitalDesc}
+                onChange={(e) => {
+                  setHospitalDesc(e);
+                  // propagate same value to every language field
+                  countryData.forEach((c) => {
+                    const procField = hospitalDescObj[
+                      c.language
+                    ] as HospitalDescFormSchemaType;
+                    setValue(procField as keyof EditHospitalFormFields, e);
+                  });
+                }}
+                className={`${errors ? 'outline-2 outline-error' : ''} w-full rounded-lg placeholder:text-sm placeholder:font-normal placeholder:text-neutral-3`}
+                placeholder="Enter hospital description"
+                id="hospital-description"
+              />
             </div>
 
             <div className="mt-7 flex flex-col">
@@ -802,7 +817,7 @@ function EditHospital({ params: { id } }: { params: { id: string } }) {
                     className="mb-3 font-poppins text-base font-normal text-neutral-2"
                     htmlFor="externalLink"
                   >
-                    External link
+                    Hospital website link
                   </label>
                   <input
                     className="w-full rounded-lg border-2 border-lightsilver px-4 py-2 placeholder:text-sm placeholder:font-normal placeholder:text-neutral-3"

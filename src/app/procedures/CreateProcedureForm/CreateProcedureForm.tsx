@@ -13,7 +13,6 @@ import type {
   CountryCode,
   Locale,
 } from '@/components/Modal/DepartmentModal/DepartmentModal';
-import departmentModalStyle from '@/components/Modal/DepartmentModal/departmentModal.module.scss';
 import procedureModalStyle from '@/components/Modal/ProcedureModal/procedureModal.module.scss';
 import type {
   NameJSONType,
@@ -22,7 +21,6 @@ import type {
 import { useGetAllDepartment } from '@/hooks/useDepartment';
 import { useCreateProcedure, useEditProcedure } from '@/hooks/useProcedure';
 import useScrollToError from '@/hooks/useScrollToError';
-import type { LanguagesType } from '@/types/components';
 import type {
   ProcedureSchemaType,
   ReimbusementSchemaType,
@@ -90,8 +88,6 @@ function CreateProcedureForm({
   } | null>(null);
   const editProcedure = useEditProcedure({ onClose });
   const allDepartment = useGetAllDepartment();
-  const [activeLanguageTab, setActiveLanguageTab] =
-    useState<LanguagesType>('English');
   const [createAnotherProcedure, setCreateAnotherProcedure] = useState(false);
   const [departmentList, setDepartmentList] = useState<Array<DepartmentType>>(
     [],
@@ -169,7 +165,6 @@ function CreateProcedureForm({
         ...reimbursementData,
       },
     });
-    setActiveLanguageTab('English');
     reset();
   };
   const handleEditProcedure = (data: ProcedureFormFields) => {
@@ -205,7 +200,6 @@ function CreateProcedureForm({
       },
     });
     setCreateAnotherProcedure(false);
-    setActiveLanguageTab('English');
     reset();
   };
 
@@ -304,7 +298,22 @@ function CreateProcedureForm({
       >
         Procedure name
       </p>
-      <div className={procedureModalStyle.languageTabContainer}>
+      <input
+        className="w-full rounded-lg border-2 border-lightsilver px-4 py-3"
+        style={{ marginBottom: '4px' }}
+        type="text"
+        // eslint-disable-next-line jsx-a11y/no-autofocus
+        autoFocus
+        placeholder="Enter procedure name"
+        onChange={(e) => {
+          const { value } = e.target;
+          Object.values(procedureObj).forEach((d) => {
+            // @ts-ignore
+            setValue(d as keyof ProcedureFormFields, value);
+          });
+        }}
+      />
+      {/* <div className={procedureModalStyle.languageTabContainer}>
         {countryData.map((data) => {
           const lang = procedureObj[data.language] as ProcedureFormSchemaType;
           return (
@@ -349,7 +358,7 @@ function CreateProcedureForm({
             )}
           </div>
         );
-      })}
+      })} */}
       {shouldRenderProcedureError && (
         <div className="mb-5 mt-1 text-start font-lexend text-base font-normal text-error">
           Fill in details in all the languages
@@ -413,7 +422,7 @@ function CreateProcedureForm({
           );
         })}
       </div>
-      {!isEdit && (
+      {/* {!isEdit && (
         <div style={{ marginTop: '64px', marginBottom: '28px' }}>
           <label className={departmentModalStyle.checkboxLabel}>
             <span className="absolute top-[-2px]">
@@ -431,7 +440,7 @@ function CreateProcedureForm({
             <span className={departmentModalStyle.checkmark} />
           </label>
         </div>
-      )}
+      )} */}
       {isEdit ? (
         <button
           className={`${editProcedure.isPending ? 'cursor-not-allowed bg-darkteal/60' : 'cursor-pointer bg-darkteal'} flex w-[280px] items-center justify-center rounded-lg px-4 py-[15px]`}

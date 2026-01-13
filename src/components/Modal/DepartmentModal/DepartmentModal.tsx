@@ -14,7 +14,6 @@ import { CloseIcon } from '@/components/Icons/Icons';
 import type { NameJSONType } from '@/hooks/useDepartment';
 import { useCreateDepartment, useEditDepartment } from '@/hooks/useDepartment';
 import useScrollToError from '@/hooks/useScrollToError';
-import type { LanguagesType } from '@/types/components';
 import { countryData } from '@/utils/global';
 
 import departmentModalStyle from './departmentModal.module.scss';
@@ -67,7 +66,6 @@ function DepartmentModal({
   selectedDepartment,
 }: DepartmentModalProps) {
   const {
-    register,
     handleSubmit,
     setValue,
     formState: { errors },
@@ -77,9 +75,7 @@ function DepartmentModal({
   });
 
   const editDept = useEditDepartment({ isSubCat: false, onClose });
-  const [activeLanguageTab, setActiveLanguageTab] =
-    useState<LanguagesType>('English');
-  const [isChecked, setIsChecked] = useState<boolean>(false);
+  const [isChecked] = useState<boolean>(false);
   const createDept = useCreateDepartment({
     isCreateSubCategory: false,
     closeModal: !isChecked ? onClose : null,
@@ -155,7 +151,7 @@ function DepartmentModal({
                 Department name
               </label>
 
-              <div className={departmentModalStyle.languageTabContainer}>
+              {/* <div className={departmentModalStyle.languageTabContainer}>
                 {countryData.map((data) => {
                   const lang = departmentObj[
                     data.language
@@ -182,9 +178,29 @@ function DepartmentModal({
                     </button>
                   );
                 })}
-              </div>
+              </div> */}
               <div className="mb-10 flex w-full flex-col items-start">
-                {countryData.map((c) => {
+                <input
+                  className="w-full rounded-lg border-2 border-lightsilver px-4 py-3"
+                  type="text"
+                  // eslint-disable-next-line jsx-a11y/no-autofocus
+                  autoFocus
+                  placeholder="Enter department name"
+                  onChange={(e) => {
+                    const { value } = e.target;
+                    // write the same value into every language field
+                    countryData.forEach((c) => {
+                      const key = departmentObj[
+                        c.language
+                      ] as DepartmentFormSchemaType;
+                      setValue(key, value, {
+                        shouldValidate: true,
+                        shouldDirty: true,
+                      });
+                    });
+                  }}
+                />
+                {/* {countryData.map((c) => {
                   const lang = departmentObj[
                     c.language
                   ] as DepartmentFormSchemaType;
@@ -202,7 +218,7 @@ function DepartmentModal({
                       )}
                     </div>
                   );
-                })}
+                })} */}
                 {shouldRenderProcedureError && (
                   <div className="mb-5 mt-1 text-start font-lexend text-base font-normal text-error">
                     Fill in details in all the languages
@@ -210,7 +226,7 @@ function DepartmentModal({
                 )}
               </div>
 
-              {!isEdit && (
+              {/* {!isEdit && (
                 <div className="relative mb-7 flex items-center">
                   <label className={departmentModalStyle.checkboxLabel}>
                     <span className="absolute top-[-2px]">
@@ -225,7 +241,7 @@ function DepartmentModal({
                     <span className={departmentModalStyle.checkmark} />
                   </label>
                 </div>
-              )}
+              )} */}
 
               {isEdit ? (
                 <button

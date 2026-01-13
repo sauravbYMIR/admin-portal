@@ -10,7 +10,6 @@ import { z } from 'zod';
 
 import { CloseIcon, FileUploadIcon } from '@/components/Icons/Icons';
 import ImageCropperModal from '@/components/ImageCropperModal/ImageCropperModal';
-import departmentModalStyle from '@/components/Modal/DepartmentModal/departmentModal.module.scss';
 import {
   useCreateHospitalMember,
   useEditHospitalMember,
@@ -18,7 +17,6 @@ import {
   useUpdateHospitalProfile,
 } from '@/hooks/useMember';
 import useScrollToError from '@/hooks/useScrollToError';
-import type { LanguagesType } from '@/types/components';
 import {
   countryData,
   handleFileSetter,
@@ -80,23 +78,18 @@ function CreateHospitalTeamMemberModal({
   const [isModalActive, setIsModalActive] = React.useState<boolean>(false);
   const editHospitalMember = useEditHospitalMember({ onClose, reset });
   const memberByIdDetails = useGetHospitalTeamMemberById({ id: memberId });
-  const [isAnotherMemberChecked, setIsAnotherMemberChecked] =
-    React.useState<boolean>(false);
+  const [isAnotherMemberChecked] = React.useState<boolean>(false);
   const createHospitalMember = useCreateHospitalMember({
     closeModal: !isAnotherMemberChecked ? onClose : null,
   });
   const updateHospitalProfile = useUpdateHospitalProfile();
-  const [activeLanguageTab, setActiveLanguageTab] =
-    React.useState<LanguagesType>('English');
-  const [activeLanguageQualificationTab, setActiveLanguageQualificationTab] =
-    React.useState<LanguagesType>('English');
 
-  const shouldRenderError = countryData.some((c) => {
-    const lang = positionObj[c.language] as PositionFormSchemaType;
-    return (
-      (errors as FormErrors)[lang] && (errors as FormErrors)[lang]?.message
-    );
-  });
+  // const shouldRenderError = countryData.some((c) => {
+  //   const lang = positionObj[c.language] as PositionFormSchemaType;
+  //   return (
+  //     (errors as FormErrors)[lang] && (errors as FormErrors)[lang]?.message
+  //   );
+  // });
   const shouldRenderQualificationError = countryData.some((c) => {
     const lang = qualificationObj[
       c.language
@@ -168,7 +161,6 @@ function CreateHospitalTeamMemberModal({
         hospitalId,
       });
     }
-    setActiveLanguageTab('English');
   };
   React.useEffect(() => {
     if (editHospitalMember.data && editHospitalMember.data.data) {
@@ -266,7 +258,7 @@ function CreateHospitalTeamMemberModal({
                 type="button"
                 onClick={() => {
                   onClose();
-                  setActiveLanguageTab('English');
+
                   reset();
                 }}
                 className="absolute right-2 top-10"
@@ -291,7 +283,7 @@ function CreateHospitalTeamMemberModal({
                   Position
                 </label>
 
-                <div className={modalStyle.languageTabContainer}>
+                {/* <div className={modalStyle.languageTabContainer}>
                   {countryData.map((data) => {
                     const lang = positionObj[
                       data.language
@@ -342,7 +334,35 @@ function CreateHospitalTeamMemberModal({
                   <small className="mb-5 mt-1 text-start font-lexend text-base font-normal text-error">
                     Fill in details in all the languages
                   </small>
-                )}
+                )} */}
+
+                <input
+                  {...register(
+                    positionObj.English as keyof CreateHospitalTeamMemberFormFields,
+                  )}
+                  // eslint-disable-next-line jsx-a11y/no-autofocus
+                  autoFocus
+                  className="w-full rounded-lg border-2 border-lightsilver px-4 py-3"
+                  type="text"
+                  id="position"
+                  onChange={(e) => {
+                    const { value } = e.target;
+                    // propagate same value to every language field
+                    countryData.forEach((c) => {
+                      const lang = positionObj[
+                        c.language
+                      ] as PositionFormSchemaType;
+                      setValue(
+                        lang as keyof CreateHospitalTeamMemberFormFields,
+                        value,
+                        {
+                          shouldValidate: true,
+                          shouldDirty: true,
+                        },
+                      );
+                    });
+                  }}
+                />
               </div>
               <div className="mb-8 flex w-full flex-col items-start">
                 <label
@@ -370,7 +390,7 @@ function CreateHospitalTeamMemberModal({
                 >
                   Qualification
                 </label>
-                <div className={modalStyle.languageTabContainer}>
+                {/* <div className={modalStyle.languageTabContainer}>
                   {countryData.map((data) => {
                     const lang = qualificationObj[
                       data.language
@@ -397,8 +417,8 @@ function CreateHospitalTeamMemberModal({
                       </button>
                     );
                   })}
-                </div>
-                {countryData.map((c) => {
+                </div> */}
+                {/* {countryData.map((c) => {
                   const lang = qualificationObj[
                     c.language
                   ] as HospitalQualificationFormSchemaType;
@@ -417,7 +437,36 @@ function CreateHospitalTeamMemberModal({
                       )}
                     </div>
                   );
-                })}
+                })} */}
+
+                <input
+                  // eslint-disable-next-line jsx-a11y/no-autofocus
+                  autoFocus
+                  className="w-full rounded-lg border-2 border-lightsilver px-4 py-3"
+                  type="text"
+                  id="qualification"
+                  {...register(
+                    qualificationObj.English as keyof CreateHospitalTeamMemberFormFields,
+                  )}
+                  // @ts-ignore
+                  onChange={(e) => {
+                    const { value } = e.target;
+                    // propagate same value to every language field
+                    countryData.forEach((c) => {
+                      const lang = qualificationObj[
+                        c.language
+                      ] as HospitalQualificationFormSchemaType;
+                      setValue(
+                        lang as keyof CreateHospitalTeamMemberFormFields,
+                        value,
+                        {
+                          shouldValidate: true,
+                          shouldDirty: true,
+                        },
+                      );
+                    });
+                  }}
+                />
 
                 {shouldRenderQualificationError && (
                   <small className="mb-5 mt-1 text-start font-lexend text-base font-normal text-error">
@@ -548,7 +597,7 @@ function CreateHospitalTeamMemberModal({
                   {errors.profile.message}
                 </small>
               )}
-              {!memberId && (
+              {/* {!memberId && (
                 <div className="mt-16">
                   <label
                     className={departmentModalStyle.checkboxLabel}
@@ -569,7 +618,7 @@ function CreateHospitalTeamMemberModal({
                     <span className={departmentModalStyle.checkmark} />
                   </label>
                 </div>
-              )}
+              )} */}
 
               <button
                 className={`${createHospitalMember.isPending || editHospitalMember.isPending ? 'cursor-not-allowed bg-darkteal/60' : 'cursor-pointer bg-darkteal'} mt-7 flex w-[280px] items-center justify-center rounded-lg px-4 py-[15px]`}

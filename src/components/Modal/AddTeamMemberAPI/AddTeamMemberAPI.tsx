@@ -9,7 +9,6 @@ import { toast } from 'sonner';
 import { z } from 'zod';
 
 import { CloseIcon } from '@/components/Icons/Icons';
-import departmentModalStyle from '@/components/Modal/DepartmentModal/departmentModal.module.scss';
 import { useGetHospitalTeamMembersByHospitalId } from '@/hooks';
 import type { NameJSONType } from '@/hooks/useDepartment';
 import {
@@ -17,7 +16,6 @@ import {
   useEditHospitalProcedureMember,
 } from '@/hooks/useHospitalProcedure';
 import useScrollToError from '@/hooks/useScrollToError';
-import type { LanguagesType } from '@/types/components';
 import { countryData } from '@/utils/global';
 
 import modalStyle from '../CreateHospitalTeamMemberModal/style.module.scss';
@@ -29,11 +27,11 @@ export const teamMemberTypeSchema = z.object({
 });
 
 export type HospitalTeamMemberSchemaType = `role${Capitalize<Locale>}`;
-type FormErrors = {
-  [key in HospitalTeamMemberSchemaType]?: { message?: string };
-} & {
-  teamMemberId?: { message?: string };
-};
+// type FormErrors = {
+//   [key in HospitalTeamMemberSchemaType]?: { message?: string };
+// } & {
+//   teamMemberId?: { message?: string };
+// };
 const RoleSchema = countryData.reduce(
   (acc, currValue) => {
     const schema =
@@ -125,8 +123,6 @@ export function AddTeamMemberAPI({
     value: string;
     name: string;
   } | null>(null);
-  const [activeLanguageTab, setActiveLanguageTab] =
-    React.useState<LanguagesType>('English');
   const {
     register,
     handleSubmit,
@@ -137,12 +133,12 @@ export function AddTeamMemberAPI({
   } = useForm<EditHospitalTeamMemberFormFields>({
     resolver: zodResolver(addTeamMemberFormSchema),
   });
-  const shouldRenderError = countryData.some((c) => {
-    const lang = roleObj[c.language] as HospitalTeamMemberSchemaType;
-    return (
-      (errors as FormErrors)[lang] && (errors as FormErrors)[lang]?.message
-    );
-  });
+  // const shouldRenderError = countryData.some((c) => {
+  //   const lang = roleObj[c.language] as HospitalTeamMemberSchemaType;
+  //   return (
+  //     (errors as FormErrors)[lang] && (errors as FormErrors)[lang]?.message
+  //   );
+  // });
   const addHospitalMemberToProcedure = useAddHospitalMemberToProcedure({
     hospitalProcedureId,
     onClose: addAnotherTeamMember ? null : onClose,
@@ -343,7 +339,7 @@ export function AddTeamMemberAPI({
                   Role
                 </label>
 
-                <div className={modalStyle.languageTabContainer}>
+                {/* <div className={modalStyle.languageTabContainer}>
                   {countryData.map((data) => {
                     const lang = roleObj[
                       data.language
@@ -394,17 +390,36 @@ export function AddTeamMemberAPI({
                   <small className="mb-5 mt-1 text-start font-lexend text-base font-normal text-error">
                     Fill in details in all the languages
                   </small>
-                )}
+                )} */}
+
+                <input
+                  // eslint-disable-next-line jsx-a11y/no-autofocus
+                  autoFocus
+                  className="w-full rounded-lg border-2 border-lightsilver px-4 py-3"
+                  type="text"
+                  id="position"
+                  // @ts-ignore
+                  {...register(roleObj.English as HospitalTeamMemberSchemaType)}
+                  onChange={(e) => {
+                    countryData.forEach((data) => {
+                      const lang = roleObj[
+                        data.language
+                      ] as HospitalTeamMemberSchemaType;
+                      // @ts-ignore
+                      setValue(lang, e.target.value);
+                    });
+                  }}
+                />
               </div>
 
-              {!isEditTeamMember && (
+              {/* {!isEditTeamMember && (
                 <div style={{ marginTop: '64px', marginBottom: '28px' }}>
                   <label
                     className={departmentModalStyle.checkboxLabel}
                     htmlFor="add-member-radio"
                   >
                     <span className="absolute top-[-2px]">
-                      Add another member
+                      Add another member1
                     </span>
                     <input
                       className={departmentModalStyle.checkboxStyle}
@@ -418,7 +433,7 @@ export function AddTeamMemberAPI({
                     <span className={departmentModalStyle.checkmark} />
                   </label>
                 </div>
-              )}
+              )} */}
               <button
                 className={`${addHospitalMemberToProcedure.isPending ? 'cursor-not-allowed bg-darkteal/60' : 'cursor-pointer bg-darkteal'} flex w-[280px] items-center justify-center rounded-lg px-4 py-[15px]`}
                 style={

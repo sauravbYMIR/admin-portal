@@ -141,24 +141,27 @@ function PatientsPage() {
               {
                 headerName: 'Procedure',
                 field: 'procedure',
-                filter: true,
-                floatingFilter: true,
+                filter: false,
+                floatingFilter: false,
                 flex: 1,
+                resizable: false,
               },
               {
                 headerName: 'Hospital',
                 field: 'hospital',
-                filter: true,
-                floatingFilter: true,
+                filter: false,
+                floatingFilter: false,
                 flex: 1,
+                resizable: false,
               },
               {
                 headerName: 'Status',
                 field: 'status',
-                filter: true,
-                floatingFilter: true,
+                filter: false,
+                floatingFilter: false,
                 flex: 1,
                 editable: true,
+                resizable: false,
                 cellStyle: (params: { data: { status: string } }) => {
                   switch (params.data.status) {
                     case REQUESTED:
@@ -185,6 +188,7 @@ function PatientsPage() {
               {
                 field: '',
                 flex: 1,
+                resizable: false,
                 cellRenderer: CustomStatusEditComponent,
               },
             ]}

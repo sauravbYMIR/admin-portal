@@ -8,7 +8,6 @@ import Select from 'react-select';
 import { ClipLoader } from 'react-spinners';
 import { z } from 'zod';
 
-import departmentModalStyle from '@/components/Modal/DepartmentModal/departmentModal.module.scss';
 import procedureModalStyle from '@/components/Modal/ProcedureModal/procedureModal.module.scss';
 import type { NameJSONType } from '@/hooks/useDepartment';
 import {
@@ -17,7 +16,6 @@ import {
   useGetAllDepartment,
 } from '@/hooks/useDepartment';
 import useScrollToError from '@/hooks/useScrollToError';
-import type { LanguagesType } from '@/types/components';
 import type { SubCategoryFormSchemaType } from '@/utils/global';
 import { countryData, subCategoryObj, SubCategorySchema } from '@/utils/global';
 
@@ -88,12 +86,8 @@ function CreateSubCategoryForm({
     closeModal: !createAnotherSubCategory ? onClose : null,
   });
 
-  const [activeLanguageTab, setActiveLanguageTab] =
-    useState<LanguagesType>('English');
-
   const {
     control,
-    register,
     handleSubmit,
     setValue,
     formState: { errors },
@@ -120,7 +114,6 @@ function CreateSubCategoryForm({
       },
       parentCategoryId: data.department.value,
     });
-    setActiveLanguageTab('English');
     reset();
   };
   const handleEditSubCategory = (data: SubCategoryFormFields) => {
@@ -142,7 +135,6 @@ function CreateSubCategoryForm({
       },
     });
     setCreateAnotherSubCategory(false);
-    setActiveLanguageTab('English');
     reset();
   };
 
@@ -233,7 +225,7 @@ function CreateSubCategoryForm({
         Sub-category
       </p>
 
-      <div className={procedureModalStyle.languageTabContainer}>
+      {/* <div className={procedureModalStyle.languageTabContainer}>
         {countryData.map((data) => {
           const lang = subCategoryObj[
             data.language
@@ -265,9 +257,28 @@ function CreateSubCategoryForm({
             </button>
           );
         })}
-      </div>
+      </div> */}
 
-      {countryData.map((c) => {
+      <input
+        // eslint-disable-next-line jsx-a11y/no-autofocus
+        autoFocus
+        className="w-full rounded-lg border-2 border-lightsilver px-4 py-3"
+        type="text"
+        placeholder="Enter sub-category name"
+        onChange={(e) => {
+          const { value } = e.target;
+          // write the same value into every language field
+          countryData.forEach((c) => {
+            const lang = subCategoryObj[
+              c.language
+            ] as SubCategoryFormWithDepSchemaType;
+            // @ts-ignore
+            setValue(lang, value, { shouldValidate: true, shouldDirty: true });
+          });
+        }}
+      />
+
+      {/* {countryData.map((c) => {
         const lang = subCategoryObj[
           c.language
         ] as SubCategoryFormWithDepSchemaType;
@@ -285,14 +296,14 @@ function CreateSubCategoryForm({
             )}
           </div>
         );
-      })}
+      })} */}
       {shouldRenderProcedureError && (
         <div className="mb-5 mt-1 text-start font-lexend text-base font-normal text-error">
           Fill in details in all the languages
         </div>
       )}
 
-      {!isEdit && (
+      {/* {!isEdit && (
         <div className="mb-7 mt-16">
           <label className={departmentModalStyle.checkboxLabel}>
             <span className="absolute top-[-2px]">
@@ -310,7 +321,7 @@ function CreateSubCategoryForm({
             <span className={departmentModalStyle.checkmark} />
           </label>
         </div>
-      )}
+      )} */}
 
       {isEdit ? (
         <button
@@ -333,7 +344,7 @@ function CreateSubCategoryForm({
         </button>
       ) : (
         <button
-          className={`${createDepartment.isPending ? 'cursor-not-allowed bg-darkteal/60' : 'cursor-pointer bg-darkteal'} flex w-[280px] items-center justify-center rounded-lg px-4 py-[15px]`}
+          className={`${createDepartment.isPending ? 'cursor-not-allowed bg-darkteal/60' : 'cursor-pointer bg-darkteal'} mt-4 flex w-[280px] items-center justify-center rounded-lg px-4 py-[15px]`}
           type="submit"
         >
           {createDepartment.isPending ? (

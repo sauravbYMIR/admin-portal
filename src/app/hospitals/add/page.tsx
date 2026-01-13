@@ -33,7 +33,6 @@ import {
   useUpdateHospitalLogo,
 } from '@/hooks';
 import useScrollToError from '@/hooks/useScrollToError';
-import type { LanguagesType } from '@/types/components';
 import {
   availableCountries,
   countryData,
@@ -114,8 +113,6 @@ function AddHospital() {
   const updateHospitalLogo = useUpdateHospitalLogo();
   const updateHospitalGallery = useUpdateHospitalGallery();
   const createHospital = useCreateHospital();
-  const [activeLanguageTab, setActiveLanguageTab] =
-    React.useState<LanguagesType>('English');
   const [selectedCountry, setSelectedCountry] = React.useState<{
     label: string;
     value: string;
@@ -125,13 +122,13 @@ function AddHospital() {
   });
   const [isActiveCancelModal, setIsActiveCancelModal] =
     React.useState<boolean>(false);
+  const [hospitalDesc, setHospitalDesc] = React.useState<string>('');
   const router = useRouter();
   const {
     register,
     control,
     reset,
     handleSubmit,
-    watch,
     setValue,
     formState: { errors },
   } = useForm<CreateHospitalFormFields>({
@@ -171,7 +168,6 @@ function AddHospital() {
       zipcode: data.zipCode,
       externalLink: data.externalLink ?? '',
     });
-    setActiveLanguageTab('English');
   };
   React.useEffect(() => {
     if (
@@ -370,7 +366,27 @@ function AddHospital() {
                 Hospital Description
               </label>
 
-              <div className={addHospitalStyle.langTabContainer}>
+              <ReactQuill
+                theme="snow"
+                value={hospitalDesc}
+                onChange={(content: string) => {
+                  setHospitalDesc(content);
+                  countryData.forEach((d) => {
+                    const key = hospitalDescObj[
+                      d.language
+                    ] as HospitalDescFormSchemaType;
+                    setValue(key as keyof CreateHospitalFormFields, content, {
+                      shouldValidate: true,
+                      shouldDirty: true,
+                    });
+                  });
+                }}
+                className={`${shouldRenderProcedureError ? 'outline-2 outline-error' : ''} w-full rounded-lg placeholder:text-sm placeholder:font-normal placeholder:text-neutral-3`}
+                placeholder="Enter hospital description"
+                id="hospital-description"
+              />
+
+              {/* <div className={addHospitalStyle.langTabContainer}>
                 {countryData.map((data) => {
                   const lang = hospitalDescObj[
                     data.language
@@ -430,7 +446,7 @@ function AddHospital() {
                 <small className="mt-1 text-start font-lexend text-sm font-normal text-error">
                   Fill in details in all the languages
                 </small>
-              )}
+              )} */}
             </div>
 
             <div className="mt-7 flex flex-col">
@@ -571,7 +587,7 @@ function AddHospital() {
                     className="mb-3 font-poppins text-base font-normal text-neutral-2"
                     htmlFor="externalLink"
                   >
-                    External link
+                    Hospital website link
                   </label>
                   <input
                     className="w-full rounded-lg border-2 border-lightsilver px-4 py-2 placeholder:text-sm placeholder:font-normal placeholder:text-neutral-3"

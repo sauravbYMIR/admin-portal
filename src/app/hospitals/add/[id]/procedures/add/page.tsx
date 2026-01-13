@@ -43,7 +43,6 @@ import {
 import { useGetAllProcedureByDeptId } from '@/hooks/useProcedure';
 import useScrollToError from '@/hooks/useScrollToError';
 import emptyTeamMember from '@/public/assets/images/emptyTeamMember.svg';
-import type { LanguagesType } from '@/types/components';
 import type { AvailableCurrencyType } from '@/utils/global';
 import {
   availableCountries,
@@ -61,18 +60,18 @@ import type {
   HospitalProcedureFormSchemaType,
 } from '../[procedureId]/edit/page';
 
-type FormErrors = {
-  [key in HospitalProcedureFormSchemaType]?: { message?: string };
-} & {
-  departmentName?: { message?: string };
-  procedureName?: { message?: string };
-  costType?: { message?: string };
-  cost?: { message?: string };
-  waitingTime?: { message?: string };
-  stayInHospital?: { message?: string };
-  stayInCity?: { message?: string };
-  gallery?: { message?: string };
-};
+// type FormErrors = {
+//   [key in HospitalProcedureFormSchemaType]?: { message?: string };
+// } & {
+//   departmentName?: { message?: string };
+//   procedureName?: { message?: string };
+//   costType?: { message?: string };
+//   cost?: { message?: string };
+//   waitingTime?: { message?: string };
+//   stayInHospital?: { message?: string };
+//   stayInCity?: { message?: string };
+//   gallery?: { message?: string };
+// };
 
 const createHospitalProcedureFormSchema = z.object({
   department: departmentTypeSchema,
@@ -187,10 +186,9 @@ function AddHospitalProcedure({ params }: { params: { id: string } }) {
   const allProcedureByDeptId = useGetAllProcedureByDeptId({
     id: selectedOption?.value ?? '',
   });
-  const [activeLanguageTab, setActiveLanguageTab] =
-    React.useState<LanguagesType>('English');
   const [isActiveCancelModal, setIsActiveCancelModal] =
     React.useState<boolean>(false);
+  const [procedureDesc, setProcedureDesc] = React.useState<string>('');
   const router = useRouter();
   const {
     register,
@@ -198,19 +196,18 @@ function AddHospitalProcedure({ params }: { params: { id: string } }) {
     reset,
     handleSubmit,
     formState: { errors },
-    watch,
     setValue,
   } = useForm<CreateHospitalProcedureFormFields>({
     resolver: zodResolver(createHospitalProcedureFormSchema),
   });
-  const shouldRenderProcedureError = countryData.some((c) => {
-    const lang = hospitalProcedureDescObj[
-      c.language
-    ] as HospitalProcedureFormSchemaType;
-    return (
-      (errors as FormErrors)[lang] && (errors as FormErrors)[lang]?.message
-    );
-  });
+  // const shouldRenderProcedureError = countryData.some((c) => {
+  //   const lang = hospitalProcedureDescObj[
+  //     c.language
+  //   ] as HospitalProcedureFormSchemaType;
+  //   return (
+  //     (errors as FormErrors)[lang] && (errors as FormErrors)[lang]?.message
+  //   );
+  // });
   const onFormSubmit: SubmitHandler<CreateHospitalProcedureFormFields> = (
     data: CreateHospitalProcedureFormFields,
   ) => {
@@ -252,7 +249,6 @@ function AddHospitalProcedure({ params }: { params: { id: string } }) {
         role: teamMemberInfo.role,
       })),
     });
-    setActiveLanguageTab('English');
   };
   React.useEffect(() => {
     if (
@@ -452,7 +448,7 @@ function AddHospitalProcedure({ params }: { params: { id: string } }) {
               Procedure Description
             </label>
 
-            <div className={addHospitalStyle.langTabContainer}>
+            {/* <div className={addHospitalStyle.langTabContainer}>
               {countryData.map((data) => {
                 const lang = hospitalProcedureDescObj[
                   data.language
@@ -511,7 +507,27 @@ function AddHospitalProcedure({ params }: { params: { id: string } }) {
               <small className="mb-5 mt-1 text-start font-lexend text-base font-normal text-error">
                 Fill in details in all the languages
               </small>
-            )}
+            )} */}
+
+            <ReactQuill
+              theme="snow"
+              value={procedureDesc}
+              onChange={(e) => {
+                setProcedureDesc(e);
+                countryData.forEach((d) => {
+                  const key = hospitalProcedureDescObj[
+                    d.language
+                  ] as HospitalProcedureFormSchemaType;
+                  setValue(key as keyof CreateHospitalProcedureFormFields, e, {
+                    shouldValidate: true,
+                    shouldDirty: true,
+                  });
+                });
+              }}
+              className={`${errors ? 'outline-2 outline-error' : ''} w-full rounded-lg placeholder:text-sm placeholder:font-normal placeholder:text-neutral-3`}
+              placeholder="Enter procedure description"
+              id="procedure-description"
+            />
           </div>
 
           <div className="grid w-full grid-cols-2 gap-x-10 gap-y-4">

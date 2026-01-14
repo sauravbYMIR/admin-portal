@@ -305,6 +305,8 @@ function CreateProcedureForm({
         // eslint-disable-next-line jsx-a11y/no-autofocus
         autoFocus
         placeholder="Enter procedure name"
+        // @ts-ignore
+        {...register('procedureEn')}
         onChange={(e) => {
           const { value } = e.target;
           Object.values(procedureObj).forEach((d) => {
@@ -361,7 +363,7 @@ function CreateProcedureForm({
       })} */}
       {shouldRenderProcedureError && (
         <div className="mb-5 mt-1 text-start font-lexend text-base font-normal text-error">
-          Fill in details in all the languages
+          Name is required
         </div>
       )}
       <div

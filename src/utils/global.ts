@@ -330,9 +330,7 @@ const ProcedureDescSchema = countryData.reduce(
   (acc, currValue) => {
     const schema =
       `procedureDesc${currValue.locale.charAt(0).toUpperCase()}${currValue.locale.slice(1)}` as HospitalProcedureFormSchemaType;
-    acc[schema] = z
-      .string()
-      .min(1, { message: 'Fill in details in all the languages' });
+    acc[schema] = z.string().min(1, { message: 'Description is required' });
     return acc;
   },
   {} as Record<HospitalProcedureFormSchemaType, z.ZodString>,
@@ -341,9 +339,7 @@ const ProcedureSchema = countryData.reduce(
   (acc, currValue) => {
     const schema =
       `procedure${currValue.locale.charAt(0).toUpperCase()}${currValue.locale.slice(1)}` as ProcedureSchemaType;
-    acc[schema] = z
-      .string()
-      .min(1, { message: 'Fill in details in all the languages' });
+    acc[schema] = z.string().min(1, { message: 'Details required' });
     return acc;
   },
   {} as Record<ProcedureSchemaType, z.ZodString>,
@@ -363,9 +359,7 @@ const SubCategorySchema = countryData.reduce(
   (acc, currValue) => {
     const schema =
       `subCategory${currValue.locale.charAt(0).toUpperCase()}${currValue.locale.slice(1)}` as SubCategoryFormSchemaType;
-    acc[schema] = z
-      .string()
-      .min(1, { message: 'Fill in details in all the languages' });
+    acc[schema] = z.string().min(1, { message: 'Details required' });
     return acc;
   },
   {} as Record<SubCategoryFormSchemaType, z.ZodString>,
@@ -374,9 +368,7 @@ const QualificationSchema = countryData.reduce(
   (acc, currValue) => {
     const schema =
       `qualification${currValue.locale.charAt(0).toUpperCase()}${currValue.locale.slice(1)}` as HospitalQualificationFormSchemaType;
-    acc[schema] = z
-      .string()
-      .min(1, { message: 'Fill in details in all the languages' });
+    acc[schema] = z.string().min(1, { message: 'Qualification is required' });
     return acc;
   },
   {} as Record<HospitalQualificationFormSchemaType, z.ZodString>,
@@ -385,9 +377,7 @@ const PositionSchema = countryData.reduce(
   (acc, currValue) => {
     const schema =
       `position${currValue.locale.charAt(0).toUpperCase()}${currValue.locale.slice(1)}` as PositionFormSchemaType;
-    acc[schema] = z
-      .string()
-      .min(1, { message: 'Fill in details in all the languages' });
+    acc[schema] = z.string().min(1, { message: 'Position is required' });
     return acc;
   },
   {} as Record<PositionFormSchemaType, z.ZodString>,
@@ -396,9 +386,7 @@ const RoleSchema = countryData.reduce(
   (acc, currValue) => {
     const schema =
       `role${currValue.locale.charAt(0).toUpperCase()}${currValue.locale.slice(1)}` as RoleFormSchemaType;
-    acc[schema] = z
-      .string()
-      .min(1, { message: 'Fill in details in all the languages' });
+    acc[schema] = z.string().min(1, { message: 'Role is required' });
     return acc;
   },
   {} as Record<RoleFormSchemaType, z.ZodString>,

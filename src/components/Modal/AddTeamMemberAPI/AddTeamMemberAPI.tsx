@@ -27,18 +27,16 @@ export const teamMemberTypeSchema = z.object({
 });
 
 export type HospitalTeamMemberSchemaType = `role${Capitalize<Locale>}`;
-// type FormErrors = {
-//   [key in HospitalTeamMemberSchemaType]?: { message?: string };
-// } & {
-//   teamMemberId?: { message?: string };
-// };
+type FormErrors = {
+  [key in HospitalTeamMemberSchemaType]?: { message?: string };
+} & {
+  teamMemberId?: { message?: string };
+};
 const RoleSchema = countryData.reduce(
   (acc, currValue) => {
     const schema =
       `role${currValue.locale.charAt(0).toUpperCase()}${currValue.locale.slice(1)}` as HospitalTeamMemberSchemaType;
-    acc[schema] = z
-      .string()
-      .min(1, { message: 'Fill in details in all the languages' });
+    acc[schema] = z.string().min(1, { message: 'Role is required' });
     return acc;
   },
   {} as Record<HospitalTeamMemberSchemaType, z.ZodString>,
@@ -133,12 +131,12 @@ export function AddTeamMemberAPI({
   } = useForm<EditHospitalTeamMemberFormFields>({
     resolver: zodResolver(addTeamMemberFormSchema),
   });
-  // const shouldRenderError = countryData.some((c) => {
-  //   const lang = roleObj[c.language] as HospitalTeamMemberSchemaType;
-  //   return (
-  //     (errors as FormErrors)[lang] && (errors as FormErrors)[lang]?.message
-  //   );
-  // });
+  const shouldRenderError = countryData.some((c) => {
+    const lang = roleObj[c.language] as HospitalTeamMemberSchemaType;
+    return (
+      (errors as FormErrors)[lang] && (errors as FormErrors)[lang]?.message
+    );
+  });
   const addHospitalMemberToProcedure = useAddHospitalMemberToProcedure({
     hospitalProcedureId,
     onClose: addAnotherTeamMember ? null : onClose,
@@ -384,13 +382,13 @@ export function AddTeamMemberAPI({
                       )}
                     </div>
                   );
-                })}
+                })} */}
 
                 {shouldRenderError && (
                   <small className="mb-5 mt-1 text-start font-lexend text-base font-normal text-error">
-                    Fill in details in all the languages
+                    Role is required
                   </small>
-                )} */}
+                )}
 
                 <input
                   // eslint-disable-next-line jsx-a11y/no-autofocus

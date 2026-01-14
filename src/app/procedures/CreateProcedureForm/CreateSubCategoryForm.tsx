@@ -90,6 +90,7 @@ function CreateSubCategoryForm({
     control,
     handleSubmit,
     setValue,
+    register,
     formState: { errors },
     reset,
   } = useForm<SubCategoryFormFields>({
@@ -265,6 +266,8 @@ function CreateSubCategoryForm({
         className="w-full rounded-lg border-2 border-lightsilver px-4 py-3"
         type="text"
         placeholder="Enter sub-category name"
+        // @ts-ignore
+        {...register('subCategoryEn')}
         onChange={(e) => {
           const { value } = e.target;
           // write the same value into every language field
@@ -299,7 +302,7 @@ function CreateSubCategoryForm({
       })} */}
       {shouldRenderProcedureError && (
         <div className="mb-5 mt-1 text-start font-lexend text-base font-normal text-error">
-          Fill in details in all the languages
+          Sub category is required
         </div>
       )}
 

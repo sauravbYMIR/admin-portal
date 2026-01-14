@@ -400,7 +400,7 @@ function EditHospitalProcedure({
 
             {shouldRenderProcedureError && (
               <small className="mb-5 mt-1 text-start font-lexend text-base font-normal text-error">
-                Fill in details in all the languages
+                Description is required
               </small>
             )}
           </div>

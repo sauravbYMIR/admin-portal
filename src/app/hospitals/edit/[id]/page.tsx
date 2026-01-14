@@ -84,19 +84,19 @@ const editHospitalFormSchema = z.object({
     .max(10, 'You can upload up to 10 images')
     .optional(),
 });
-// type FormErrors = {
-//   [key in HospitalDescFormSchemaType]?: { message?: string };
-// } & {
-//   hospitalName?: { message?: string };
-//   streetName?: { message?: string };
-//   city?: { message?: string };
-//   externalLink?: { message?: string };
-//   country?: { message?: string };
-//   streetNumber?: { message?: string };
-//   zipCode?: { message?: string };
-//   logo?: { message?: string };
-//   gallery?: { message?: string };
-// };
+type FormErrors = {
+  [key in HospitalDescFormSchemaType]?: { message?: string };
+} & {
+  hospitalName?: { message?: string };
+  streetName?: { message?: string };
+  city?: { message?: string };
+  externalLink?: { message?: string };
+  country?: { message?: string };
+  streetNumber?: { message?: string };
+  zipCode?: { message?: string };
+  logo?: { message?: string };
+  gallery?: { message?: string };
+};
 export type EditHospitalFormFields = z.infer<typeof editHospitalFormSchema>;
 function EditHospital({ params: { id } }: { params: { id: string } }) {
   const ReactQuill = React.useMemo(
@@ -143,12 +143,12 @@ function EditHospital({ params: { id } }: { params: { id: string } }) {
   const [logoImg, setLogoImg] = React.useState<File | null>(null);
   const [isModalActiveLogo, setIsModalActiveLogo] =
     React.useState<boolean>(false);
-  // const shouldRenderProcedureError = countryData.some((c) => {
-  //   const lang = hospitalDescObj[c.language] as HospitalDescFormSchemaType;
-  //   return (
-  //     (errors as FormErrors)[lang] && (errors as FormErrors)[lang]?.message
-  //   );
-  // });
+  const shouldRenderProcedureError = countryData.some((c) => {
+    const lang = hospitalDescObj[c.language] as HospitalDescFormSchemaType;
+    return (
+      (errors as FormErrors)[lang] && (errors as FormErrors)[lang]?.message
+    );
+  });
   const handleCheckIsNoOfImagesValid = (
     galleryImage: File[] | null | undefined,
     minimumNoOfImages: number,
@@ -660,13 +660,13 @@ function EditHospital({ params: { id } }: { params: { id: string } }) {
                     )}
                   </div>
                 );
-              })}
+              })} */}
 
               {shouldRenderProcedureError && (
                 <small className="mb-5 mt-1 text-start font-lexend text-base font-normal text-error">
-                  Fill in details in all the languages
+                  Description is required
                 </small>
-              )} */}
+              )}
               <ReactQuill
                 theme="snow"
                 value={hospitalDesc}

@@ -440,13 +440,13 @@ function AddHospital() {
                     )}
                   </div>
                 );
-              })}
+              })} */}
 
               {shouldRenderProcedureError && (
                 <small className="mt-1 text-start font-lexend text-sm font-normal text-error">
-                  Fill in details in all the languages
+                  Description is required
                 </small>
-              )} */}
+              )}
             </div>
 
             <div className="mt-7 flex flex-col">

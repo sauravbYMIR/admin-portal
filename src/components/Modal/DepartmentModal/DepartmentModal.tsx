@@ -34,9 +34,7 @@ const departmentObj = countryData.reduce(
 const DepartmentNameSchema = countryData.reduce(
   (acc, currValue) => {
     const schema = `name${currValue.locale.charAt(0).toUpperCase()}${currValue.locale.slice(1)}`;
-    acc[schema] = z
-      .string()
-      .min(1, { message: 'Fill in details in all the languages' });
+    acc[schema] = z.string().min(1, { message: 'Department name is required' });
     return acc;
   },
   {} as Record<string, z.ZodString>,
@@ -67,6 +65,7 @@ function DepartmentModal({
 }: DepartmentModalProps) {
   const {
     handleSubmit,
+    register,
     setValue,
     formState: { errors },
     reset,
@@ -102,6 +101,7 @@ function DepartmentModal({
         departmentId: updateId,
       });
       reset();
+      return;
     }
     createDept.mutate({
       name: { ...nameData },
@@ -128,6 +128,7 @@ function DepartmentModal({
           <div className={departmentModalStyle.modal}>
             <div className={departmentModalStyle.modalHeader}>
               <h2 className="font-poppins text-lg font-semibold text-neutral-1">
+                {isEdit.toString()}
                 {isEdit ? 'Edit department' : 'Create a department'}
               </h2>
 
@@ -186,6 +187,10 @@ function DepartmentModal({
                   // eslint-disable-next-line jsx-a11y/no-autofocus
                   autoFocus
                   placeholder="Enter department name"
+                  // @ts-ignore
+                  {...register(
+                    departmentObj.English as DepartmentFormSchemaType,
+                  )}
                   onChange={(e) => {
                     const { value } = e.target;
                     // write the same value into every language field
@@ -221,7 +226,7 @@ function DepartmentModal({
                 })} */}
                 {shouldRenderProcedureError && (
                   <div className="mb-5 mt-1 text-start font-lexend text-base font-normal text-error">
-                    Fill in details in all the languages
+                    Despartment name is required
                   </div>
                 )}
               </div>

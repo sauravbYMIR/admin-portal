@@ -84,12 +84,12 @@ function CreateHospitalTeamMemberModal({
   });
   const updateHospitalProfile = useUpdateHospitalProfile();
 
-  // const shouldRenderError = countryData.some((c) => {
-  //   const lang = positionObj[c.language] as PositionFormSchemaType;
-  //   return (
-  //     (errors as FormErrors)[lang] && (errors as FormErrors)[lang]?.message
-  //   );
-  // });
+  const shouldRenderError = countryData.some((c) => {
+    const lang = positionObj[c.language] as PositionFormSchemaType;
+    return (
+      (errors as FormErrors)[lang] && (errors as FormErrors)[lang]?.message
+    );
+  });
   const shouldRenderQualificationError = countryData.some((c) => {
     const lang = qualificationObj[
       c.language
@@ -328,13 +328,13 @@ function CreateHospitalTeamMemberModal({
                       )}
                     </div>
                   );
-                })}
+                })} */}
 
                 {shouldRenderError && (
                   <small className="mb-5 mt-1 text-start font-lexend text-base font-normal text-error">
-                    Fill in details in all the languages
+                    Position is required
                   </small>
-                )} */}
+                )}
 
                 <input
                   {...register(
@@ -470,7 +470,7 @@ function CreateHospitalTeamMemberModal({
 
                 {shouldRenderQualificationError && (
                   <small className="mb-5 mt-1 text-start font-lexend text-base font-normal text-error">
-                    Fill in details in all the languages
+                    Qualification is required
                   </small>
                 )}
               </div>

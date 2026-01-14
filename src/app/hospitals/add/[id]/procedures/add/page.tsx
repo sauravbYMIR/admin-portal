@@ -60,18 +60,18 @@ import type {
   HospitalProcedureFormSchemaType,
 } from '../[procedureId]/edit/page';
 
-// type FormErrors = {
-//   [key in HospitalProcedureFormSchemaType]?: { message?: string };
-// } & {
-//   departmentName?: { message?: string };
-//   procedureName?: { message?: string };
-//   costType?: { message?: string };
-//   cost?: { message?: string };
-//   waitingTime?: { message?: string };
-//   stayInHospital?: { message?: string };
-//   stayInCity?: { message?: string };
-//   gallery?: { message?: string };
-// };
+type FormErrors = {
+  [key in HospitalProcedureFormSchemaType]?: { message?: string };
+} & {
+  departmentName?: { message?: string };
+  procedureName?: { message?: string };
+  costType?: { message?: string };
+  cost?: { message?: string };
+  waitingTime?: { message?: string };
+  stayInHospital?: { message?: string };
+  stayInCity?: { message?: string };
+  gallery?: { message?: string };
+};
 
 const createHospitalProcedureFormSchema = z.object({
   department: departmentTypeSchema,
@@ -200,14 +200,14 @@ function AddHospitalProcedure({ params }: { params: { id: string } }) {
   } = useForm<CreateHospitalProcedureFormFields>({
     resolver: zodResolver(createHospitalProcedureFormSchema),
   });
-  // const shouldRenderProcedureError = countryData.some((c) => {
-  //   const lang = hospitalProcedureDescObj[
-  //     c.language
-  //   ] as HospitalProcedureFormSchemaType;
-  //   return (
-  //     (errors as FormErrors)[lang] && (errors as FormErrors)[lang]?.message
-  //   );
-  // });
+  const shouldRenderProcedureError = countryData.some((c) => {
+    const lang = hospitalProcedureDescObj[
+      c.language
+    ] as HospitalProcedureFormSchemaType;
+    return (
+      (errors as FormErrors)[lang] && (errors as FormErrors)[lang]?.message
+    );
+  });
   const onFormSubmit: SubmitHandler<CreateHospitalProcedureFormFields> = (
     data: CreateHospitalProcedureFormFields,
   ) => {
@@ -501,13 +501,13 @@ function AddHospitalProcedure({ params }: { params: { id: string } }) {
                   )}
                 </div>
               );
-            })}
+            })} */}
 
             {shouldRenderProcedureError && (
               <small className="mb-5 mt-1 text-start font-lexend text-base font-normal text-error">
-                Fill in details in all the languages
+                Description is required
               </small>
-            )} */}
+            )}
 
             <ReactQuill
               theme="snow"

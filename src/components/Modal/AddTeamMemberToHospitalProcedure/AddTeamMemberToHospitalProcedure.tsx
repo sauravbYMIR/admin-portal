@@ -10,7 +10,7 @@ import { CloseIcon } from '@/components/Icons/Icons';
 import { useGetHospitalTeamMembersByHospitalId } from '@/hooks';
 import type { NameJSONType } from '@/hooks/useDepartment';
 import useScrollToError from '@/hooks/useScrollToError';
-import { roleObj, RoleSchema } from '@/utils/global';
+import { countryData, roleObj, RoleSchema } from '@/utils/global';
 
 import modalStyle from '../CreateHospitalTeamMemberModal/style.module.scss';
 import type { Locale } from '../DepartmentModal/DepartmentModal';
@@ -27,11 +27,11 @@ const addTeamMemberFormSchema = z.object({
   ...RoleSchema,
 });
 
-// type FormErrors = {
-//   [key in RoleFormSchemaType]?: { message?: string };
-// } & {
-//   teamMemberId?: { message?: string };
-// };
+type FormErrors = {
+  [key in RoleFormSchemaType]?: { message?: string };
+} & {
+  teamMemberId?: { message?: string };
+};
 export type CreateHospitalTeamMemberFormFields = z.infer<
   typeof addTeamMemberFormSchema
 >;
@@ -114,12 +114,12 @@ export function AddTeamMemberToHospitalProcedure({
   } = useForm<CreateHospitalTeamMemberFormFields>({
     resolver: zodResolver(addTeamMemberFormSchema),
   });
-  // const shouldRenderError = countryData.some((c) => {
-  //   const lang = roleObj[c.language] as RoleFormSchemaType;
-  //   return (
-  //     (errors as FormErrors)[lang] && (errors as FormErrors)[lang]?.message
-  //   );
-  // });
+  const shouldRenderError = countryData.some((c) => {
+    const lang = roleObj[c.language] as RoleFormSchemaType;
+    return (
+      (errors as FormErrors)[lang] && (errors as FormErrors)[lang]?.message
+    );
+  });
   const onFormSubmit: SubmitHandler<CreateHospitalTeamMemberFormFields> = (
     data: CreateHospitalTeamMemberFormFields,
   ) => {
@@ -270,7 +270,7 @@ export function AddTeamMemberToHospitalProcedure({
                   className="font-poppins text-base font-normal text-neutral-2"
                   htmlFor="position"
                 >
-                  Role1
+                  Role
                 </label>
 
                 {/* <div className={modalStyle.languageTabContainer}>
@@ -314,13 +314,13 @@ export function AddTeamMemberToHospitalProcedure({
                       )}
                     </div>
                   );
-                })}
+                })} */}
 
                 {shouldRenderError && (
                   <small className="mb-5 mt-1 text-start font-lexend text-base font-normal text-error">
-                    Fill in details in all the languages
+                    Role is required
                   </small>
-                )} */}
+                )}
 
                 <input
                   // eslint-disable-next-line jsx-a11y/no-autofocus

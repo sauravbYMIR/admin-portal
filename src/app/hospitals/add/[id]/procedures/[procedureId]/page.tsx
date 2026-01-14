@@ -36,18 +36,10 @@ export type HospitalFormSchemaType =
 
 const createHospitalFormSchema = z.object({
   hospitalName: z.string().min(1, { message: 'Hospital name is required' }),
-  hospitalDescEn: z
-    .string()
-    .min(1, { message: 'Fill in details in all the languages' }),
-  hospitalDescNb: z
-    .string()
-    .min(1, { message: 'Fill in details in all the languages' }),
-  hospitalDescDa: z
-    .string()
-    .min(1, { message: 'Fill in details in all the languages' }),
-  hospitalDescSv: z
-    .string()
-    .min(1, { message: 'Fill in details in all the languages' }),
+  hospitalDescEn: z.string().min(1, { message: 'Description is required' }),
+  hospitalDescNb: z.string().min(1, { message: 'Description is required' }),
+  hospitalDescDa: z.string().min(1, { message: 'Description is required' }),
+  hospitalDescSv: z.string().min(1, { message: 'Description is required' }),
   streetName: z.string().min(1, { message: 'Street name is required' }),
   city: z.string().min(1, { message: 'City is required' }),
   country: z.string().min(1, { message: 'Country is required' }),

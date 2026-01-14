@@ -39,18 +39,10 @@ const teamMemberTypeSchema = z.object({
 });
 
 const createHospitalTeamMemberFormSchema = z.object({
-  roleEn: z
-    .string()
-    .min(1, { message: 'Fill in details in all the languages' }),
-  roleNb: z
-    .string()
-    .min(1, { message: 'Fill in details in all the languages' }),
-  roleDa: z
-    .string()
-    .min(1, { message: 'Fill in details in all the languages' }),
-  roleSv: z
-    .string()
-    .min(1, { message: 'Fill in details in all the languages' }),
+  roleEn: z.string().min(1, { message: 'Details required' }),
+  roleNb: z.string().min(1, { message: 'Details required' }),
+  roleDa: z.string().min(1, { message: 'Details required' }),
+  roleSv: z.string().min(1, { message: 'Details required' }),
   member: teamMemberTypeSchema,
 });
 export type CreateHospitalTeamMemberFormFields = z.infer<
